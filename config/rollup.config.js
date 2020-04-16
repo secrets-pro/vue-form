@@ -13,17 +13,18 @@ let baseconfig = (format) => {
       },
       extend: true,
       format,
+      sourceMap: true,
       file:
         format === "iife" ? "dist/vue-form.js" : `dist/vue-form.${format}.js`,
     },
     external: ["vue", "lodash"],
     plugins: [
-      uglify(),
       resolve(),
       babel({
         //exclude: "node_modules/**", // 只编译我们的源代码
       }),
       vueplugin({ css: true }),
+      uglify(),
     ],
   };
 };

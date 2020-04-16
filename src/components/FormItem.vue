@@ -19,11 +19,6 @@ export default {
       currentValue: this.value,
     };
   },
-  methods: {
-    input(key, value) {
-      console.log(key, value);
-    },
-  },
   render(h) {
     let type = this.config.type;
     let props = {
@@ -66,22 +61,45 @@ export default {
     if (type === "object") {
       return h(
         "div",
-        {},
-        Object.keys(this.currentValue).map((el) => {
-          return h("vue-form-item", {
-            props: {
-              prop: `${this.prop}.${el}`,
-              value: this.currentValue[el],
-              config: this.config.properties[el],
-            },
-            on: {
-              input: (value) => {
-                console.log(value);
-                this.currentValue[el] = value;
+        {
+          style: {
+            display: "flex",
+          },
+        },
+        [
+          h(
+            "div",
+            {
+              class: ["el-form-item__label"],
+              style: {
+                width: "100px",
               },
             },
-          });
-        })
+            this.config.title
+          ),
+          h(
+            "div",
+            {
+              style: {
+                flex: 1,
+              },
+            },
+            Object.keys(this.currentValue).map((el) => {
+              return h("vue-form-item", {
+                props: {
+                  prop: `${this.prop}.${el}`,
+                  value: this.currentValue[el],
+                  config: this.config.properties[el],
+                },
+                on: {
+                  input: (value) => {
+                    this.currentValue[el] = value;
+                  },
+                },
+              });
+            })
+          ),
+        ]
       );
     }
     return h(

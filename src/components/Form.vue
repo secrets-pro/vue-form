@@ -39,7 +39,7 @@
 <script>
 /* eslint-disable no-unused-vars */
 const letters = "abcdefghijklmn".split("");
-import { set, get } from "lodash";
+const { set, get } = require("lodash");
 // import util from "element-ui/lib/utils/date.js";
 import FormItemPlugin from "./FormItem.vue";
 const util = require("element-ui/lib/utils/date.js");
@@ -210,7 +210,6 @@ export default {
       model = this.setModel(this.currentScheme, rules);
       this.rules = rules;
       this.currentModel = model;
-      console.log(model, rules);
     },
   },
 };
