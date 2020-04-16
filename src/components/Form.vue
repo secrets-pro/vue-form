@@ -40,8 +40,9 @@
 /* eslint-disable no-unused-vars */
 const letters = "abcdefghijklmn".split("");
 import { set, get } from "lodash";
-import util from "element-ui/lib/utils/date.js";
-import FormItemPlugin from "./FormItem";
+// import util from "element-ui/lib/utils/date.js";
+import FormItemPlugin from "./FormItem.vue";
+const util = require("element-ui/lib/utils/date.js");
 export default {
   components: { "form-item-plugin": FormItemPlugin },
   name: "vue-form",
