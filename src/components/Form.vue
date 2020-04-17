@@ -12,26 +12,11 @@
         </el-row>
       </template>-->
       <template v-for="(prop, key) in this.currentScheme.properties">
-        <form-item-plugin
-          v-model="currentModel[key]"
-          :config="prop"
-          :prop="key"
-          :key="key"
-        ></form-item-plugin>
+        <form-item-plugin v-model="currentModel[key]" :config="prop" :prop="key" :key="key"></form-item-plugin>
       </template>
       <div style="text-align:right;padding-right:12px;" v-if="schema.buttons">
-        <el-button
-          type="success"
-          @click="confirm"
-          v-show="schema.buttons.includes('confirm')"
-          >确定</el-button
-        >
-        <el-button
-          type="default"
-          @click="reset"
-          v-show="schema.buttons.includes('reset')"
-          >重置</el-button
-        >
+        <el-button type="success" @click="confirm" v-show="schema.buttons.includes('confirm')">确定</el-button>
+        <el-button type="default" @click="reset" v-show="schema.buttons.includes('reset')">重置</el-button>
       </div>
     </el-form>
   </div>
@@ -52,8 +37,8 @@ export default {
       type: Object,
       default() {
         return {};
-      },
-    },
+      }
+    }
   },
 
   mounted() {
@@ -75,13 +60,13 @@ export default {
             Object.keys(this.currentModel).length /
               (24 / (this.schema.layout.span || 8))
           );
-    },
+    }
   },
   watch: {
     schema(n) {
       this.currentScheme = n;
       this.validateScheme();
-    },
+    }
   },
   data() {
     return {
@@ -89,7 +74,7 @@ export default {
       currentModel: {},
       formId: this.randomId(),
 
-      rules: {},
+      rules: {}
     };
   },
   methods: {
@@ -110,7 +95,7 @@ export default {
     },
     getData() {
       return {
-        ...this.currentModel,
+        ...this.currentModel
       };
     },
     randomId() {
@@ -118,15 +103,15 @@ export default {
       return y
         .substring(6)
         .split("")
-        .map((el) => letters[el])
+        .map(el => letters[el])
         .join("");
     },
     validate() {
       return new Promise((resolve, reject) => {
-        this.$refs[this.formId].validate((el) => {
+        this.$refs[this.formId].validate(el => {
           if (el) {
             let model = { ...this.currentModel };
-            Object.keys(model).forEach((el) => {
+            Object.keys(model).forEach(el => {
               let value = model[el];
               if (value instanceof Date) {
                 model[el] = util.format(value, "yyyy-MM-dd");
@@ -149,11 +134,31 @@ export default {
     reset() {
       this.$refs[this.formId].resetFields();
     },
+    setArrayModal(currentScheme, rules, parentProp) {
+      let model = [];
+      const { items } = currentScheme;
+
+      let _value = [];
+      if (items.type === "string") {
+        _value.push("");
+      }
+      if (items.type === "boolean") {
+        _value.push(true);
+      } else if (items.type === "number" || items.type === "integer") {
+        _value.push(0);
+      } else if (items.type === "object") {
+        let itemproperties = items.properties;
+        let obj = this.setModel(items, {}, parentProp);
+
+        _value.push(obj);
+      }
+      return _value;
+    },
     setModel(currentScheme, rules, parentProp) {
       const { properties, required } = currentScheme;
       let model = {};
       let props = Object.keys(properties);
-      props.forEach((el) => {
+      props.forEach(el => {
         let prop = el;
         let config = properties[el];
         let defaultValue = this.model[el] || config.defaultValue;
@@ -163,6 +168,14 @@ export default {
           set(model, prop, defaultValue || []);
           if (prop.indexOf(".") > -1) {
             model[prop] = defaultValue || [];
+          }
+        } else if (config.type === "array") {
+          // 数组类型
+          // 设置默认的格式 config.items
+          let _value = this.setArrayModal(config, rules, prop);
+          set(model, prop, defaultValue || _value);
+          if (prop.indexOf(".") > -1) {
+            model[prop] = defaultValue || _value;
           }
         } else {
           // model[prop] = defaultValue || null;
@@ -177,16 +190,17 @@ export default {
         } else {
           let ruleType = {
             checkbox: "array",
+            array: "array",
             number: "number",
             date: "date",
-            switch: "boolean",
+            switch: "boolean"
           };
           let baseRule = [
             {
               required: required ? required.includes(prop) : false,
               type: ruleType[config.type] || "string",
-              message: config.description || `请输入${config.title || prop}`,
-            },
+              message: config.description || `请输入${config.title || prop}`
+            }
           ];
           // 更多校验规则
           this.$set(
@@ -200,7 +214,7 @@ export default {
     },
     validateScheme() {
       if (!this.currentScheme) {
-        throw new Error("请配置scheme");
+        throw new Error("请配置schema");
       }
       // 解析 shceme
       const { properties, required } = this.currentScheme;
@@ -210,8 +224,10 @@ export default {
       model = this.setModel(this.currentScheme, rules);
       this.rules = rules;
       this.currentModel = model;
-    },
-  },
+      console.log(model);
+      console.log(rules);
+    }
+  }
 };
 </script>
 <style lang="less">
