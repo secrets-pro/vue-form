@@ -26,15 +26,13 @@
           size="mini"
           @click="confirm"
           v-show="schema.buttons.includes('confirm')"
-          >确定</el-button
-        >
+        >确定</el-button>
         <el-button
           type="default"
           size="mini"
           @click="reset"
           v-show="schema.buttons.includes('reset')"
-          >重置</el-button
-        >
+        >重置</el-button>
       </div>
     </el-form>
   </div>
@@ -55,8 +53,8 @@ export default {
       type: Object,
       default() {
         return {};
-      },
-    },
+      }
+    }
   },
 
   mounted() {
@@ -78,13 +76,13 @@ export default {
             Object.keys(this.currentModel).length /
               (24 / (this.schema.layout.span || 8))
           );
-    },
+    }
   },
   watch: {
     schema(n) {
       this.currentScheme = n;
       this.validateScheme();
-    },
+    }
   },
   data() {
     return {
@@ -93,6 +91,7 @@ export default {
       formId: this.randomId(),
 
       rules: {},
+      special: []
     };
   },
   methods: {
@@ -112,24 +111,35 @@ export default {
       }
     },
     getData() {
-      return {
-        ...this.currentModel,
+      let obj = {
+        ...this.currentModel
       };
+      if (this.special.length) {
+        this.special.forEach(el => {
+          let v = obj[el];
+          let value = {};
+          v.forEach(els => {
+            value[els.key] = els.value;
+          });
+          obj[el] = value;
+        });
+      }
+      return obj;
     },
     randomId() {
       let y = new Date().getTime() + "";
       return y
         .substring(6)
         .split("")
-        .map((el) => letters[el])
+        .map(el => letters[el])
         .join("");
     },
     validate() {
       return new Promise((resolve, reject) => {
-        this.$refs[this.formId].validate((el) => {
+        this.$refs[this.formId].validate(el => {
           if (el) {
             let model = { ...this.currentModel };
-            Object.keys(model).forEach((el) => {
+            Object.keys(model).forEach(el => {
               let value = model[el];
               if (value instanceof Date) {
                 model[el] = util.format(value, "yyyy-MM-dd");
@@ -172,14 +182,10 @@ export default {
       return _value;
     },
     setModel(currentScheme, rules, parentProp) {
-      const { properties, required } = currentScheme;
+      let { properties, required } = currentScheme;
       let model = {};
-
-      if (!properties) {
-        throw new Error(`类型为object的属性${parentProp}没有properties配置`);
-      }
       let props = Object.keys(properties);
-      props.forEach((el) => {
+      props.forEach(el => {
         let prop = el;
         let config = properties[el];
         let defaultValue =
@@ -206,25 +212,51 @@ export default {
             model[prop] = defaultValue;
           }
         }
-        if (config.type === "object") {
+        if (config.type === "object" && config.properties) {
           // model.prop =
           model[prop] = this.setModel(config, rules, prop);
+        } else if (config.type === "object" && !config.properties) {
+          // debugger;
+          // currentScheme.type = "array";
+          this.special.push(prop);
+          let properties = {
+            key: {
+              type: "string",
+              title: "键"
+            },
+            value: {
+              type: "string",
+              title: "值"
+            }
+          };
+          config.type = "array";
+          config.items = {
+            type: "object",
+            properties
+          };
+          let _value = this.setArrayModal(config, rules, prop);
+          set(model, prop, defaultValue || _value);
+          if (prop.indexOf(".") > -1) {
+            model[prop] = defaultValue || _value;
+          }
+          // throw new Error(`类型为object的属性${parentProp}没有properties配置`);
         } else {
           let ruleType = {
             checkbox: "array",
             array: "array",
             number: "number",
+            integer: "number",
             date: "date",
             switch: "boolean",
-            boolean: "boolean",
+            boolean: "boolean"
           };
           if (config.type !== "array") {
             let baseRule = [
               {
                 required: required ? required.includes(prop) : false,
                 type: ruleType[config.type] || "string",
-                message: config.description || `请输入${config.title || prop}`,
-              },
+                message: config.description || `请输入${config.title || prop}`
+              }
             ];
 
             // 更多校验规则
@@ -248,8 +280,8 @@ export default {
       this.currentModel = model;
       console.log(model);
       console.log(rules);
-    },
-  },
+    }
+  }
 };
 </script>
 <style lang="less">
