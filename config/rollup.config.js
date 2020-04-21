@@ -20,11 +20,11 @@ let baseconfig = (format) => {
     external: ["vue", "lodash"],
     plugins: [
       resolve(),
-      babel({
-        exclude: "node_modules/**", // 只编译我们的源代码
-      }),
+      // babel({
+      //   exclude: "node_modules/**", // 只编译我们的源代码
+      // }),
       vueplugin({ css: true }),
-      uglify(),
+      // uglify(),
     ],
   };
 };

@@ -7,37 +7,37 @@ export default {
   props: {
     value: [String, Number, Boolean, Array, Date, Object],
     config: Object,
-    prop: String
+    prop: String,
   },
   watch: {
     value(n) {
       this.currentValue = n;
-    }
+    },
   },
   data() {
     return {
-      currentValue: this.value
+      currentValue: this.value,
     };
   },
   methods: {
     renderSelectOptions(h, options) {
-      return options.map(el => {
+      return options.map((el) => {
         return h(`el-option`, {
           props: {
-            label: el.value,
-            value: el.value
-          }
+            label: el.label,
+            value: el.value,
+          },
         });
       });
     },
     renderRadioCheckbox(h, type, options) {
-      return options.map(el => {
+      return options.map((el) => {
         return h(
           `el-${type}`,
           {
             props: {
-              label: el.value
-            }
+              label: el.value,
+            },
           },
           el.label
         );
@@ -48,54 +48,74 @@ export default {
         "div",
         {
           style: {
-            display: "flex"
-          }
+            display: "flex",
+          },
         },
         [
+          prop.indexOf(".") > -1
+            ? null
+            : h(
+                "div",
+                {
+                  class: ["el-form-item__label"],
+                  style: {
+                    width: "100px",
+                  },
+                },
+                config.title
+              ),
           h(
             "div",
             {
-              class: ["el-form-item__label"],
               style: {
-                width: "100px"
-              }
+                flex: 1,
+                display: prop.indexOf(".") > -1 ? "flex" : "initial",
+              },
             },
-            config.title
-          ),
-          h(
-            "div",
-            {
-              style: {
-                flex: 1
-              }
-            },
-            Object.keys(model).map(el => {
+            Object.keys(model).map((el) => {
               return h("vue-form-item", {
                 props: {
                   prop: `${this.prop}.${el}`,
                   value: model[el],
-                  config: config.properties[el]
+                  config: config.properties[el],
                 },
                 on: {
-                  input: value => {
+                  input: (value) => {
                     model[el] = value;
-                  }
-                }
+                  },
+                },
               });
             })
-          )
+          ),
         ]
       );
     },
     renderArray(h, config, prop, model) {
       const { items } = config;
       let { type } = items;
+      let that = this;
+      let children =
+        type === "object"
+          ? model.map((el, index) => {
+              // model是当前构造出来的数组对象 el就是子项 如果el不是object类型
+
+              return h("div", {}, [
+                this.renderFun(h, items, `${prop}.${index}`, model[index]),
+              ]);
+            })
+          : model.map((el, index) => {
+              // model是当前构造出来的数组对象 el就是子项 如果el不是object类型
+              return h("div", {}, [
+                this.renderFun(h, items, `${prop}.${index}`, model, index),
+              ]);
+            });
+
       return h(
         "div",
         {
           style: {
-            display: "flex"
-          }
+            display: "flex",
+          },
         },
         [
           h(
@@ -103,8 +123,8 @@ export default {
             {
               class: ["el-form-item__label"],
               style: {
-                width: "100px"
-              }
+                width: "100px",
+              },
             },
             config.title
           ),
@@ -112,43 +132,46 @@ export default {
             "div",
             {
               style: {
-                flex: 1
-              }
+                flex: 1,
+                // display: "flex",
+              },
             },
-            model.map((el, index) => {
-              return h(
-                "div",
+            [
+              ...children,
+              h(
+                "el-button",
                 {
-                  style: {
-                    display: "flex"
-                  }
-                },
-                [
-                  Object.keys(el).map(ch => {
-                    return h("vue-form-item", {
-                      props: {
-                        prop: `${prop}.${index}.${ch}`,
-                        value: model[index][ch],
-                        config: config.properties[ch]
-                      },
-                      on: {
-                        input: value => {
-                          model[index][ch] = value;
-                        }
+                  props: {
+                    type: "success",
+                  },
+                  on: {
+                    click: () => {
+                      let zore = model[0];
+                      if (typeof zore === "object") {
+                        model.push({
+                          ...model[0],
+                        });
+                      } else if (
+                        typeof zore === "string" ||
+                        typeof zore === "number"
+                      ) {
+                        model.push("");
                       }
-                    });
-                  })
-                ]
-              );
-            })
-          )
+                    },
+                  },
+                },
+                "add"
+              ),
+            ]
+          ),
         ]
       );
     },
-    renderFun(h, config, prop, currentValue) {
+    renderFun(h, config, prop, currentValue, _arrayIndex) {
       let type = config.type;
       let props = {
-        value: currentValue
+        value:
+          _arrayIndex !== undefined ? currentValue[_arrayIndex] : currentValue,
       };
       let children = [];
 
@@ -168,6 +191,8 @@ export default {
         children = this.renderSelectOptions(h, config.options);
       } else if (type === "string") {
         type = "input";
+      } else if (type === "boolean") {
+        type = "switch";
       }
       if (type === "array") {
         return this.renderArray(h, config, prop, currentValue);
@@ -179,8 +204,8 @@ export default {
         {
           props: {
             prop: prop,
-            label: config.title || prop
-          }
+            label: config.title || prop,
+          },
         },
         [
           h(
@@ -188,19 +213,24 @@ export default {
             {
               props,
               on: {
-                input: value => {
-                  this.$emit("input", value);
-                }
-              }
+                input: (value) => {
+                  if (_arrayIndex !== undefined) {
+                    currentValue[_arrayIndex] = value;
+                    this.$emit("arrayInput", prop, currentValue[_arrayIndex]);
+                  } else {
+                    this.$emit("input", value);
+                  }
+                },
+              },
             },
             children
-          )
+          ),
         ]
       );
-    }
+    },
   },
   render(h) {
     return this.renderFun(h, this.config, this.prop, this.currentValue);
-  }
+  },
 };
 </script>

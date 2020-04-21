@@ -4,7 +4,7 @@
       :model="currentModel"
       :ref="formId"
       :rules="rules"
-      :label-width="schema.labelWidth || '100px'"
+      :label-width="schema.labelWidth || '120px'"
     >
       <!-- <template v-if="scheme.layout">
         <el-row :gutter="scheme.layout.gutter||20" v-for="row in rowSize" :key="row">
@@ -12,11 +12,27 @@
         </el-row>
       </template>-->
       <template v-for="(prop, key) in this.currentScheme.properties">
-        <form-item-plugin v-model="currentModel[key]" :config="prop" :prop="key" :key="key"></form-item-plugin>
+        <form-item-plugin
+          v-model="currentModel[key]"
+          :config="prop"
+          :prop="key"
+          :key="key"
+          @arrayInput="input"
+        ></form-item-plugin>
       </template>
       <div style="text-align:right;padding-right:12px;" v-if="schema.buttons">
-        <el-button type="success" @click="confirm" v-show="schema.buttons.includes('confirm')">确定</el-button>
-        <el-button type="default" @click="reset" v-show="schema.buttons.includes('reset')">重置</el-button>
+        <el-button
+          type="success"
+          @click="confirm"
+          v-show="schema.buttons.includes('confirm')"
+          >确定</el-button
+        >
+        <el-button
+          type="default"
+          @click="reset"
+          v-show="schema.buttons.includes('reset')"
+          >重置</el-button
+        >
       </div>
     </el-form>
   </div>
@@ -37,8 +53,8 @@ export default {
       type: Object,
       default() {
         return {};
-      }
-    }
+      },
+    },
   },
 
   mounted() {
@@ -60,13 +76,13 @@ export default {
             Object.keys(this.currentModel).length /
               (24 / (this.schema.layout.span || 8))
           );
-    }
+    },
   },
   watch: {
     schema(n) {
       this.currentScheme = n;
       this.validateScheme();
-    }
+    },
   },
   data() {
     return {
@@ -74,7 +90,7 @@ export default {
       currentModel: {},
       formId: this.randomId(),
 
-      rules: {}
+      rules: {},
     };
   },
   methods: {
@@ -88,14 +104,14 @@ export default {
           let curKey = keys[index];
           obj = obj[curKey];
         }
-        set(obj, lastKey, value);
+        this.$set(obj, lastKey, value);
       } else {
-        set(this.currentModel, key, value);
+        this.$set(this.currentModel, key, value);
       }
     },
     getData() {
       return {
-        ...this.currentModel
+        ...this.currentModel,
       };
     },
     randomId() {
@@ -103,15 +119,15 @@ export default {
       return y
         .substring(6)
         .split("")
-        .map(el => letters[el])
+        .map((el) => letters[el])
         .join("");
     },
     validate() {
       return new Promise((resolve, reject) => {
-        this.$refs[this.formId].validate(el => {
+        this.$refs[this.formId].validate((el) => {
           if (el) {
             let model = { ...this.currentModel };
-            Object.keys(model).forEach(el => {
+            Object.keys(model).forEach((el) => {
               let value = model[el];
               if (value instanceof Date) {
                 model[el] = util.format(value, "yyyy-MM-dd");
@@ -147,7 +163,6 @@ export default {
       } else if (items.type === "number" || items.type === "integer") {
         _value.push(0);
       } else if (items.type === "object") {
-        let itemproperties = items.properties;
         let obj = this.setModel(items, {}, parentProp);
 
         _value.push(obj);
@@ -157,8 +172,12 @@ export default {
     setModel(currentScheme, rules, parentProp) {
       const { properties, required } = currentScheme;
       let model = {};
+
+      if (!properties) {
+        throw new Error(`类型为object的属性${parentProp}没有properties配置`);
+      }
       let props = Object.keys(properties);
-      props.forEach(el => {
+      props.forEach((el) => {
         let prop = el;
         let config = properties[el];
         let defaultValue = this.model[el] || config.defaultValue;
@@ -193,21 +212,21 @@ export default {
             array: "array",
             number: "number",
             date: "date",
-            switch: "boolean"
+            switch: "boolean",
+            boolean: "boolean",
           };
-          let baseRule = [
-            {
-              required: required ? required.includes(prop) : false,
-              type: ruleType[config.type] || "string",
-              message: config.description || `请输入${config.title || prop}`
-            }
-          ];
-          // 更多校验规则
-          this.$set(
-            rules,
-            parentProp ? parentProp + "." + prop : prop,
-            baseRule
-          );
+          if (config.type !== "array") {
+            let baseRule = [
+              {
+                required: required ? required.includes(prop) : false,
+                type: ruleType[config.type] || "string",
+                message: config.description || `请输入${config.title || prop}`,
+              },
+            ];
+
+            // 更多校验规则
+            set(rules, parentProp ? parentProp + "." + prop : prop, baseRule);
+          }
         }
       });
       return model;
@@ -226,8 +245,8 @@ export default {
       this.currentModel = model;
       console.log(model);
       console.log(rules);
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="less">
