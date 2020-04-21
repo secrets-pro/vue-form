@@ -20,7 +20,28 @@ export default {
     };
   },
   methods: {
-    renderSelectOptions(h, options) {
+    renderSelectOptions(h, options, groups) {
+      if (groups) {
+        console.log(options);
+        return options.map((el) => {
+          return h(
+            "el-option-group",
+            {
+              props: {
+                label: el.label,
+              },
+            },
+            el.options.map((op) => {
+              return h(`el-option`, {
+                props: {
+                  label: op.label,
+                  value: op.value,
+                },
+              });
+            })
+          );
+        });
+      }
       return options.map((el) => {
         return h(`el-option`, {
           props: {
@@ -126,7 +147,7 @@ export default {
                 width: "100px",
               },
             },
-            config.title
+            config.title || prop
           ),
           h(
             "div",
@@ -139,28 +160,44 @@ export default {
             [
               ...children,
               h(
-                "el-button",
+                "div",
                 {
-                  props: {
-                    type: "success",
-                  },
-                  on: {
-                    click: () => {
-                      let zore = model[0];
-                      if (typeof zore === "object") {
-                        model.push({
-                          ...model[0],
-                        });
-                      } else if (
-                        typeof zore === "string" ||
-                        typeof zore === "number"
-                      ) {
-                        model.push("");
-                      }
-                    },
+                  style: {
+                    textAlign: "right",
                   },
                 },
-                "add"
+                [
+                  h(
+                    "el-button",
+                    {
+                      props: {
+                        type: "primary",
+                        size: "small",
+                      },
+                      on: {
+                        click: () => {
+                          const { minItems, maxItems } = config;
+                          if (maxItems && model.length >= maxItems) {
+                            console.warn(`最大数量限制为${maxItems}`);
+                            return;
+                          }
+                          let zore = model[0];
+                          if (typeof zore === "object") {
+                            model.push({
+                              ...model[0],
+                            });
+                          } else if (
+                            typeof zore === "string" ||
+                            typeof zore === "number"
+                          ) {
+                            model.push("");
+                          }
+                        },
+                      },
+                    },
+                    "新增"
+                  ),
+                ]
               ),
             ]
           ),
@@ -173,6 +210,19 @@ export default {
         value:
           _arrayIndex !== undefined ? currentValue[_arrayIndex] : currentValue,
       };
+      if (config.maxLength) {
+        props.maxLength = config.maxLength;
+      }
+      if (config.anyOf) {
+        type = "select";
+        config.groups = true;
+        config.options = config.anyOf.map((el) => {
+          return {
+            label: el.description,
+            options: el.enum.map((ele) => ({ label: ele, value: ele })),
+          };
+        });
+      }
       let children = [];
 
       if (type === "radio" || type === "checkbox") {
@@ -187,8 +237,18 @@ export default {
         type = "input-number";
         props["controls-position"] = "right";
         props["precision"] = type === "integer" ? 0 : 2;
-      } else if (type === "select") {
-        children = this.renderSelectOptions(h, config.options);
+      } else if (type === "select" || config.enum) {
+        if (config.enum) {
+          config.options = config.enum.map((el) => {
+            return {
+              label: el,
+              value: el,
+            };
+          });
+        }
+
+        children = this.renderSelectOptions(h, config.options, config.groups);
+        type = "select";
       } else if (type === "string") {
         type = "input";
       } else if (type === "boolean") {

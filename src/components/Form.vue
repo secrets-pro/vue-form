@@ -22,13 +22,15 @@
       </template>
       <div style="text-align:right;padding-right:12px;" v-if="schema.buttons">
         <el-button
-          type="success"
+          type="primary"
+          size="mini"
           @click="confirm"
           v-show="schema.buttons.includes('confirm')"
           >确定</el-button
         >
         <el-button
           type="default"
+          size="mini"
           @click="reset"
           v-show="schema.buttons.includes('reset')"
           >重置</el-button
@@ -180,7 +182,8 @@ export default {
       props.forEach((el) => {
         let prop = el;
         let config = properties[el];
-        let defaultValue = this.model[el] || config.defaultValue;
+        let defaultValue =
+          this.model[el] || config.defaultValue || config.default;
 
         if (config.type === "checkbox") {
           // model[prop] = defaultValue || [];
