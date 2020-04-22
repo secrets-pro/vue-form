@@ -117,17 +117,35 @@ export default {
       let obj = {
         ...this.currentModel,
       };
+      let result = {};
+      Object.keys(obj).forEach((el) => {
+        let value = obj[el];
+        if (value instanceof Date) {
+          result[el] = util.format(value, "yyyy-MM-dd");
+        } else if (Array.isArray(value)) {
+          // 空数组 或者 数组里的值都是空
+          // if (value.length === 0 || value.join("").length === 0) {
+          //   // empty
+          // } else {
+          //   result[el] = value;
+          // }
+        } else if (value) {
+          result[el] = value;
+        }
+      });
       if (this.special.length) {
         this.special.forEach((el) => {
-          let v = obj[el];
+          let v = JSON.parse(JSON.stringify(result[el]));
           let value = {};
           v.forEach((els) => {
-            value[els.key] = els.value;
+            if (els.key) {
+              value[els.key] = els.value;
+            }
           });
-          obj[el] = value;
+          result[el] = value;
         });
       }
-      return obj;
+      return result;
     },
     randomId() {
       let y = new Date().getTime() + "";
@@ -141,7 +159,7 @@ export default {
       return new Promise((resolve, reject) => {
         this.$refs[this.formId].validate((el) => {
           if (el) {
-            let model = { ...this.currentModel };
+            let model = this.getData();
             Object.keys(model).forEach((el) => {
               let value = model[el];
               if (value instanceof Date) {
@@ -166,9 +184,7 @@ export default {
       this.$refs[this.formId].resetFields();
     },
     setArrayModal(currentScheme, rules, parentProp) {
-      let model = [];
       const { items } = currentScheme;
-
       let _value = [];
       if (items.type === "string") {
         _value.push("");
@@ -179,8 +195,12 @@ export default {
         _value.push(0);
       } else if (items.type === "object") {
         let obj = this.setModel(items, {}, parentProp);
-
         _value.push(obj);
+      }
+      if (currentScheme.minItems > 1) {
+        for (let j = 0; j < currentScheme.minItems - 1; j++) {
+          _value.push(_value[0]);
+        }
       }
       return _value;
     },
@@ -208,6 +228,8 @@ export default {
           if (prop.indexOf(".") > -1) {
             model[prop] = defaultValue || _value || "";
           }
+        } else if (config.type === "boolean") {
+          model[prop] = !!defaultValue;
         } else {
           // model[prop] = defaultValue || null;
           set(model, prop, defaultValue || "");
@@ -238,9 +260,18 @@ export default {
             properties,
           };
           let _value = this.setArrayModal(config, rules, prop);
-          set(model, prop, defaultValue || _value || "");
+          if (defaultValue && !Array.isArray(defaultValue)) {
+            let value = Object.keys(defaultValue).map((k) => ({
+              key: k,
+              value: defaultValue[k],
+            }));
+            set(model, prop, value || _value || []);
+          } else {
+            set(model, prop, defaultValue || _value || []);
+          }
+
           if (prop.indexOf(".") > -1) {
-            model[prop] = defaultValue || _value || "";
+            model[prop] = defaultValue || _value || [];
           }
           // throw new Error(`类型为object的属性${parentProp}没有properties配置`);
         } else {
@@ -255,6 +286,7 @@ export default {
           };
           if (config.type !== "array") {
             let required_ = config.minLength || config.maxLength || config.enum;
+            //  || config.pattern;
             let text = config.enum || config.options ? "请选择" : "请输入";
             let baseRule = [
               {
@@ -263,6 +295,7 @@ export default {
                   : required
                   ? required.includes(prop)
                   : false,
+
                 type: ruleType[config.type] || "string",
                 message: config.description || `${text}${config.title || prop}`,
               },
@@ -286,6 +319,13 @@ export default {
               }
               baseRule.push(ruleMinlength);
             }
+            if (config.pattern) {
+              baseRule.push({
+                pattern: new RegExp(config.pattern),
+                message: `格式需要满足正则${config.pattern}`,
+                trigger: "blur",
+              });
+            }
             set(rules, parentProp ? parentProp + "." + prop : prop, baseRule);
           }
         }
@@ -304,8 +344,8 @@ export default {
       model = this.setModel(this.currentScheme, rules);
       this.rules = rules;
       this.currentModel = model;
-      console.log(model);
       console.log(rules);
+      console.log(model);
     },
   },
 };
