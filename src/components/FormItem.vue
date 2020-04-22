@@ -242,6 +242,7 @@ export default {
           props["step-strictly"] = true;
           props["step"] = 1;
         }
+        debugger;
         if (config.minimum) {
           props["min"] = config.minimum;
         }
