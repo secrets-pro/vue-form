@@ -27,15 +27,13 @@
           size="mini"
           @click="confirm"
           v-show="schema.buttons.includes('confirm')"
-          >确定</el-button
-        >
+        >确定</el-button>
         <el-button
           type="default"
           size="mini"
           @click="reset"
           v-show="schema.buttons.includes('reset')"
-          >重置</el-button
-        >
+        >重置</el-button>
       </div>
     </el-form>
   </div>
@@ -56,8 +54,8 @@ export default {
       type: Object,
       default() {
         return {};
-      },
-    },
+      }
+    }
   },
 
   mounted() {
@@ -79,13 +77,13 @@ export default {
             Object.keys(this.currentModel).length /
               (24 / (this.schema.layout.span || 8))
           );
-    },
+    }
   },
   watch: {
     schema(n) {
       this.currentScheme = n;
       this.validateScheme();
-    },
+    }
   },
   data() {
     return {
@@ -94,7 +92,7 @@ export default {
       formId: this.randomId(),
 
       rules: {},
-      special: [],
+      special: []
     };
   },
   methods: {
@@ -115,10 +113,10 @@ export default {
     },
     getData() {
       let obj = {
-        ...this.currentModel,
+        ...this.currentModel
       };
       let result = {};
-      Object.keys(obj).forEach((el) => {
+      Object.keys(obj).forEach(el => {
         let value = obj[el];
         if (value instanceof Date) {
           result[el] = util.format(value, "yyyy-MM-dd");
@@ -129,15 +127,16 @@ export default {
           // } else {
           //   result[el] = value;
           // }
-        } else if (value) {
+          result[el] = value;
+        } else if (value != "") {
           result[el] = value;
         }
       });
       if (this.special.length) {
-        this.special.forEach((el) => {
-          let v = JSON.parse(JSON.stringify(result[el]));
+        this.special.forEach(el => {
+          let v = JSON.parse(JSON.stringify(obj[el]));
           let value = {};
-          v.forEach((els) => {
+          v.forEach(els => {
             if (els.key) {
               value[els.key] = els.value;
             }
@@ -152,15 +151,15 @@ export default {
       return y
         .substring(6)
         .split("")
-        .map((el) => letters[el])
+        .map(el => letters[el])
         .join("");
     },
     validate() {
       return new Promise((resolve, reject) => {
-        this.$refs[this.formId].validate((el) => {
+        this.$refs[this.formId].validate(el => {
           if (el) {
             let model = this.getData();
-            Object.keys(model).forEach((el) => {
+            Object.keys(model).forEach(el => {
               let value = model[el];
               if (value instanceof Date) {
                 model[el] = util.format(value, "yyyy-MM-dd");
@@ -208,7 +207,7 @@ export default {
       let { properties, required } = currentScheme;
       let model = {};
       let props = Object.keys(properties);
-      props.forEach((el) => {
+      props.forEach(el => {
         let prop = el;
         let config = properties[el];
         let defaultValue =
@@ -247,23 +246,23 @@ export default {
           let properties = {
             key: {
               type: "string",
-              title: "键",
+              title: "键"
             },
             value: {
               type: "string",
-              title: "值",
-            },
+              title: "值"
+            }
           };
           config.type = "array";
           config.items = {
             type: "object",
-            properties,
+            properties
           };
           let _value = this.setArrayModal(config, rules, prop);
           if (defaultValue && !Array.isArray(defaultValue)) {
-            let value = Object.keys(defaultValue).map((k) => ({
+            let value = Object.keys(defaultValue).map(k => ({
               key: k,
-              value: defaultValue[k],
+              value: defaultValue[k]
             }));
             set(model, prop, value || _value || []);
           } else {
@@ -282,7 +281,7 @@ export default {
             integer: "number",
             date: "date",
             switch: "boolean",
-            boolean: "boolean",
+            boolean: "boolean"
           };
           if (config.type !== "array") {
             let required_ = config.minLength || config.maxLength || config.enum;
@@ -297,8 +296,8 @@ export default {
                   : false,
 
                 type: ruleType[config.type] || "string",
-                message: config.description || `${text}${config.title || prop}`,
-              },
+                message: config.description || `${text}${config.title || prop}`
+              }
             ];
 
             // 更多校验规则
@@ -306,7 +305,7 @@ export default {
               let ruleMinlength = {
                 min: config.minLength || 1,
                 message: "长度至少" + (config.minLength || 1),
-                trigger: "blur",
+                trigger: "blur"
               };
               if (config.maxlength) {
                 ruleMinlength["max"] = config.maxLength;
@@ -323,7 +322,7 @@ export default {
               baseRule.push({
                 pattern: new RegExp(config.pattern),
                 message: `格式需要满足正则${config.pattern}`,
-                trigger: "blur",
+                trigger: "blur"
               });
             }
             set(rules, parentProp ? parentProp + "." + prop : prop, baseRule);
@@ -344,10 +343,10 @@ export default {
       model = this.setModel(this.currentScheme, rules);
       this.rules = rules;
       this.currentModel = model;
-      console.log(rules);
-      console.log(model);
-    },
-  },
+      // console.log(rules);
+      // console.log(model);
+    }
+  }
 };
 </script>
 <style lang="less">
