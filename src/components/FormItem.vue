@@ -213,7 +213,10 @@ export default {
           _arrayIndex !== undefined ? currentValue[_arrayIndex] : currentValue,
       };
       if (config.maxLength) {
-        props.maxLength = config.maxLength;
+        props.maxlength = config.maxLength;
+      }
+      if (config.minLength) {
+        props.minlength = config.minLength;
       }
       if (config.anyOf) {
         // TODO 可能不是enum
@@ -242,11 +245,10 @@ export default {
           props["step-strictly"] = true;
           props["step"] = 1;
         }
-        debugger;
-        if (config.minimum) {
+        if (config.minimum !== undefined) {
           props["min"] = config.minimum;
         }
-        if (config.maximum) {
+        if (config.maximum !== undefined) {
           props["min"] = config.maximum;
         }
         type = "input-number";

@@ -1,6 +1,7 @@
 <template>
   <div v-if="Object.keys(currentModel).length">
     <el-form
+      size="medium"
       :model="currentModel"
       :ref="formId"
       :rules="rules"
@@ -26,13 +27,15 @@
           size="mini"
           @click="confirm"
           v-show="schema.buttons.includes('confirm')"
-        >确定</el-button>
+          >确定</el-button
+        >
         <el-button
           type="default"
           size="mini"
           @click="reset"
           v-show="schema.buttons.includes('reset')"
-        >重置</el-button>
+          >重置</el-button
+        >
       </div>
     </el-form>
   </div>
@@ -53,8 +56,8 @@ export default {
       type: Object,
       default() {
         return {};
-      }
-    }
+      },
+    },
   },
 
   mounted() {
@@ -76,13 +79,13 @@ export default {
             Object.keys(this.currentModel).length /
               (24 / (this.schema.layout.span || 8))
           );
-    }
+    },
   },
   watch: {
     schema(n) {
       this.currentScheme = n;
       this.validateScheme();
-    }
+    },
   },
   data() {
     return {
@@ -91,7 +94,7 @@ export default {
       formId: this.randomId(),
 
       rules: {},
-      special: []
+      special: [],
     };
   },
   methods: {
@@ -112,13 +115,13 @@ export default {
     },
     getData() {
       let obj = {
-        ...this.currentModel
+        ...this.currentModel,
       };
       if (this.special.length) {
-        this.special.forEach(el => {
+        this.special.forEach((el) => {
           let v = obj[el];
           let value = {};
-          v.forEach(els => {
+          v.forEach((els) => {
             value[els.key] = els.value;
           });
           obj[el] = value;
@@ -131,15 +134,15 @@ export default {
       return y
         .substring(6)
         .split("")
-        .map(el => letters[el])
+        .map((el) => letters[el])
         .join("");
     },
     validate() {
       return new Promise((resolve, reject) => {
-        this.$refs[this.formId].validate(el => {
+        this.$refs[this.formId].validate((el) => {
           if (el) {
             let model = { ...this.currentModel };
-            Object.keys(model).forEach(el => {
+            Object.keys(model).forEach((el) => {
               let value = model[el];
               if (value instanceof Date) {
                 model[el] = util.format(value, "yyyy-MM-dd");
@@ -185,7 +188,7 @@ export default {
       let { properties, required } = currentScheme;
       let model = {};
       let props = Object.keys(properties);
-      props.forEach(el => {
+      props.forEach((el) => {
         let prop = el;
         let config = properties[el];
         let defaultValue =
@@ -201,13 +204,13 @@ export default {
           // 数组类型
           // 设置默认的格式 config.items
           let _value = this.setArrayModal(config, rules, prop);
-          set(model, prop, defaultValue || _value);
+          set(model, prop, defaultValue || _value || "");
           if (prop.indexOf(".") > -1) {
-            model[prop] = defaultValue || _value;
+            model[prop] = defaultValue || _value || "";
           }
         } else {
           // model[prop] = defaultValue || null;
-          set(model, prop, defaultValue || null);
+          set(model, prop, defaultValue || "");
           if (prop.indexOf(".") > -1) {
             model[prop] = defaultValue;
           }
@@ -222,22 +225,22 @@ export default {
           let properties = {
             key: {
               type: "string",
-              title: "键"
+              title: "键",
             },
             value: {
               type: "string",
-              title: "值"
-            }
+              title: "值",
+            },
           };
           config.type = "array";
           config.items = {
             type: "object",
-            properties
+            properties,
           };
           let _value = this.setArrayModal(config, rules, prop);
-          set(model, prop, defaultValue || _value);
+          set(model, prop, defaultValue || _value || "");
           if (prop.indexOf(".") > -1) {
-            model[prop] = defaultValue || _value;
+            model[prop] = defaultValue || _value || "";
           }
           // throw new Error(`类型为object的属性${parentProp}没有properties配置`);
         } else {
@@ -248,18 +251,41 @@ export default {
             integer: "number",
             date: "date",
             switch: "boolean",
-            boolean: "boolean"
+            boolean: "boolean",
           };
           if (config.type !== "array") {
+            let required_ = config.minLength || config.maxLength || config.enum;
+            let text = config.enum || config.options ? "请选择" : "请输入";
             let baseRule = [
               {
-                required: required ? required.includes(prop) : false,
+                required: required_
+                  ? true
+                  : required
+                  ? required.includes(prop)
+                  : false,
                 type: ruleType[config.type] || "string",
-                message: config.description || `请输入${config.title || prop}`
-              }
+                message: config.description || `${text}${config.title || prop}`,
+              },
             ];
 
             // 更多校验规则
+            if (config.minLength || config.maxLength) {
+              let ruleMinlength = {
+                min: config.minLength || 1,
+                message: "长度至少" + (config.minLength || 1),
+                trigger: "blur",
+              };
+              if (config.maxlength) {
+                ruleMinlength["max"] = config.maxLength;
+                ruleMinlength["message"] =
+                  "长度在" +
+                  (config.minLength || 1) +
+                  "和" +
+                  config.maxLength +
+                  "之间";
+              }
+              baseRule.push(ruleMinlength);
+            }
             set(rules, parentProp ? parentProp + "." + prop : prop, baseRule);
           }
         }
@@ -280,8 +306,8 @@ export default {
       this.currentModel = model;
       console.log(model);
       console.log(rules);
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="less">
