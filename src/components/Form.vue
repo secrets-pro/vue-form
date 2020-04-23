@@ -128,7 +128,7 @@ export default {
           //   result[el] = value;
           // }
           result[el] = value;
-        } else if (value != "") {
+        } else if (value !== "") {
           result[el] = value;
         }
       });

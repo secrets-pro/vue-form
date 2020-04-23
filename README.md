@@ -2,6 +2,12 @@
 
 A JSON Scheme parse for Form with Element-UI
 
+- support `switch`,`input`,`input-number`,`select`,`radio`,`checkbox`,`date` components.
+- support `minimun`,`maximun`,`minLength`,`maxlenght`,`pattern` form rules.
+- support array & object nest
+- support simple object without properties
+- support anyOf
+
 ## How to use
 
 ```bash
@@ -9,7 +15,9 @@ npm i @secrets/vue-form
 ```
 
 ```js
+import elementUI from "element-ui";
 import vueForm from "@secrets/vue-form";
+Vue.use(elementUI);
 Vue.use(vueForm);
 ```
 

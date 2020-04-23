@@ -1,6 +1,6 @@
 {
   "name": "@secrets/vue-form",
-  "version": "1.0.14",
+  "version": "1.0.16",
   "description": "vue-form",
   "main": "dist/vue-form.cjs.js",
   "module": "dist/vue-form.esm.js",
@@ -23,8 +23,9 @@
   "keywords": [
     "rollup",
     "vue",
-    "ElementUI",
-    "JSONSchema"
+    "element-ui",
+    "JSON schema",
+    "vue-form"
   ],
   "author": "xubowenjx",
   "license": "MIT",
