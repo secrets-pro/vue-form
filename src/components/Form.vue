@@ -1,5 +1,5 @@
 <template>
-  <div v-if="Object.keys(currentModel).length">
+  <div v-if="Object.keys(currentModel).length" class="vue-form">
     <el-form
       size="medium"
       :model="currentModel"
@@ -350,10 +350,12 @@ export default {
 };
 </script>
 <style lang="less">
-.el-form-item__content {
-  .el-select,
-  .el-input-number {
-    width: 100%;
+.vue-form {
+  .el-form-item__content {
+    .el-select,
+    .el-input-number {
+      width: 100%;
+    }
   }
 }
 </style>
