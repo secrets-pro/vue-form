@@ -1,21 +1,25 @@
 <script>
 /* eslint-disable no-unused-vars */
+const MonacoEditor = require("vue-monaco");
 
 export default {
   name: "vue-form-item",
+  components: {
+    "el-editor": MonacoEditor.default
+  },
   props: {
     value: [String, Number, Boolean, Array, Date, Object],
     config: Object,
-    prop: String,
+    prop: String
   },
   watch: {
     value(n) {
       this.currentValue = n;
-    },
+    }
   },
   data() {
     return {
-      currentValue: this.value,
+      currentValue: this.value
     };
   },
   methods: {
@@ -26,15 +30,15 @@ export default {
             "el-option-group",
             {
               props: {
-                label: el.label,
-              },
+                label: el.label
+              }
             },
             el.options.map((op) => {
               return h(`el-option`, {
                 props: {
                   label: op.label,
-                  value: op.value,
-                },
+                  value: op.value
+                }
               });
             })
           );
@@ -44,8 +48,8 @@ export default {
         return h(`el-option`, {
           props: {
             label: el.label,
-            value: el.value,
-          },
+            value: el.value
+          }
         });
       });
     },
@@ -55,8 +59,8 @@ export default {
           `el-${type}`,
           {
             props: {
-              label: el.value,
-            },
+              label: el.value
+            }
           },
           el.label
         );
@@ -67,8 +71,8 @@ export default {
         "div",
         {
           style: {
-            display: "flex",
-          },
+            display: "flex"
+          }
         },
         [
           prop.indexOf(".") > -1
@@ -78,8 +82,8 @@ export default {
                 {
                   class: ["el-form-item__label"],
                   style: {
-                    width: "100px",
-                  },
+                    width: "100px"
+                  }
                 },
                 config.title
               ),
@@ -88,24 +92,24 @@ export default {
             {
               style: {
                 flex: 1,
-                display: prop.indexOf(".") > -1 ? "flex" : "initial",
-              },
+                display: prop.indexOf(".") > -1 ? "flex" : "initial"
+              }
             },
             Object.keys(model).map((el) => {
               return h("vue-form-item", {
                 props: {
                   prop: `${this.prop}.${el}`,
                   value: model[el],
-                  config: config.properties[el],
+                  config: config.properties[el]
                 },
                 on: {
                   input: (value) => {
                     model[el] = value;
-                  },
-                },
+                  }
+                }
               });
             })
-          ),
+          )
         ]
       );
     },
@@ -119,13 +123,13 @@ export default {
               // model是当前构造出来的数组对象 el就是子项 如果el不是object类型
 
               return h("div", {}, [
-                this.renderFun(h, items, `${prop}.${index}`, model[index]),
+                this.renderFun(h, items, `${prop}.${index}`, model[index])
               ]);
             })
           : model.map((el, index) => {
               // model是当前构造出来的数组对象 el就是子项 如果el不是object类型
               return h("div", {}, [
-                this.renderFun(h, items, `${prop}.${index}`, model, index),
+                this.renderFun(h, items, `${prop}.${index}`, model, index)
               ]);
             });
 
@@ -133,8 +137,8 @@ export default {
         "div",
         {
           style: {
-            display: "flex",
-          },
+            display: "flex"
+          }
         },
         [
           h(
@@ -142,8 +146,8 @@ export default {
             {
               class: ["el-form-item__label"],
               style: {
-                width: "100px",
-              },
+                width: "100px"
+              }
             },
             config.title || prop
           ),
@@ -151,9 +155,9 @@ export default {
             "div",
             {
               style: {
-                flex: 1,
+                flex: 1
                 // display: "flex",
-              },
+              }
             },
             [
               ...children,
@@ -161,8 +165,8 @@ export default {
                 "div",
                 {
                   style: {
-                    textAlign: "right",
-                  },
+                    textAlign: "right"
+                  }
                 },
                 [
                   h(
@@ -170,7 +174,7 @@ export default {
                     {
                       props: {
                         type: "primary",
-                        size: "small",
+                        size: "small"
                       },
                       on: {
                         click: () => {
@@ -193,23 +197,24 @@ export default {
                           ) {
                             model.push("");
                           }
-                        },
-                      },
+                        }
+                      }
                     },
                     "新增"
-                  ),
+                  )
                 ]
-              ),
+              )
             ]
-          ),
+          )
         ]
       );
     },
     renderFun(h, config, prop, currentValue, _arrayIndex) {
       let type = config.type;
+      let style = {};
       let props = {
         value:
-          _arrayIndex !== undefined ? currentValue[_arrayIndex] : currentValue,
+          _arrayIndex !== undefined ? currentValue[_arrayIndex] : currentValue
       };
       if (config.maxLength) {
         props.maxlength = config.maxLength;
@@ -224,7 +229,7 @@ export default {
         config.options = config.anyOf.map((el) => {
           return {
             label: el.description,
-            options: el.enum.map((ele) => ({ label: ele, value: ele })),
+            options: el.enum.map((ele) => ({ label: ele, value: ele }))
           };
         });
       }
@@ -256,7 +261,7 @@ export default {
           config.options = config.enum.map((el) => {
             return {
               label: el,
-              value: el,
+              value: el
             };
           });
         }
@@ -267,6 +272,14 @@ export default {
         type = "input";
       } else if (type === "boolean") {
         type = "switch";
+      } else if (type === "editor") {
+        //  theme="vs-dark"
+        // v-model="code"
+        // language="javascript"
+        props.theme = "vs-dark";
+        props.language = config.language || "javascript";
+        style.width = "100%";
+        style.height = "400px";
       }
       if (type === "array") {
         return this.renderArray(h, config, prop, currentValue);
@@ -278,15 +291,21 @@ export default {
         {
           props: {
             prop: prop,
-            label: config.title || prop,
-          },
+            label: config.title || prop
+          }
         },
         [
           h(
             `el-${type}`,
             {
               props,
+              style,
               on: {
+                change: (value) => {
+                  if (type === "editor") {
+                    this.$emit("input", value);
+                  }
+                },
                 input: (value) => {
                   if (_arrayIndex !== undefined) {
                     currentValue[_arrayIndex] = value;
@@ -294,17 +313,17 @@ export default {
                   } else {
                     this.$emit("input", value);
                   }
-                },
-              },
+                }
+              }
             },
             children
-          ),
+          )
         ]
       );
-    },
+    }
   },
   render(h) {
     return this.renderFun(h, this.config, this.prop, this.currentValue);
-  },
+  }
 };
 </script>

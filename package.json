@@ -29,7 +29,9 @@
   ],
   "author": "xubowenjx",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "vue-monaco": "^1.2.1"
+  },
   "devDependencies": {
     "@babel/cli": "^7.7.0",
     "@babel/core": "^7.7.2",
