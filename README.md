@@ -31,7 +31,7 @@ const schema = {
   properties: {
     name: {
       type: "string",
-      title: "姓名",
+      title: "姓名"
     },
     school: {
       title: "学校",
@@ -39,7 +39,7 @@ const schema = {
       properties: {
         address: {
           title: "地址",
-          type: "string",
+          type: "string"
         },
         category: {
           title: "等级",
@@ -47,15 +47,15 @@ const schema = {
           options: [
             {
               label: "高中",
-              value: "major",
+              value: "major"
             },
             {
               label: "初中",
-              value: "minor",
-            },
-          ],
-        },
-      },
+              value: "minor"
+            }
+          ]
+        }
+      }
     },
     type: {
       type: "select",
@@ -63,13 +63,13 @@ const schema = {
       options: [
         {
           label: "类型1",
-          value: "type1",
+          value: "type1"
         },
         {
           label: "类型2",
-          value: "type2",
-        },
-      ],
+          value: "type2"
+        }
+      ]
     },
     radio: {
       type: "radio",
@@ -77,27 +77,27 @@ const schema = {
       options: [
         {
           label: "类型1",
-          value: "type1",
+          value: "type1"
         },
         {
           label: "类型2",
-          value: "type2",
-        },
-      ],
+          value: "type2"
+        }
+      ]
     },
     date: {
       type: "date",
-      title: "生日",
+      title: "生日"
     },
     secrets: {
       type: "array",
       title: "密钥",
       items: {
-        type: "string",
-      },
+        type: "string"
+      }
     },
     headers: {
-      type: "object", // get a basic object
+      type: "object" // get a basic object
     },
     key: {
       // like a select
@@ -105,14 +105,14 @@ const schema = {
         "remote_addr",
         "server_addr",
         "http_x_real_ip",
-        "http_x_forwarded_for",
+        "http_x_forwarded_for"
       ],
-      type: "string",
+      type: "string"
     },
     rejected_code: {
       default: 201,
       minimum: 200, //minimum maximum
-      type: "integer",
+      type: "integer"
     },
     configmaps: {
       type: "array",
@@ -122,17 +122,17 @@ const schema = {
         properties: {
           name: {
             type: "string",
-            title: "名称",
+            title: "名称"
           },
           path: {
             type: "string",
-            title: "路径",
-          },
-        },
-      },
-    },
+            title: "路径"
+          }
+        }
+      }
+    }
   },
-  required: ["name", "phone"],
+  required: ["name", "phone"]
 };
 ```
 
@@ -151,3 +151,26 @@ this.$ref.form.getData(); // get the realtime data
 ```
 
 ![demo.png](demo.png)
+
+## 打包
+
+```bash
+yarn build
+// or
+npm run build
+```
+
+## 本地测试
+
+1. 本项目中
+
+```bash
+yarn build  // 打包出来
+yarn link //加入到本地全局模块
+```
+
+2. 目标项目
+
+```bash
+yarn link  @secrets/vue-form
+```
