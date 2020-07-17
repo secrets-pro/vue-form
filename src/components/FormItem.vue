@@ -114,7 +114,7 @@ export default {
         ]
       );
     },
-    renderArrayButton(h, config, model) {
+    renderArrayButton(h, config, model, title) {
       return h(
         "div",
         {
@@ -154,7 +154,7 @@ export default {
                 }
               }
             },
-            "新增"
+            `新增${title}`
           )
         ]
       );
@@ -205,7 +205,10 @@ export default {
                 // display: "flex",
               }
             },
-            [...children, this.renderArrayButton(h, config, model)]
+            [
+              ...children,
+              this.renderArrayButton(h, config, model, config.title || prop)
+            ]
           )
         ]
       );
@@ -254,7 +257,7 @@ export default {
           props["min"] = config.minimum;
         }
         if (config.maximum !== undefined) {
-          props["min"] = config.maximum;
+          props["max"] = config.maximum;
         }
         type = "input-number";
       } else if (type === "select" || config.enum) {
@@ -318,8 +321,29 @@ export default {
               }
             },
             children
-          )
+          ),
+          this.renderLabel(config.title || prop, config.description)
         ]
+      );
+    },
+    renderLabel(title, description) {
+      return (
+        <span slot="label">
+          <span>{title}</span>
+          {description ? (
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content={description}
+              placement="top"
+            >
+              <el-button
+                icon="el-icon-info"
+                style={{ padding: 0, border: 0, color: "#409eff" }}
+              ></el-button>
+            </el-tooltip>
+          ) : null}
+        </span>
       );
     }
   },
