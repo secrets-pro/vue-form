@@ -1,6 +1,7 @@
 <script>
 /* eslint-disable no-unused-vars */
 const MonacoEditor = require("vue-monaco");
+import setting from "../config";
 
 export default {
   name: "vue-form-item",
@@ -113,6 +114,51 @@ export default {
         ]
       );
     },
+    renderArrayButton(h, config, model, title) {
+      return h(
+        "div",
+        {
+          style: {
+            textAlign: "right"
+          }
+        },
+        [
+          h(
+            "el-button",
+            {
+              props: {
+                type: "primary",
+                size: "small"
+              },
+              on: {
+                click: () => {
+                  const { minItems, maxItems } = config;
+                  if (maxItems && model.length >= maxItems) {
+                    console.warn(`最大数量限制为${maxItems}`);
+                    return;
+                  }
+                  let zore = model[0];
+                  if (typeof zore === "object") {
+                    let keys = Object.keys(model[0]);
+                    let obj = {};
+                    keys.forEach((els) => {
+                      obj[els] = "";
+                    });
+                    model.push(obj);
+                  } else if (
+                    typeof zore === "string" ||
+                    typeof zore === "number"
+                  ) {
+                    model.push("");
+                  }
+                }
+              }
+            },
+            `新增${title}`
+          )
+        ]
+      );
+    },
     renderArray(h, config, prop, model) {
       const { items } = config;
       let { type } = items;
@@ -161,49 +207,7 @@ export default {
             },
             [
               ...children,
-              h(
-                "div",
-                {
-                  style: {
-                    textAlign: "right"
-                  }
-                },
-                [
-                  h(
-                    "el-button",
-                    {
-                      props: {
-                        type: "primary",
-                        size: "small"
-                      },
-                      on: {
-                        click: () => {
-                          const { minItems, maxItems } = config;
-                          if (maxItems && model.length >= maxItems) {
-                            console.warn(`最大数量限制为${maxItems}`);
-                            return;
-                          }
-                          let zore = model[0];
-                          if (typeof zore === "object") {
-                            let keys = Object.keys(model[0]);
-                            let obj = {};
-                            keys.forEach((els) => {
-                              obj[els] = "";
-                            });
-                            model.push(obj);
-                          } else if (
-                            typeof zore === "string" ||
-                            typeof zore === "number"
-                          ) {
-                            model.push("");
-                          }
-                        }
-                      }
-                    },
-                    "新增"
-                  )
-                ]
-              )
+              this.renderArrayButton(h, config, model, config.title || prop)
             ]
           )
         ]
@@ -242,7 +246,7 @@ export default {
         type = "date-picker";
         props.placeholder = "请选择日期";
         props.type = "date";
-        props.format = config.format || "yyyy-MM-dd";
+        props.format = config.format || setting.format;
       } else if (type === "number" || type === "integer") {
         props["controls-position"] = "right";
         if (type === "integer") {
@@ -253,7 +257,7 @@ export default {
           props["min"] = config.minimum;
         }
         if (config.maximum !== undefined) {
-          props["min"] = config.maximum;
+          props["max"] = config.maximum;
         }
         type = "input-number";
       } else if (type === "select" || config.enum) {
@@ -277,7 +281,7 @@ export default {
         // v-model="code"
         // language="javascript"
         props.theme = "vs-dark";
-        props.language = config.language || "javascript";
+        props.language = config.language || setting.language;
         style.width = "100%";
         style.height = "400px";
       }
@@ -317,8 +321,29 @@ export default {
               }
             },
             children
-          )
+          ),
+          this.renderLabel(config.title || prop, config.description)
         ]
+      );
+    },
+    renderLabel(title, description) {
+      return (
+        <span slot="label">
+          <span>{title}</span>
+          {description ? (
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content={description}
+              placement="top"
+            >
+              <el-button
+                icon="el-icon-info"
+                style={{ padding: 0, border: 0, color: "#409eff" }}
+              ></el-button>
+            </el-tooltip>
+          ) : null}
+        </span>
       );
     }
   },
