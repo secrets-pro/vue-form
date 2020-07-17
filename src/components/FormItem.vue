@@ -1,6 +1,7 @@
 <script>
 /* eslint-disable no-unused-vars */
 const MonacoEditor = require("vue-monaco");
+import setting from "../config";
 
 export default {
   name: "vue-form-item",
@@ -113,6 +114,51 @@ export default {
         ]
       );
     },
+    renderArrayButton(h, config, model) {
+      return h(
+        "div",
+        {
+          style: {
+            textAlign: "right"
+          }
+        },
+        [
+          h(
+            "el-button",
+            {
+              props: {
+                type: "primary",
+                size: "small"
+              },
+              on: {
+                click: () => {
+                  const { minItems, maxItems } = config;
+                  if (maxItems && model.length >= maxItems) {
+                    console.warn(`最大数量限制为${maxItems}`);
+                    return;
+                  }
+                  let zore = model[0];
+                  if (typeof zore === "object") {
+                    let keys = Object.keys(model[0]);
+                    let obj = {};
+                    keys.forEach((els) => {
+                      obj[els] = "";
+                    });
+                    model.push(obj);
+                  } else if (
+                    typeof zore === "string" ||
+                    typeof zore === "number"
+                  ) {
+                    model.push("");
+                  }
+                }
+              }
+            },
+            "新增"
+          )
+        ]
+      );
+    },
     renderArray(h, config, prop, model) {
       const { items } = config;
       let { type } = items;
@@ -159,52 +205,7 @@ export default {
                 // display: "flex",
               }
             },
-            [
-              ...children,
-              h(
-                "div",
-                {
-                  style: {
-                    textAlign: "right"
-                  }
-                },
-                [
-                  h(
-                    "el-button",
-                    {
-                      props: {
-                        type: "primary",
-                        size: "small"
-                      },
-                      on: {
-                        click: () => {
-                          const { minItems, maxItems } = config;
-                          if (maxItems && model.length >= maxItems) {
-                            console.warn(`最大数量限制为${maxItems}`);
-                            return;
-                          }
-                          let zore = model[0];
-                          if (typeof zore === "object") {
-                            let keys = Object.keys(model[0]);
-                            let obj = {};
-                            keys.forEach((els) => {
-                              obj[els] = "";
-                            });
-                            model.push(obj);
-                          } else if (
-                            typeof zore === "string" ||
-                            typeof zore === "number"
-                          ) {
-                            model.push("");
-                          }
-                        }
-                      }
-                    },
-                    "新增"
-                  )
-                ]
-              )
-            ]
+            [...children, this.renderArrayButton(h, config, model)]
           )
         ]
       );
@@ -242,7 +243,7 @@ export default {
         type = "date-picker";
         props.placeholder = "请选择日期";
         props.type = "date";
-        props.format = config.format || "yyyy-MM-dd";
+        props.format = config.format || setting.format;
       } else if (type === "number" || type === "integer") {
         props["controls-position"] = "right";
         if (type === "integer") {
@@ -277,7 +278,7 @@ export default {
         // v-model="code"
         // language="javascript"
         props.theme = "vs-dark";
-        props.language = config.language || "javascript";
+        props.language = config.language || setting.language;
         style.width = "100%";
         style.height = "400px";
       }

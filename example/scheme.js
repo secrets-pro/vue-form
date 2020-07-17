@@ -104,6 +104,11 @@ export default {
           }
         }
       }
+    },
+    code: {
+      title: '代码编辑',
+      type: 'editor',
+      language: 'json' //javascript', 'css', 'html', 'typescript', 'json
     }
   },
   required: ['name', 'phone']

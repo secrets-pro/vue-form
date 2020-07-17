@@ -30,6 +30,7 @@
   "author": "xubowenjx",
   "license": "MIT",
   "dependencies": {
+    "@babel/plugin-transform-regenerator": "^7.10.4",
     "vue-monaco": "^1.2.1"
   },
   "devDependencies": {
@@ -45,6 +46,7 @@
     "babel-core": "^7.0.0-bridge.0",
     "babel-jest": "^24.9.0",
     "babel-loader": "^8.0.6",
+    "babel-runtime": "^6.26.0",
     "css-loader": "^3.2.0",
     "element-ui": "^2.13.1",
     "eslint": "^6.6.0",
