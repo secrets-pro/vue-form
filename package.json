@@ -1,6 +1,6 @@
 {
   "name": "@secrets/vue-form",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "vue-form",
   "main": "dist/vue-form.cjs.js",
   "module": "dist/vue-form.esm.js",
@@ -15,7 +15,7 @@
     "build": "rollup --config ./config/rollup.config.js",
     "lint": "eslint --ext .vue,.js src/",
     "test": "jest",
-    "release": "npm publish --access public",
+    "release": "npm publish --access public --registry  https://registry.npmjs.org/",
     "build:style": "gulp --gulpfile ./config/gulp.js",
     "serve": "webpack-dev-server  --config ./config/webpack.js",
     "codecov": "codecov"
