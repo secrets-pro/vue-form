@@ -30,6 +30,7 @@
   "author": "xubowenjx",
   "license": "MIT",
   "dependencies": {
+    "@vue/babel-preset-jsx": "^1.1.2",
     "vue-monaco": "^1.2.1"
   },
   "devDependencies": {

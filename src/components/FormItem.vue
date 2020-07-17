@@ -253,7 +253,7 @@ export default {
           props["min"] = config.minimum;
         }
         if (config.maximum !== undefined) {
-          props["min"] = config.maximum;
+          props["max"] = config.maximum;
         }
         type = "input-number";
       } else if (type === "select" || config.enum) {
@@ -317,9 +317,24 @@ export default {
               }
             },
             children
-          )
+          ),
+          this.renderLabel(config.title || prop, config.description)
         ]
       );
+    },
+    renderLabel(title, description) {
+      return (
+        <div slot="label">
+          <span>{title}</span>
+          {
+            description ? (
+              <el-tooltip class="item" effect="dark" content={description} placement="bottom-start">
+                <el-button icon="el-icon-info" style={{ padding: 0, border: 0, color: '#409eff' }}></el-button>
+              </el-tooltip>
+            ) : null
+          }
+        </div>
+      )
     }
   },
   render(h) {
