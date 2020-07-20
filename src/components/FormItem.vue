@@ -282,8 +282,16 @@ export default {
         // language="javascript"
         props.theme = "vs-dark";
         props.language = config.language || setting.language;
+        props.options = {
+          cursorStyle: "line", // 光标样式
+          automaticLayout: true, // 自动布局
+          formatOnPaste: true,
+          formatOnType: true
+        };
         style.width = "100%";
         style.height = "400px";
+        style.minHeight = "400px";
+        style.minWidth = "400px";
       }
       if (type === "array") {
         return this.renderArray(h, config, prop, currentValue);
