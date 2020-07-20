@@ -69,7 +69,7 @@ module.exports = {
   devServer: {
     contentBase: path.join(__dirname, "example/dist"),
     compress: true,
-    port: 8080,
+    port: 8081,
     hot: true,
     open: true //默认打开浏览器
   }
