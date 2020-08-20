@@ -3,6 +3,67 @@ export default {
   type: "object",
   buttons: ["confirm"],
   properties: {
+    policy: {
+      description: '',
+      enum: ["local", "redis"],
+      title: '实现方式',
+      type: "string",
+      children: {
+        redis: {
+          redis_host: {
+            title: "redis地址",
+            type: "string",
+            default: '127.0.0.1',
+            description: ""
+          },
+          redis_port: {
+            title: "redis端口",
+            type: "integer",
+            description: "redis通信端口设置",
+            minimum: 6379,
+            default: 6379
+          },
+          redis_timeout: {
+            title: "redis超时设置",
+            type: "integer",
+            default: 3000,
+            description: "redis超时时间设置单位为毫秒",
+            minimum: 100
+          }
+        }
+      }
+    },
+    if_key_advanced_settings: {
+      title: "启用限流策略高级设置",
+      default: false,
+      type: "boolean",
+      children: {
+        key_advanced_settings: {
+          title: "限流策略高级设置",
+          minItems: 0,
+          items: {
+            properties: {
+              key: {
+                title: 'key',
+                enum: ["client_ip", "app"],
+                type: "string"
+              },
+              op: {
+                description: "==等于限流",
+                enum: ["=="],
+                type: "string"
+              },
+              value: {
+                title: 'value',
+                type: 'string'
+              }
+            },
+            type: "object"
+          },
+          type: "array"
+        }
+      }
+    },
     name: {
       type: "string",
       title: "姓名",

@@ -202,7 +202,6 @@ export default {
             {
               style: {
                 flex: 1
-                // display: "flex",
               }
             },
             [
@@ -322,7 +321,7 @@ export default {
             },
             children
           ),
-          this.renderLabel(config.title || prop, config.description)
+          this.renderLabel(config.title || prop, config.description),
         ]
       );
     },
@@ -334,9 +333,9 @@ export default {
             <el-tooltip
               class="item"
               effect="dark"
-              content={description}
               placement="top"
             >
+              <span slot="content" style={{ whiteSpace: 'pre' }}>{ description }</span>
               <el-button
                 icon="el-icon-info"
                 style={{ padding: 0, border: 0, color: "#409eff" }}

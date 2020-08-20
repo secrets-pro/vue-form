@@ -5,7 +5,7 @@
       :model="currentModel"
       :ref="formId"
       :rules="rules"
-      :label-width="schema.labelWidth || '120px'"
+      :label-width="schema.labelWidth || '100px'"
     >
       <!-- <template v-if="scheme.layout">
         <el-row :gutter="scheme.layout.gutter||20" v-for="row in rowSize" :key="row">
@@ -20,6 +20,28 @@
           :key="key"
           @arrayInput="input"
         ></form-item-plugin>
+        <div v-if="prop.enum && prop.children && prop.children[currentModel[key]]" :key="'children' + key">
+          <div v-for="(childrenProp, childrenKey) in prop.children[currentModel[key]]" :key="childrenKey">
+            <form-item-plugin
+              v-model="currentModel[childrenKey]"
+              :config="childrenProp"
+              :prop="childrenKey"
+              :key="childrenKey"
+              @arrayInput="input"
+            ></form-item-plugin>
+          </div>
+        </div>
+        <div v-if="prop.type === 'boolean' && prop.children && currentModel[key]" :key="'children' + key">
+          <div v-for="(childrenProp, childrenKey) in prop.children" :key="childrenKey">
+            <form-item-plugin
+              v-model="currentModel[childrenKey]"
+              :config="childrenProp"
+              :prop="childrenKey"
+              :key="childrenKey"
+              @arrayInput="input"
+            ></form-item-plugin>
+          </div>
+        </div>
       </template>
       <div style="text-align:right;padding-right:12px;" v-if="schema.buttons">
         <el-button
@@ -228,12 +250,38 @@ export default {
             model[prop] = defaultValue || _value || "";
           }
         } else if (config.type === "boolean") {
+          if (config.children) {
+            let childrenProps = Object.keys(config.children);
+            childrenProps.forEach((childrenProp) => {
+              let childrenConfig = config.children[childrenProp]
+              let childrenDefaultValue = this.model[childrenProp] || childrenConfig.defaultValue || childrenConfig.default;
+              let _childrenValue = this.setArrayModal(childrenConfig, rules, childrenProp);
+              set(model, childrenProp, childrenDefaultValue || _childrenValue || "");
+              if (childrenProp.indexOf(".") > -1) {
+                model[childrenProp] = childrenDefaultValue || _childrenValue || ""
+              }
+            })
+          }
           model[prop] = !!defaultValue;
         } else {
           // model[prop] = defaultValue || null;
           set(model, prop, defaultValue || "");
           if (prop.indexOf(".") > -1) {
             model[prop] = defaultValue;
+          }
+
+          if (config.children) {
+            Object.keys(config.children).forEach((parentProp) => {
+              let childrenProps = Object.keys(config.children[parentProp]);
+              childrenProps.forEach((childrenProp) => {
+                let childrenConfig = config.children[parentProp][childrenProp];
+                let childrenDefaultValue = this.model[childrenProp] || childrenConfig.defaultValue || childrenConfig.default;
+                set(model, childrenProp, childrenDefaultValue || "");
+                if (childrenProp.indexOf(".") > -1) {
+                  model[childrenProp] = childrenDefaultValue ;
+                }
+              });
+            });
           }
         }
         if (config.type === "object" && config.properties) {
@@ -356,6 +404,10 @@ export default {
     .el-input-number {
       width: 100%;
     }
+  }
+
+  .el-form-item__label {
+    word-break: break-all;
   }
 }
 </style>
