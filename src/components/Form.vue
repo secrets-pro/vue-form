@@ -1,5 +1,5 @@
 <template>
-  <div v-if="Object.keys(currentModel).length" class="vue-form">
+  <div v-if="Object.keys(currentModel).length" class="vue-form" v-show="show">
     <el-form
       size="medium"
       :model="currentModel"
@@ -49,13 +49,15 @@
           size="mini"
           @click="confirm"
           v-show="schema.buttons.includes('confirm')"
-        >确定</el-button>
+          >确定</el-button
+        >
         <el-button
           type="default"
           size="mini"
           @click="reset"
           v-show="schema.buttons.includes('reset')"
-        >重置</el-button>
+          >重置</el-button
+        >
       </div>
     </el-form>
   </div>
@@ -69,6 +71,11 @@ import FormItemPlugin from "./FormItem.vue";
 const util = require("element-ui/lib/utils/date.js");
 export default {
   components: { "form-item-plugin": FormItemPlugin },
+  provide() {
+    return {
+      Form: this
+    };
+  },
   name: "vue-form",
   props: {
     schema: Object,
@@ -76,6 +83,12 @@ export default {
       type: Object,
       default() {
         return {};
+      }
+    },
+    show: {
+      type: Boolean,
+      default() {
+        return true;
       }
     }
   },
@@ -105,6 +118,16 @@ export default {
     schema(n) {
       this.currentScheme = n;
       this.validateScheme();
+    },
+    show(n, o) {
+      // 当状态变化
+      if (!this.once) {
+        // 只会监听一次
+        if (n === true && o === false) {
+          this.once = true;
+          this.visiableStatus = true;
+        }
+      }
     }
   },
   data() {
@@ -112,9 +135,11 @@ export default {
       currentScheme: this.schema,
       currentModel: {},
       formId: this.randomId(),
-
+      // 默认状态为show的初始值
+      visiableStatus: this.show,
       rules: {},
-      special: []
+      special: [],
+      once: false
     };
   },
   methods: {
@@ -138,7 +163,7 @@ export default {
         ...this.currentModel
       };
       let result = {};
-      Object.keys(obj).forEach(el => {
+      Object.keys(obj).forEach((el) => {
         let value = obj[el];
         if (value instanceof Date) {
           result[el] = util.format(value, "yyyy-MM-dd");
@@ -155,10 +180,10 @@ export default {
         }
       });
       if (this.special.length) {
-        this.special.forEach(el => {
+        this.special.forEach((el) => {
           let v = JSON.parse(JSON.stringify(obj[el]));
           let value = {};
-          v.forEach(els => {
+          v.forEach((els) => {
             if (els.key) {
               value[els.key] = els.value;
             }
@@ -173,15 +198,15 @@ export default {
       return y
         .substring(6)
         .split("")
-        .map(el => letters[el])
+        .map((el) => letters[el])
         .join("");
     },
     validate() {
       return new Promise((resolve, reject) => {
-        this.$refs[this.formId].validate(el => {
+        this.$refs[this.formId].validate((el) => {
           if (el) {
             let model = this.getData();
-            Object.keys(model).forEach(el => {
+            Object.keys(model).forEach((el) => {
               let value = model[el];
               if (value instanceof Date) {
                 model[el] = util.format(value, "yyyy-MM-dd");
@@ -229,7 +254,7 @@ export default {
       let { properties, required } = currentScheme;
       let model = {};
       let props = Object.keys(properties);
-      props.forEach(el => {
+      props.forEach((el) => {
         let prop = el;
         let config = properties[el];
         let defaultValue =
@@ -308,7 +333,7 @@ export default {
           };
           let _value = this.setArrayModal(config, rules, prop);
           if (defaultValue && !Array.isArray(defaultValue)) {
-            let value = Object.keys(defaultValue).map(k => ({
+            let value = Object.keys(defaultValue).map((k) => ({
               key: k,
               value: defaultValue[k]
             }));
