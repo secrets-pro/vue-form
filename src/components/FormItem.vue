@@ -5,6 +5,7 @@ import setting from "../config";
 
 export default {
   name: "vue-form-item",
+  inject: ["Form"],
   components: {
     "el-editor": MonacoEditor.default
   },
@@ -286,8 +287,10 @@ export default {
           cursorStyle: "line", // 光标样式
           automaticLayout: true, // 自动布局
           formatOnPaste: true,
-          formatOnType: true
+          formatOnType: true,
+          automaticLayout: true
         };
+        style.automaticLayout = true;
         style.width = "100%";
         style.height = "400px";
         style.minHeight = "400px";
@@ -317,6 +320,10 @@ export default {
                   if (type === "editor") {
                     this.$emit("input", value);
                   }
+                },
+                editorDidMount: (editor) => {
+                  console.log("editorDidMount", editor);
+                  editor.layout();
                 },
                 input: (value) => {
                   if (_arrayIndex !== undefined) {
@@ -356,7 +363,10 @@ export default {
     }
   },
   render(h) {
-    return this.renderFun(h, this.config, this.prop, this.currentValue);
+    if (this.Form.visiableStatus) {
+      return this.renderFun(h, this.config, this.prop, this.currentValue);
+    }
+    return null;
   }
 };
 </script>
