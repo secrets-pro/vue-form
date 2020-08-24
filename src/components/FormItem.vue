@@ -286,10 +286,8 @@ export default {
           cursorStyle: "line", // 光标样式
           automaticLayout: true, // 自动布局
           formatOnPaste: true,
-          formatOnType: true,
-          automaticLayout: true
+          formatOnType: true
         };
-        style.automaticLayout = true;
         style.width = "100%";
         style.height = "400px";
         style.minHeight = "400px";
@@ -321,7 +319,6 @@ export default {
                   }
                 },
                 editorDidMount: (editor) => {
-                  console.log("editorDidMount", editor);
                   editor.layout();
                 },
                 input: (value) => {
@@ -336,7 +333,7 @@ export default {
             },
             children
           ),
-          this.renderLabel(config.title || prop, config.description),
+          this.renderLabel(config.title || prop, config.description)
         ]
       );
     },
@@ -345,12 +342,10 @@ export default {
         <span slot="label">
           <span>{title}</span>
           {description ? (
-            <el-tooltip
-              class="item"
-              effect="dark"
-              placement="top"
-            >
-              <span slot="content" style={{ whiteSpace: 'pre' }}>{ description }</span>
+            <el-tooltip class="item" effect="dark" placement="top">
+              <span slot="content" style={{ whiteSpace: "pre" }}>
+                {description}
+              </span>
               <el-button
                 icon="el-icon-info"
                 style={{ padding: 0, border: 0, color: "#409eff" }}
