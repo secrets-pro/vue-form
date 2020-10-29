@@ -69,6 +69,10 @@ export default {
       });
     },
     renderObject(h, config, prop, model) {
+      // 渲染对象，根据字段的position进行排序，position越小排前面
+      let modelKeysSorted = Object.keys(model).sort(
+        (a, b) => config.properties[a].position - config.properties[b].position
+      );
       return h(
         "div",
         {
@@ -97,7 +101,7 @@ export default {
                 display: prop.indexOf(".") > -1 ? "flex" : "initial"
               }
             },
-            Object.keys(model).map((el) => {
+            modelKeysSorted.map((el) => {
               return h("vue-form-item", {
                 props: {
                   prop: `${this.prop}.${el}`,

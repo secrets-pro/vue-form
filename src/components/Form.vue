@@ -12,27 +12,45 @@
            <el-col v-for=""></el-col>
         </el-row>
       </template>-->
-      <template v-for="(prop, key) in this.currentScheme.properties">
+      <template v-for="prop in propertiesSorted">
         <form-item-plugin
-          v-model="currentModel[key]"
+          v-model="currentModel[prop.name]"
           :config="prop"
-          :prop="key"
-          :key="key"
+          :prop="prop.name"
+          :key="prop.name"
           @arrayInput="input"
         ></form-item-plugin>
-        <div v-if="prop.enum && prop.children && prop.children[currentModel[key]]" :key="'children' + key">
-          <div v-for="(childrenProp, childrenKey) in prop.children[currentModel[key]]" :key="childrenKey">
+        <!-- 下拉选项，选择不同的值，渲染不同的子字段 -->
+        <div
+          v-if="
+            prop.enum && prop.children && prop.children[currentModel[prop.name]]
+          "
+          :key="'children' + prop.name"
+        >
+          <div
+            v-for="childrenProp in prop.children[currentModel[prop.name]]"
+            :key="childrenProp.name"
+          >
             <form-item-plugin
-              v-model="currentModel[childrenKey]"
+              v-model="currentModel[childrenProp.name]"
               :config="childrenProp"
-              :prop="childrenKey"
-              :key="childrenKey"
+              :prop="childrenProp.name"
+              :key="childrenProp.name"
               @arrayInput="input"
             ></form-item-plugin>
           </div>
         </div>
-        <div v-if="prop.type === 'boolean' && prop.children && currentModel[key]" :key="'children' + key">
-          <div v-for="(childrenProp, childrenKey) in prop.children" :key="childrenKey">
+        <!-- 布尔类型，为true渲染子字段 -->
+        <div
+          v-if="
+            prop.type === 'boolean' && prop.children && currentModel[prop.name]
+          "
+          :key="'children' + prop.name"
+        >
+          <div
+            v-for="(childrenProp, childrenKey) in prop.children"
+            :key="childrenKey"
+          >
             <form-item-plugin
               v-model="currentModel[childrenKey]"
               :config="childrenProp"
@@ -69,6 +87,7 @@ const { set, get } = require("lodash");
 // import util from "element-ui/lib/utils/date.js";
 import FormItemPlugin from "./FormItem.vue";
 const util = require("element-ui/lib/utils/date.js");
+
 export default {
   components: { "form-item-plugin": FormItemPlugin },
   provide() {
@@ -95,6 +114,7 @@ export default {
 
   mounted() {
     this.validateScheme();
+    this.setSortProperties();
   },
   computed: {
     // prop_name: {
@@ -117,7 +137,9 @@ export default {
   watch: {
     schema(n) {
       this.currentScheme = n;
+
       this.validateScheme();
+      this.setSortProperties();
     },
     show(n, o) {
       // 当状态变化
@@ -139,10 +161,46 @@ export default {
       visiableStatus: this.show,
       rules: {},
       special: [],
-      once: false
+      once: false,
+      propertiesSorted: []
     };
   },
   methods: {
+    setSortProperties() {
+      let properties = this.currentScheme.properties
+        ? JSON.parse(JSON.stringify(this.currentScheme.properties))
+        : {};
+      // 对最外层properties进行排序（position越小排前面）
+      let propertiesSorted = Object.keys(properties)
+        .sort((a, b) => properties[a].position - properties[b].position)
+        .map((el) => ({
+          name: el,
+          ...properties[el]
+        }));
+
+      // 父子段为下拉选项，根据父子段的值渲染不同的子字段，同样需要对其子字段根据position排序
+      propertiesSorted.forEach((el) => {
+        if (el.enum && el.children && Object.keys(el.children).length) {
+          Object.keys(el.children).forEach((key) => {
+            let childrenProperties = el.children[key];
+            let childrenPropertiesSorted = Object.keys(childrenProperties)
+              .sort(
+                (a, b) =>
+                  childrenProperties[a].position -
+                  childrenProperties[b].position
+              )
+              .map((childrenPropertiesName) => ({
+                name: childrenPropertiesName,
+                ...childrenProperties[childrenPropertiesName]
+              }));
+            el.children[key] = JSON.parse(
+              JSON.stringify(childrenPropertiesSorted)
+            );
+          });
+        }
+      });
+      this.propertiesSorted = JSON.parse(JSON.stringify(propertiesSorted));
+    },
     input(key, value) {
       if (key.indexOf(".") > -1) {
         let keys = key.split(".");
@@ -278,14 +336,26 @@ export default {
           if (config.children) {
             let childrenProps = Object.keys(config.children);
             childrenProps.forEach((childrenProp) => {
-              let childrenConfig = config.children[childrenProp]
-              let childrenDefaultValue = this.model[childrenProp] || childrenConfig.defaultValue || childrenConfig.default;
-              let _childrenValue = this.setArrayModal(childrenConfig, rules, childrenProp);
-              set(model, childrenProp, childrenDefaultValue || _childrenValue || "");
+              let childrenConfig = config.children[childrenProp];
+              let childrenDefaultValue =
+                this.model[childrenProp] ||
+                childrenConfig.defaultValue ||
+                childrenConfig.default;
+              let _childrenValue = this.setArrayModal(
+                childrenConfig,
+                rules,
+                childrenProp
+              );
+              set(
+                model,
+                childrenProp,
+                childrenDefaultValue || _childrenValue || ""
+              );
               if (childrenProp.indexOf(".") > -1) {
-                model[childrenProp] = childrenDefaultValue || _childrenValue || ""
+                model[childrenProp] =
+                  childrenDefaultValue || _childrenValue || "";
               }
-            })
+            });
           }
           model[prop] = !!defaultValue;
         } else {
@@ -300,10 +370,13 @@ export default {
               let childrenProps = Object.keys(config.children[parentProp]);
               childrenProps.forEach((childrenProp) => {
                 let childrenConfig = config.children[parentProp][childrenProp];
-                let childrenDefaultValue = this.model[childrenProp] || childrenConfig.defaultValue || childrenConfig.default;
+                let childrenDefaultValue =
+                  this.model[childrenProp] ||
+                  childrenConfig.defaultValue ||
+                  childrenConfig.default;
                 set(model, childrenProp, childrenDefaultValue || "");
                 if (childrenProp.indexOf(".") > -1) {
-                  model[childrenProp] = childrenDefaultValue ;
+                  model[childrenProp] = childrenDefaultValue;
                 }
               });
             });
@@ -414,6 +487,7 @@ export default {
       let model = {}; // 准备model
       let rules = {}; //  准备rules
       model = this.setModel(this.currentScheme, rules);
+      console.log(this.currentScheme);
       this.rules = rules;
       this.currentModel = model;
       // console.log(rules);
