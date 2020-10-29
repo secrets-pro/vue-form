@@ -113,8 +113,8 @@ export default {
   },
 
   mounted() {
-    this.setSortProperties();
     this.validateScheme();
+    this.setSortProperties();
   },
   computed: {
     // prop_name: {
@@ -137,8 +137,9 @@ export default {
   watch: {
     schema(n) {
       this.currentScheme = n;
-      this.setSortProperties();
+
       this.validateScheme();
+      this.setSortProperties();
     },
     show(n, o) {
       // 当状态变化
@@ -486,6 +487,7 @@ export default {
       let model = {}; // 准备model
       let rules = {}; //  准备rules
       model = this.setModel(this.currentScheme, rules);
+      console.log(this.currentScheme);
       this.rules = rules;
       this.currentModel = model;
       // console.log(rules);
