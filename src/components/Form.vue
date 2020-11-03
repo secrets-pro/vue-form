@@ -315,8 +315,10 @@ export default {
       props.forEach((el) => {
         let prop = el;
         let config = properties[el];
-        let defaultValue =
-          this.model[el] || config.defaultValue || config.default;
+        let defaultValue = this.model[el] || config.defaultValue || config.default;
+        if (this.model[el] === false || this.model[el] === 0) {
+          defaultValue = this.model[el]
+        }
 
         if (config.type === "checkbox") {
           // model[prop] = defaultValue || [];
