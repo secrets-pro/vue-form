@@ -98,6 +98,7 @@ export default {
             {
               style: {
                 flex: 1,
+                flexWrap: 'wrap',
                 display: prop.indexOf(".") > -1 ? "flex" : "initial"
               }
             },
