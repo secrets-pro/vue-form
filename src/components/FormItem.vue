@@ -161,6 +161,26 @@ export default {
               }
             },
             `新增${title}`
+          ),
+          h(
+            "el-button",
+            {
+              props: {
+                type: "danger",
+                size: "small"
+              },
+              on: {
+                click: () => {
+                  const { minItems } = config;
+                  if ((minItems && model.length <= minItems) || model.length <= 1) {
+                    console.warn(`最小数量限制为${minItems}`);
+                    return;
+                  }
+                  model.pop();
+                }
+              }
+            },
+            `删除${title}`
           )
         ]
       );
