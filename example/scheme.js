@@ -1,163 +1,472 @@
 export default {
-  title: "basic",
-  type: "object",
-  buttons: ["confirm"],
   properties: {
-    name: {
-      position: 5,
-      type: "string",
-      title: "姓名",
-      description: "测试描述"
-    },
-    school: {
-      title: "学校",
-      type: "object",
-      position: 4,
-      properties: {
-        address: {
-          title: "地址",
-          type: "string"
-        },
-        category: {
-          title: "等级",
-          type: "select",
-          options: [
-            {
-              label: "高中",
-              value: "major"
-            },
-            {
-              label: "初中",
-              value: "minor"
-            }
-          ]
-        }
-      }
-    },
-    type: {
-      type: "select",
-      title: "类型",
-      position: 3,
-      options: [
-        {
-          label: "类型1",
-          value: "type1"
-        },
-        {
-          label: "类型2",
-          value: "type2"
-        }
-      ]
-    },
-    radio: {
-      type: "radio",
-      title: "类型",
-      position: 1,
-      options: [
-        {
-          label: "类型1",
-          value: "type1"
-        },
-        {
-          label: "类型2",
-          value: "type2"
-        }
-      ]
-    },
-    date: {
-      type: "date",
-      title: "生日",
-      position: 2
-    },
-    secrets: {
-      type: "array",
-      title: "密钥",
-      items: {
-        type: "string"
-      }
-    },
-    headers: {
-      type: "object"
-      // properties: {
-      //   name: {
-      //     type: "string",
-      //     title: "键"
-      //   },
-      //   value: {
-      //     type: "string",
-      //     title: "值"
-      //   }
-      // } // get a basic object
-    },
-    key: {
-      // like a select
-      enum: [
-        "remote_addr",
-        "server_addr",
-        "http_x_real_ip",
-        "http_x_forwarded_for"
-      ],
+    domain: {
+      description: "域名",
+      title: "domain",
       type: "string"
     },
-    rejected_code: {
-      default: 201,
-      minimum: 200, //minimum maximum
-      type: "integer"
-    },
-    configmaps: {
-      type: "array",
-      title: "挂载",
+    args: {
+      description: "参数",
       items: {
-        type: "object",
+        type: "string"
+      },
+      title: "args",
+      type: "array"
+    },
+    cmd: {
+      description: "命令",
+      items: {
+        type: "string"
+      },
+      title: "cmd",
+      type: "array"
+    },
+
+    env: {
+      description: "环境变量",
+      items: {
         properties: {
           name: {
-            type: "string",
-            title: "名称"
+            description: "名称",
+            title: "name",
+            type: "string"
           },
-          path: {
-            type: "string",
-            title: "路径"
+          value: {
+            description: "值",
+            title: "value",
+            type: "string"
           }
-        }
-      }
+        },
+        required: ["name"],
+        type: "object"
+      },
+      title: "env",
+      type: "array"
     },
-    code: {
-      title: "代码编辑",
-      type: "editor",
-      language: "json" //javascript', 'css', 'html', 'typescript', 'json
+    envFromConfigmap: {
+      description: "整个配置文件作为环境变量",
+      items: {
+        type: "string"
+      },
+      title: "envFromConfigmap",
+      type: "array"
+    },
+    envFromConfigmapRef: {
+      description: "引用配置文件中的key对应的value,作为环境变量",
+      items: {
+        properties: {
+          key: {
+            description: "配置文件key",
+            title: "key",
+            type: "string"
+          },
+          name: {
+            description: "环境变量名称",
+            title: "name",
+            type: "string"
+          },
+          refName: {
+            description: "配置文件名称",
+            title: "refName",
+            type: "string"
+          }
+        },
+        required: ["name", "refName", "key"],
+        type: "object"
+      },
+      title: "envFromConfigmapRef",
+      type: "array"
+    },
+    envFromFieldRef: {
+      description: "引用容器属性作为环境变量",
+      items: {
+        properties: {
+          fieldPath: {
+            description: "路径",
+            enum: [
+              "metadata.name",
+              "metadata.namespace",
+              "metadata.uid",
+              "status.podIP",
+              "metadata.nodeName",
+              "metadata.hostIP"
+            ],
+            title: "fieldPath",
+            type: "string"
+          },
+          name: {
+            description: "环境变量名称",
+            title: "name",
+            type: "string"
+          }
+        },
+        required: ["name", "fieldPath"],
+        type: "object"
+      },
+      title: "envFromFieldRef",
+      type: "array"
+    },
+    envFromSecret: {
+      description: "整个加密文件作为环境变量",
+      items: {
+        properties: {
+          name: {
+            description: "加密文件名称",
+            title: "name",
+            type: "string"
+          }
+        },
+        required: ["name"],
+        type: "object"
+      },
+      title: "envFromSecret",
+      type: "array"
+    },
+    envFromSecretRef: {
+      description: "引用加密配置文件中的key对应的value,作为环境变量",
+      items: {
+        properties: {
+          key: {
+            description: "加密文件key",
+            title: "key",
+            type: "string"
+          },
+          name: {
+            description: "环境变量名称",
+            title: "name",
+            type: "string"
+          },
+          refName: {
+            description: "配置文件名称",
+            title: "refName",
+            type: "string"
+          }
+        },
+        required: ["name", "refName", "key"],
+        type: "object"
+      },
+      title: "envFromSecretRef",
+      type: "array"
+    },
+    http: {
+      additionalProperties: {
+        properties: {
+          port: {
+            description: "集群内部访问端口",
+            format: "int32",
+            type: "integer"
+          },
+          targetPort: {
+            description: "容器端口",
+            format: "int32",
+            type: "integer"
+          }
+        },
+        required: ["targetPort", "port"],
+        type: "object"
+      },
+      description: "路径与端口",
+      title: "http",
+      type: "object"
+    },
+    image: {
+      default: "KUBEEASE-IMAGE",
+      description: "镜像地址",
+      title: "image",
+      type: "string"
+    },
+    imagePullSecrets: {
+      description: "拉取镜像凭证",
+      items: {
+        type: "string"
+      },
+      title: "imagePullSecrets",
+      type: "array"
+    },
+    ingressAnnotations: {
+      additionalProperties: {
+        type: "string"
+      },
+      description: "域名访问相关注释",
+      title: "ingressAnnotations",
+      type: "object"
+    },
+    livenessProbe: {
+      description: "存活性探针",
+      properties: {
+        initialDelaySeconds: {
+          default: 60,
+          description: "初始延迟(秒)",
+          maximum: 2147483647,
+          minimum: -2147483648,
+          title: "initialDelaySeconds",
+          type: "integer"
+        },
+        probeConfig: {
+          oneOf: [
+            {
+              properties: {
+                command: {
+                  description: "命令",
+                  items: {
+                    type: "string"
+                  },
+                  type: "array"
+                }
+              }
+            },
+            {
+              properties: {
+                path: {
+                  default: "/",
+                  description: "路径",
+                  type: "string"
+                },
+                port: {
+                  description: "容器端口",
+                  type: "integer"
+                }
+              },
+              required: ["path", "port"]
+            },
+            {
+              properties: {
+                port: {
+                  type: "integer"
+                }
+              },
+              required: ["port"]
+            }
+          ],
+          title: "probeConfig",
+          type: "object"
+        },
+        timeoutSeconds: {
+          default: 10,
+          description: "超时时间(秒)",
+          maximum: 2147483647,
+          minimum: -2147483648,
+          title: "timeoutSeconds",
+          type: "integer"
+        }
+      },
+      required: ["probeConfig", "initialDelaySeconds", "timeoutSeconds"],
+      title: "livenessProbe",
+      type: "object"
+    },
+    quotaModel: {
+      description: "资源配额",
+      title: "quotaModel",
+      type: "string"
+    },
+    readinessProbe: {
+      description: "就绪性探针",
+      properties: {
+        initialDelaySeconds: {
+          default: 60,
+          description: "初始延迟(秒)",
+          maximum: 2147483647,
+          minimum: -2147483648,
+          title: "initialDelaySeconds",
+          type: "integer"
+        },
+        probeConfig: {
+          oneOf: [
+            {
+              properties: {
+                command: {
+                  description: "命令",
+                  items: {
+                    type: "string"
+                  },
+                  type: "array"
+                }
+              }
+            },
+            {
+              properties: {
+                path: {
+                  default: "/",
+                  description: "路径",
+                  type: "string"
+                },
+                port: {
+                  description: "容器端口",
+                  type: "integer"
+                }
+              },
+              required: ["path", "port"]
+            },
+            {
+              allOf: [
+                {
+                  properties: {
+                    port: {
+                      description: "容器端口",
+                      type: "integer"
+                    }
+                  },
+                  required: ["port"]
+                },
+                {
+                  not: {
+                    anyOf: [
+                      {
+                        properties: {
+                          path: {
+                            default: "/",
+                            description: "路径",
+                            type: "string"
+                          },
+                          port: {
+                            description: "容器端口",
+                            type: "integer"
+                          }
+                        },
+                        required: ["path", "port"]
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ],
+          title: "probeConfig",
+          type: "object"
+        },
+        timeoutSeconds: {
+          default: 10,
+          description: "超时时间(秒)",
+          maximum: 2147483647,
+          minimum: -2147483648,
+          title: "timeoutSeconds",
+          type: "integer"
+        }
+      },
+      required: ["probeConfig", "initialDelaySeconds", "timeoutSeconds"],
+      title: "readinessProbe",
+      type: "object"
+    },
+    replicas: {
+      default: 1,
+      description: "副本数",
+      maximum: 2147483647,
+      minimum: -2147483648,
+      title: "replicas",
+      type: "integer"
+    },
+    volumeMountsConfigmap: {
+      description: "挂载配置文件",
+      items: {
+        properties: {
+          mountPath: {
+            description: "挂载路径",
+            title: "mountPath",
+            type: "string"
+          },
+          name: {
+            description: "配置文件名称",
+            title: "name",
+            type: "string"
+          },
+          readOnly: {
+            default: false,
+            description: "只读",
+            title: "readOnly",
+            type: "boolean"
+          },
+          subPath: {
+            description: "子路径",
+            title: "subPath",
+            type: "string"
+          },
+          volumeName: {
+            description: "挂载名称",
+            title: "volumeName",
+            type: "string"
+          }
+        },
+        required: ["name", "volumeName", "readOnly", "mountPath"],
+        type: "object"
+      },
+      title: "volumeMountsConfigmap",
+      type: "array"
+    },
+    volumeMountsPvc: {
+      description: "挂载磁盘",
+      items: {
+        properties: {
+          mountPath: {
+            description: "挂载路径",
+            title: "mountPath",
+            type: "string"
+          },
+          name: {
+            description: "磁盘名称(空，挂载宿主机上的目录或文件)",
+            title: "name",
+            type: "string"
+          },
+          readOnly: {
+            default: false,
+            description: "只读",
+            title: "readOnly",
+            type: "boolean"
+          },
+          subPath: {
+            description: "子路径",
+            title: "subPath",
+            type: "string"
+          },
+          volumeName: {
+            description: "挂载名称",
+            title: "volumeName",
+            type: "string"
+          }
+        },
+        required: ["volumeName", "readOnly", "mountPath"],
+        type: "object"
+      },
+      title: "volumeMountsPvc",
+      type: "array"
+    },
+    volumeMountsSecret: {
+      description: "挂载加密文件",
+      items: {
+        properties: {
+          mountPath: {
+            description: "挂载路径",
+            title: "mountPath",
+            type: "string"
+          },
+          name: {
+            description: "加密文件名称",
+            title: "name",
+            type: "string"
+          },
+          readOnly: {
+            default: false,
+            description: "只读",
+            title: "readOnly",
+            type: "boolean"
+          },
+          subPath: {
+            description: "子路径",
+            title: "subPath",
+            type: "string"
+          },
+          volumeName: {
+            description: "挂载名称",
+            title: "volumeName",
+            type: "string"
+          }
+        },
+        required: ["name", "volumeName", "readOnly", "mountPath"],
+        type: "object"
+      },
+      title: "volumeMountsSecret",
+      type: "array"
     }
   },
-  required: ["name", "phone"]
+  required: ["replicas", "image", "http", "quotaModel", "domain"],
+  type: "object"
 };
-// export default {
-//   description: "响应模拟",
-//   buttons: ["confirm"],
-//   properties: {
-//     mock_response_code: {
-//       description: "",
-//       title: "http响应码",
-//       default: 200,
-//       type: "integer"
-//     },
-//     mock_response_body: {
-//       description: "",
-//       title: "返回值设置",
-//       default: `{"data":{"iconsInLine":4,"menuList":[{"name":"公共服务","iconList":[{"iconUrl":"https://gw.alipayobjects.com/os/q/cms/images/k8g1ntl0/9fdc00aa-577b-459f-ab6c-212bdcbb0c91_w180_h180.png","iconName":"我的账单"},{"iconUrl":"https://gw.alipayobjects.com/os/q/cms/images/k8g1o6zg/4fce755b-940c-40e0-8056-1037488ce4ee_w180_h180.png","iconName":"每日用电"},{"iconUrl":"https://gw.alipayobjects.com/os/q/cms/images/k8g1ov9e/e556b050-d5aa-42a1-8935-ad1aa46efcc3_w180_h180.png","iconName":"居民电价"},{"iconUrl":"https://gw.alipayobjects.com/os/q/cms/images/k8g1p7yu/54e4514f-620f-47ff-895f-96a372507e64_w184_h180.png","iconName":"缴费记录"},{"iconUrl":"https://gw.alipayobjects.com/os/q/cms/images/k8g1pljs/26e5e551-db96-4ece-b247-59dc44003f3f_w180_h180.png","iconName":"停电公告"},{"iconUrl":"https://gw.alipayobjects.com/os/q/cms/images/k8g1q46k/17f5f19c-96b0-41f6-8e5b-1dff0557fabf_w180_h180.png","iconName":"营业网点"}]}]}}`,
-//       type: "editor"
-//     },
-//     mock_headers_arr: {
-//       description: "",
-//       title: "响应头设置",
-//       type: "array",
-//       items: {
-//         properties: {
-//           value: { title: "value", description: "", type: "string" },
-//           name: { title: "key", description: "", type: "string" }
-//         },
-//         type: "object"
-//       }
-//     }
-//   },
-//   title: "mock插件",
-//   type: "object"
-// };
