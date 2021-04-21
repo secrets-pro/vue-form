@@ -2,17 +2,7 @@
 /* eslint-disable no-unused-vars */
 const MonacoEditor = require("vue-monaco");
 import setting from "../config";
-const extraOptions = (description) => {
-  let rtn = {};
-  try {
-    rtn = JSON.parse(description);
-  } catch (error) {
-    // 不是json
-    // rtn.title = description;
-    rtn.description = description;
-  }
-  return rtn;
-};
+const extraOptions = setting.extraOptions;
 export default {
   name: "vue-form-item",
   inject: ["Form"],
@@ -383,7 +373,7 @@ export default {
             children
           ),
           this.renderLabel(
-            extra.title || config.title || prop,
+            extra.title || config.title || (_arrayIndex > -1 ? "" : prop),
             extra.description
           )
         ]

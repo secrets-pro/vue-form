@@ -1,13 +1,19 @@
 <template>
   <div class="test">
-    <vue-form
-      @on-confirm="confirm"
-      ref="form"
-      :schema="schema"
-      style="min-height:400px;max-width:50%;"
-    ></vue-form>
+    <div style="display:flex;">
+      <div style="width:40%;">
+        <el-input type="textarea" :rows="100" v-model="schemaString" />
+      </div>
+      <vue-form
+        @on-confirm="confirm"
+        ref="form"
+        :schema="schema"
+        style="min-height:400px;max-width:50%;"
+      ></vue-form>
+    </div>
+
     <el-button @click="getData">获取数据</el-button>
-    <el-input type="textarea" v-model="data1" />
+    <el-input type="textarea" v-model="data1" :rows="10" />
   </div>
 </template>
 <script>
@@ -17,8 +23,13 @@ export default {
     return {
       data1: null,
       active: "2",
-      schema: scheme
+      schemaString: JSON.stringify(scheme, null, "\t")
     };
+  },
+  computed: {
+    schema() {
+      return JSON.parse(this.schemaString);
+    }
   },
   methods: {
     confirm(model) {

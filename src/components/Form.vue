@@ -87,6 +87,8 @@ const { set } = require("lodash");
 // import util from "element-ui/lib/utils/date.js";
 import FormItemPlugin from "./FormItem.vue";
 const util = require("element-ui/lib/utils/date.js");
+import setting from "../config";
+const extraOptions = setting.extraOptions;
 
 export default {
   components: { "form-item-plugin": FormItemPlugin },
@@ -421,7 +423,9 @@ export default {
                   : false,
 
                 type: ruleType[config.type] || "string",
-                message: config.description || `${text}${config.title || prop}`
+                message:
+                  extraOptions(config.description).description ||
+                  `${text}${config.title || prop}`
               }
             ];
 
