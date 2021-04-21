@@ -4,8 +4,10 @@
       @on-confirm="confirm"
       ref="form"
       :schema="schema"
-      style="min-height:400px;"
+      style="min-height:400px;max-width:50%;"
     ></vue-form>
+    <el-button @click="getData">获取数据</el-button>
+    <el-input type="textarea" v-model="data1" />
   </div>
 </template>
 <script>
@@ -13,6 +15,7 @@ import scheme from "./scheme";
 export default {
   data() {
     return {
+      data1: null,
       active: "2",
       schema: scheme
     };
@@ -20,6 +23,10 @@ export default {
   methods: {
     confirm(model) {
       console.log(model);
+    },
+    getData() {
+      let data = this.$refs.form.getData();
+      this.data1 = JSON.stringify(data, null, "\t");
     }
   }
 };

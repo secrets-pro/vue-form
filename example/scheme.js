@@ -2,7 +2,7 @@ export default {
   labelWidth: "120px",
   properties: {
     domain: {
-      description: "域名",
+      description: '{"title":"域名","description":"域名描述"}',
       title: "domain",
       type: "string"
     },

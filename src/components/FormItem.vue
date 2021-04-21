@@ -2,7 +2,17 @@
 /* eslint-disable no-unused-vars */
 const MonacoEditor = require("vue-monaco");
 import setting from "../config";
-
+const extraOptions = (description) => {
+  let rtn = {};
+  try {
+    rtn = JSON.parse(description);
+  } catch (error) {
+    // 不是json
+    // rtn.title = description;
+    rtn.description = description;
+  }
+  return rtn;
+};
 export default {
   name: "vue-form-item",
   inject: ["Form"],
@@ -98,7 +108,7 @@ export default {
             {
               style: {
                 flex: 1,
-                flexWrap: 'wrap',
+                flexWrap: "wrap",
                 display: prop.indexOf(".") > -1 ? "flex" : "initial"
               }
             },
@@ -172,7 +182,10 @@ export default {
               on: {
                 click: () => {
                   const { minItems } = config;
-                  if ((minItems && model.length <= minItems) || model.length <= 1) {
+                  if (
+                    (minItems && model.length <= minItems) ||
+                    model.length <= 1
+                  ) {
                     console.warn(`最小数量限制为${minItems}`);
                     return;
                   }
@@ -240,11 +253,18 @@ export default {
     },
     renderFun(h, config, prop, currentValue, _arrayIndex) {
       let type = config.type;
+      // 解析description
+      let extra = extraOptions(config.description);
       let style = {};
       let props = {
         value:
           _arrayIndex !== undefined ? currentValue[_arrayIndex] : currentValue
       };
+      // ui 配置
+      let uiOptions = config["ui:options"] || extra["ui:options"];
+      if (uiOptions) {
+        style = Object.assign(style, uiOptions);
+      }
       if (config.maxLength) {
         props.maxlength = config.maxLength;
       }
@@ -323,12 +343,16 @@ export default {
       } else if (type === "object") {
         return this.renderObject(h, config, prop, currentValue);
       }
+      let styles = type === "edit" ? {} : style;
       return h(
         "el-form-item",
         {
           props: {
             prop: prop,
-            label: config.title || prop
+            label: extra.title || config.title || prop
+          },
+          style: {
+            ...styles
           }
         },
         [
@@ -336,7 +360,7 @@ export default {
             `el-${type}`,
             {
               props,
-              style,
+              style: type !== "edit" ? {} : style,
               on: {
                 change: (value) => {
                   if (type === "editor") {
@@ -358,11 +382,15 @@ export default {
             },
             children
           ),
-          this.renderLabel(config.title || prop, config.description)
+          this.renderLabel(
+            extra.title || config.title || prop,
+            extra.description
+          )
         ]
       );
     },
     renderLabel(title, description) {
+      // let exp = extraOptions(description);
       return (
         <span slot="label">
           <span>{title}</span>

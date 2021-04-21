@@ -83,7 +83,7 @@
 <script>
 /* eslint-disable no-unused-vars */
 const letters = "abcdefghijklmn".split("");
-const { set, get } = require("lodash");
+const { set } = require("lodash");
 // import util from "element-ui/lib/utils/date.js";
 import FormItemPlugin from "./FormItem.vue";
 const util = require("element-ui/lib/utils/date.js");
@@ -117,14 +117,6 @@ export default {
     this.setSortProperties();
   },
   computed: {
-    // prop_name: {
-    //   get() {
-    //     return get(this.currentModel, "prop.name");
-    //   },
-    //   set(value) {
-    //     set(this.currentModel, "prop.name", value);
-    //   }
-    // },
     rowSize() {
       return !this.schema.layout
         ? 1
@@ -315,9 +307,10 @@ export default {
       props.forEach((el) => {
         let prop = el;
         let config = properties[el];
-        let defaultValue = this.model[el] || config.defaultValue || config.default;
+        let defaultValue =
+          this.model[el] || config.defaultValue || config.default;
         if (this.model[el] === false || this.model[el] === 0) {
-          defaultValue = this.model[el]
+          defaultValue = this.model[el];
         }
 
         if (config.type === "checkbox") {
@@ -336,11 +329,15 @@ export default {
           }
         } else if (config.type === "boolean") {
           if (config.children) {
-            let values = this.setModel({ properties: config.children }, config.children.rules || {}, el)
+            let values = this.setModel(
+              { properties: config.children },
+              config.children.rules || {},
+              el
+            );
             // 将children的值平铺开放到model里
-            Object.keys(values).map(el => {
-              model[el] = values[el]
-            })
+            Object.keys(values).map((el) => {
+              model[el] = values[el];
+            });
           }
           model[prop] = !!defaultValue;
         } else {
@@ -352,11 +349,15 @@ export default {
 
           if (config.children) {
             Object.keys(config.children).forEach((pProp) => {
-              let values = this.setModel({ properties: config.children[pProp] }, config.children[pProp].rules || {}, pProp)
+              let values = this.setModel(
+                { properties: config.children[pProp] },
+                config.children[pProp].rules || {},
+                pProp
+              );
               // 将children的值平铺开放到model里
-              Object.keys(values).map(el => {
-                model[el] = values[el]
-              })
+              Object.keys(values).map((el) => {
+                model[el] = values[el];
+              });
             });
           }
         }
@@ -482,7 +483,6 @@ export default {
       width: 100%;
     }
   }
-
   .el-form-item__label {
     word-break: break-all;
   }
