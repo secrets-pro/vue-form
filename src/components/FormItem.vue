@@ -235,7 +235,12 @@ export default {
             },
             [
               ...children,
-              this.renderArrayButton(h, config, model, config.title || prop)
+              this.renderArrayButton(
+                h,
+                config,
+                model,
+                extraOptions(config.description).title || config.title || prop
+              )
             ]
           )
         ]
