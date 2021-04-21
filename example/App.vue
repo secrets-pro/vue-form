@@ -8,6 +8,7 @@
         @on-confirm="confirm"
         ref="form"
         :schema="schema"
+        :model="model"
         style="min-height:400px;max-width:50%;"
       ></vue-form>
     </div>
@@ -23,6 +24,20 @@ export default {
     return {
       data1: null,
       active: "2",
+      model: {
+        // dddd: {
+        //   args: [1]
+        // }
+        domain: "xxxx",
+        livenessProbe: {
+          initialDelaySeconds: 60,
+          timeoutSeconds: 10,
+          probeConfig: {
+            a: "v",
+            xasxsa: "xasxsaxsac"
+          }
+        }
+      },
       schemaString: JSON.stringify(scheme, null, "\t")
     };
   },

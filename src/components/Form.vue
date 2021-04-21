@@ -83,7 +83,7 @@
 <script>
 /* eslint-disable no-unused-vars */
 const letters = "abcdefghijklmn".split("");
-const { set } = require("lodash");
+const { set, get } = require("lodash");
 // import util from "element-ui/lib/utils/date.js";
 import FormItemPlugin from "./FormItem.vue";
 const util = require("element-ui/lib/utils/date.js");
@@ -211,9 +211,7 @@ export default {
       }
     },
     getData() {
-      let obj = {
-        ...this.currentModel
-      };
+      let obj = JSON.parse(JSON.stringify(this.currentModel));
       let result = {};
       Object.keys(obj).forEach((el) => {
         let value = obj[el];
@@ -233,14 +231,16 @@ export default {
       });
       if (this.special.length) {
         this.special.forEach((el) => {
-          let v = JSON.parse(JSON.stringify(obj[el]));
+          let v = JSON.parse(JSON.stringify(get(obj, el)));
           let value = {};
           v.forEach((els) => {
             if (els.key) {
               value[els.key] = els.value;
             }
           });
-          result[el] = value;
+          // debugger;
+          // result[el] = value;
+          set(result, el, value);
         });
       }
       return result;
@@ -309,10 +309,15 @@ export default {
       props.forEach((el) => {
         let prop = el;
         let config = properties[el];
-        let defaultValue =
-          this.model[el] || config.defaultValue || config.default;
-        if (this.model[el] === false || this.model[el] === 0) {
-          defaultValue = this.model[el];
+
+        let defaultValue = get(
+          this.model,
+          parentProp ? parentProp + "." + el : el,
+          config.defaultValue || config.default
+        );
+        let d = get(this.model, parentProp ? parentProp + "." + el : el);
+        if (d === false || d === 0) {
+          defaultValue = d;
         }
 
         if (config.type === "checkbox") {
@@ -369,7 +374,7 @@ export default {
         } else if (config.type === "object" && !config.properties) {
           // debugger;
           // currentScheme.type = "array";
-          this.special.push(prop);
+          this.special.push(parentProp ? parentProp + "." + prop : prop);
           let properties = {
             key: {
               type: "string",

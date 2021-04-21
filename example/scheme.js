@@ -219,44 +219,6 @@ export default {
           }
         },
         probeConfig: {
-          oneOf: [
-            {
-              description: "命令",
-              properties: {
-                command: {
-                  description: "命令",
-                  items: {
-                    type: "string"
-                  },
-                  type: "array"
-                }
-              }
-            },
-            {
-              description: "httpGet",
-              properties: {
-                path: {
-                  default: "/",
-                  description: "路径",
-                  type: "string"
-                },
-                port: {
-                  description: "容器端口",
-                  type: "integer"
-                }
-              },
-              required: ["path", "port"]
-            },
-            {
-              description: "socket",
-              properties: {
-                port: {
-                  type: "integer"
-                }
-              },
-              required: ["port"]
-            }
-          ],
           title: "probeConfig",
           type: "object"
         }
@@ -502,3 +464,39 @@ export default {
   required: ["replicas", "image", "http", "quotaModel", "domain"],
   type: "object"
 };
+
+// export default {
+//   labelWidth: "120px",
+//   properties: {
+//     domain: {
+//       description: '{"title":"域名","description":"域名描述"}',
+//       title: "domain",
+//       type: "array",
+//       items: {
+//         type: "object"
+//       }
+//     },
+//     dddd: {
+//       type: "object",
+//       description: "dddd",
+//       title: "dd",
+//       properties: {
+//         args: {
+//           description: "参数",
+//           options: [
+//             {
+//               label: "xx",
+//               value: 1
+//             },
+//             {
+//               label: "xx1",
+//               value: 11
+//             }
+//           ],
+//           title: "args",
+//           type: "checkbox"
+//         }
+//       }
+//     }
+//   }
+// };
