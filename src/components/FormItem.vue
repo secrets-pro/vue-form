@@ -224,7 +224,7 @@ export default {
                 width: "100px"
               }
             },
-            config.title || prop
+            extraOptions(config.description).title || config.title || prop
           ),
           h(
             "div",
