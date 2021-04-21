@@ -12,7 +12,7 @@ module.exports = {
   output: {
     filename: "index.js",
     chunkFilename: "[name].[hash:8].bundle.js",
-    path: resolve("../example/dist")
+    path: resolve("../docs")
   },
   mode: "development",
   devtool: "source-map",
@@ -67,7 +67,7 @@ module.exports = {
     }
   },
   devServer: {
-    contentBase: path.join(__dirname, "example/dist"),
+    contentBase: path.join(__dirname, "docs"),
     compress: true,
     port: 8081,
     hot: true,
