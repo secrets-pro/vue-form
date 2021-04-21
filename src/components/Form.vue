@@ -470,12 +470,11 @@ export default {
         throw new Error("请配置schema");
       }
       // 解析 shceme
-      const { properties, required } = this.currentScheme;
-      let props = Object.keys(properties);
-      let model = {}; // 准备model
+      // let props = Object.keys(this.currentScheme.properties);
+      // let model = {}; // 准备model
       let rules = {}; //  准备rules
-      model = this.setModel(this.currentScheme, rules);
-      console.log(this.currentScheme);
+      let model = this.setModel(this.currentScheme, rules);
+      // console.log(this.currentScheme);
       this.rules = rules;
       this.currentModel = model;
       // console.log(rules);

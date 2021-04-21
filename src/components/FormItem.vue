@@ -333,7 +333,7 @@ export default {
       } else if (type === "object") {
         return this.renderObject(h, config, prop, currentValue);
       }
-      let styles = type === "edit" ? {} : style;
+
       return h(
         "el-form-item",
         {
@@ -341,9 +341,7 @@ export default {
             prop: prop,
             label: extra.title || config.title || prop
           },
-          style: {
-            ...styles
-          }
+          style: type === "edit" ? {} : style
         },
         [
           h(
