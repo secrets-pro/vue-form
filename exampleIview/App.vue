@@ -1,11 +1,8 @@
-<template>
-  <div>
-    <Button type="primary">xxxx</Button>
-    <i-button type="primary">xxxx</i-button>
-  </div>
-</template>
 <script>
 export default {
-  name: "App"
+  name: "App",
+  render(h) {
+    return h("i-form", [h("i-form-item", [h("i-input"), h("i-switch")])]);
+  }
 };
 </script>

@@ -2,10 +2,11 @@ import "view-design/dist/styles/iview.css";
 
 import Vue from "vue";
 import App from "./App.vue";
-import elementUI from "view-design";
+import "./iview";
+// import elementUI from "view-design";
 // import VueForm from "../src";
 
-Vue.use(elementUI);
+// Vue.use(elementUI);
 // Vue.use(VueForm);
 new Vue({
   render: (h) => h(App)
