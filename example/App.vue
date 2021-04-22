@@ -33,8 +33,7 @@ export default {
           initialDelaySeconds: 60,
           timeoutSeconds: 10,
           probeConfig: {
-            a: "v",
-            xasxsa: "xasxsaxsac"
+            command: ['1', '2', '3']
           }
         }
       },

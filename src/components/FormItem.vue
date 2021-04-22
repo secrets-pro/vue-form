@@ -76,8 +76,13 @@ export default {
     renderObject(h, config, prop, model) {
       // 渲染对象，根据字段的position进行排序，position越小排前面
       let modelKeysSorted = Object.keys(model).sort(
-        (a, b) => config.properties[a].position - config.properties[b].position
+        (a, b) => {
+          if (config.properties[a] && config.properties[a].position && config.properties[b] && config.properties[b].position) {
+            return config.properties[a].position - config.properties[b].position
+          }
+        } 
       );
+
       return h(
         "div",
         {
@@ -108,15 +113,35 @@ export default {
               }
             },
             modelKeysSorted.map((el) => {
+              let configResult = config.properties[el];
+              if (el.includes('-option')) {
+                // 是oneof选项
+                const oneOfName = el.split('-')[0];
+                configResult = {
+                  type: 'select',
+                  options: config.properties[oneOfName].oneOf.map((oneOfItem, index) => ({
+                    label: oneOfItem.description,
+                    value: index
+                  }))
+                }
+              }
               return h("vue-form-item", {
                 props: {
                   prop: `${this.prop}.${el}`,
                   value: model[el],
-                  config: config.properties[el]
+                  config: configResult
                 },
                 on: {
                   input: (value) => {
                     model[el] = value;
+                    // oneof选项变化
+                    if (el.includes('-option')) {
+                      config.properties[el.split('-')[0]].selectedIndex = value;
+                      model[el.split('-')[0]] = config.properties[el.split('-')[0]].oneOf[value].defaultModel;
+                    }
+                  },
+                  arrayInput: (key, value) => {
+                    this.$emit("arrayInput", key, value);
                   }
                 }
               });
@@ -322,6 +347,12 @@ export default {
             options: el.enum.map((ele) => ({ label: ele, value: ele }))
           };
         });
+      }
+      if (config.oneOf) {
+        config = {
+          oneOf: config.oneOf,
+          ...config.oneOf[config.selectedIndex]
+        } 
       }
       let children = [];
 
