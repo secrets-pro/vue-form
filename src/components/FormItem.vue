@@ -19,6 +19,11 @@ export default {
       this.currentValue = n;
     }
   },
+  computed:{
+    prefix(){
+      return setting.options.elementUI?"el":"I"
+    }
+  },
   data() {
     return {
       currentValue: this.value
@@ -29,14 +34,14 @@ export default {
       if (groups) {
         return options.map((el) => {
           return h(
-            "el-option-group",
+            `${this.prefix}-option-group`,
             {
               props: {
                 label: el.label
               }
             },
             el.options.map((op) => {
-              return h(`el-option`, {
+              return h(`${this.prefix}-option`, {
                 props: {
                   label: op.label,
                   value: op.value
@@ -47,7 +52,7 @@ export default {
         });
       }
       return options.map((el) => {
-        return h(`el-option`, {
+        return h(`${this.prefix}-option`, {
           props: {
             label: el.label,
             value: el.value
@@ -58,7 +63,7 @@ export default {
     renderRadioCheckbox(h, type, options) {
       return options.map((el) => {
         return h(
-          `el-${type}`,
+          `${this.prefix}-${type}`,
           {
             props: {
               label: el.value
@@ -86,7 +91,7 @@ export default {
             : h(
                 "div",
                 {
-                  class: ["el-form-item__label"],
+                  class: [`${this.prefix}-form-item__label`],
                   style: {
                     width: "100px"
                   }
@@ -130,7 +135,7 @@ export default {
         },
         [
           h(
-            "el-button",
+            `${this.prefix}-button`,
             {
               props: {
                 type: "primary",
@@ -163,7 +168,7 @@ export default {
             `新增${title}`
           ),
           h(
-            "el-button",
+            `${this.prefix}-button`,
             {
               props: {
                 type: "danger",
@@ -212,25 +217,66 @@ export default {
         "div",
         {
           style: {
-            display: "flex"
+            display: "flex",
           }
         },
         [
-          h(
-            "div",
+          h(`${this.prefix}-tooltip`,{
+            props:{
+              content:config.description,
+              placement:"top",
+              disabled:!config.description
+            }
+          }, [   h(
+           "div",
             {
-              class: ["el-form-item__label"],
+             class: [`${this.prefix}-form-item__label`],
               style: {
                 width: "100px"
-              }
-            },
-            extraOptions(config.description).title || config.title || prop
-          ),
+              },
+              
+             },
+             extraOptions(config.description).title || config.title || prop
+           )]),
+          
+          // h(
+          //   "div",
+          //   {
+          //     class: [`${this.prefix}-form-item__label`],
+          //     style: {
+          //       width: "100px"
+          //     },
+              
+          //   },
+          //   extraOptions(config.description).title || config.title || prop
+          // ),
+
+          // h(`${this.prefix}-tooltip`,{
+          //   props:{
+          //     content:config.description,
+          //     placement:"top"
+          //   }
+          // }, [ h(
+          //   `${this.prefix}-button`,
+          //   {
+          //     style: {
+          //       padding:0,
+          //       border:0,
+          //       color:"#409eff",
+          //       display:"flex",
+          //       alignItems:"start"
+          //     },
+          //     props:{
+          //       icon:`${this.prefix}-icon-info`
+          //     }
+          //   },
+          // )]),
           h(
             "div",
             {
               style: {
-                flex: 1
+                flex: 1,
+                padding:"10px 5px"
               }
             },
             [
@@ -340,7 +386,7 @@ export default {
       }
 
       return h(
-        "el-form-item",
+        `${this.prefix}-form-item`,
         {
           props: {
             prop: prop,
@@ -350,7 +396,7 @@ export default {
         },
         [
           h(
-            `el-${type}`,
+            `${this.prefix}-${type}`,
             {
               props,
               style: type !== "edit" ? {} : style,

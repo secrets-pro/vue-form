@@ -1,6 +1,10 @@
 export default {
   language: "json",
   format: "yyyy-MM-dd",
+  options:{
+    elementUI:true,
+    IView:false
+  },
   extraOptions(description) {
     let rtn = {};
     try {
