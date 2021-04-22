@@ -1,13 +1,7 @@
 export default {
-  labelWidth: "120px",
   properties: {
-    domain: {
-      description: '{"title":"域名","description":"域名描述"}',
-      title: "domain",
-      type: "string"
-    },
     args: {
-      description: "参数",
+      description: '{"title":"参数"}',
       items: {
         type: "string"
       },
@@ -15,60 +9,65 @@ export default {
       type: "array"
     },
     cmd: {
-      description: "命令",
+      description: '{"title":"命令"}',
       items: {
         type: "string"
       },
       title: "cmd",
       type: "array"
     },
-
+    domain: {
+      description: '{"title":"域名"}',
+      title: "domain",
+      type: "string"
+    },
     env: {
-      description: "环境变量",
+      description: '{"title":"环境变量"}',
       items: {
         properties: {
           name: {
-            description: "名称",
+            description: '{"title":"名称"}',
+            pattern: "^[-._a-zA-Z][-._a-zA-Z0-9]*$",
             title: "name",
             type: "string"
           },
           value: {
-            description: "值",
+            description: '{"title":"值"}',
             title: "value",
             type: "string"
           }
         },
-        required: ["name"],
+        required: ["name", "value"],
         type: "object"
       },
       title: "env",
       type: "array"
     },
     envFromConfigmap: {
-      description: "整个配置文件作为环境变量",
+      description: '{"title":"整个配置文件作为环境变量"}',
       items: {
-        title: "配置文件名称",
         type: "string"
       },
-      title: "引用配置文件",
+      title: "envFromConfigmap",
       type: "array"
     },
     envFromConfigmapRef: {
-      description: "引用配置文件中的key对应的value,作为环境变量",
+      description: '{"title":"引用配置文件中的key对应的value,作为环境变量"}',
       items: {
         properties: {
           key: {
-            description: "配置文件key",
+            description: '{"title":"配置文件key"}',
             title: "key",
             type: "string"
           },
           name: {
-            description: "环境变量名称",
+            description: '{"title":"环境变量名称"}',
+            pattern: "^[-._a-zA-Z][-._a-zA-Z0-9]*$",
             title: "name",
             type: "string"
           },
           refName: {
-            description: "配置文件名称",
+            description: '{"title":"配置文件名称"}',
             title: "refName",
             type: "string"
           }
@@ -84,7 +83,7 @@ export default {
       items: {
         properties: {
           fieldPath: {
-            description: "路径",
+            description: '{"title":"路径"}',
             enum: [
               "metadata.name",
               "metadata.namespace",
@@ -97,7 +96,8 @@ export default {
             type: "string"
           },
           name: {
-            description: "环境变量名称",
+            description: '{"title":"环境变量名称"}',
+            pattern: "^[-._a-zA-Z][-._a-zA-Z0-9]*$",
             title: "name",
             type: "string"
           }
@@ -109,37 +109,31 @@ export default {
       type: "array"
     },
     envFromSecret: {
-      description: "整个加密文件作为环境变量",
+      description: '{"title":"整个加密文件作为环境变量"}',
       items: {
-        properties: {
-          name: {
-            description: "加密文件名称",
-            title: "name",
-            type: "string"
-          }
-        },
-        required: ["name"],
-        type: "object"
+        type: "string"
       },
       title: "envFromSecret",
       type: "array"
     },
     envFromSecretRef: {
-      description: "引用加密配置文件中的key对应的value,作为环境变量",
+      description:
+        '{"title":"引用加密配置文件中的key对应的value,作为环境变量"}',
       items: {
         properties: {
           key: {
-            description: "加密文件key",
+            description: '{"title":"加密文件key"}',
             title: "key",
             type: "string"
           },
           name: {
-            description: "环境变量名称",
+            description: '{"title":"环境变量名称"}',
+            pattern: "^[-._a-zA-Z][-._a-zA-Z0-9]*$",
             title: "name",
             type: "string"
           },
           refName: {
-            description: "配置文件名称",
+            description: '{"title":"配置文件名称"}',
             title: "refName",
             type: "string"
           }
@@ -154,31 +148,39 @@ export default {
       additionalProperties: {
         properties: {
           port: {
-            description: "集群内部访问端口",
-            format: "int32",
-            type: "integer"
+            default: 80,
+            description: '{"title":"集群内部访问端口"}',
+            exclusiveMaximum: true,
+            exclusiveMinimum: true,
+            maximum: 65536,
+            minimum: 0,
+            type: "number"
           },
           targetPort: {
-            description: "容器端口",
-            format: "int32",
-            type: "integer"
+            default: 80,
+            description: '{"title":"容器端口"}',
+            exclusiveMaximum: true,
+            exclusiveMinimum: true,
+            maximum: 65536,
+            minimum: 0,
+            type: "number"
           }
         },
-        required: ["targetPort", "port"],
+        required: ["port", "targetPort"],
         type: "object"
       },
-      description: "路径与端口",
+      description: '{"title":"路径与端口"}',
       title: "http",
       type: "object"
     },
     image: {
       default: "KUBEEASE-IMAGE",
-      description: "镜像地址",
+      description: '{"title":"镜像地址","description":"镜像地址"}',
       title: "image",
       type: "string"
     },
     imagePullSecrets: {
-      description: "拉取镜像凭证",
+      description: '{"title":"拉取镜像凭证"}',
       items: {
         type: "string"
       },
@@ -189,230 +191,131 @@ export default {
       additionalProperties: {
         type: "string"
       },
-      description: "域名访问相关注释",
-      title: "域名注释",
+      description: '{"title":"域名访问相关注释"}',
+      title: "ingressAnnotations",
       type: "object"
     },
     livenessProbe: {
-      description: "存活性探针",
+      description: '{"title":"存活性探针"}"}',
       properties: {
-        initialDelaySeconds: {
-          default: 60,
-          description: "初始延迟(秒)",
-          maximum: 2147483647,
-          minimum: -2147483648,
-          title: "初始延迟",
-          type: "integer",
-          "ui:options": {
-            width: "50%"
-          }
-        },
-        timeoutSeconds: {
-          default: 10,
-          description: "超时时间(秒)",
-          maximum: 2147483647,
-          minimum: -2147483648,
-          title: "超时时间",
-          type: "integer",
-          "ui:options": {
-            width: "50%"
-          }
-        },
         probeConfig: {
+          description: '{"title":"探针类型"}',
           title: "probeConfig",
           type: "object"
         }
       },
-      required: ["probeConfig", "initialDelaySeconds", "timeoutSeconds"],
-      title: "存活探针",
+      required: ["probeConfig"],
+      title: "livenessProbe",
       type: "object"
     },
     quotaModel: {
-      description: "资源配额",
+      description:
+        '{"title":"配额","description":"用于指定容器需要的最小、最大cpu内存配置，通过配额管理配置模板","url":"/argo/v4/tenants/{tenantName}/projects/{projectName}/quota-model/list?cluster={cluster}","type":"select","key":"id","show":"name","return":"jsonStr"}',
       title: "quotaModel",
       type: "string"
     },
     readinessProbe: {
-      description: "就绪性探针",
+      description: '{"title":"就绪性探针"}',
       properties: {
         initialDelaySeconds: {
           default: 60,
-          description: "初始延迟(秒)",
+          description: '{"title":"初始延迟(秒)"}',
           maximum: 2147483647,
           minimum: -2147483648,
-          title: "初始延迟",
+          title: "initialDelaySeconds",
           type: "integer"
         },
         probeConfig: {
-          oneOf: [
-            {
-              description: "命令",
-              properties: {
-                command: {
-                  description: "命令",
-                  items: {
-                    type: "string"
-                  },
-                  type: "array"
-                }
-              }
-            },
-            {
-              properties: {
-                path: {
-                  default: "/",
-                  description: "路径",
-                  type: "string"
-                },
-                port: {
-                  description: "容器端口",
-                  type: "integer"
-                }
-              },
-              required: ["path", "port"]
-            },
-            {
-              allOf: [
-                {
-                  properties: {
-                    port: {
-                      description: "容器端口",
-                      type: "integer"
-                    }
-                  },
-                  required: ["port"]
-                },
-                {
-                  not: {
-                    anyOf: [
-                      {
-                        properties: {
-                          path: {
-                            default: "/",
-                            description: "路径",
-                            type: "string"
-                          },
-                          port: {
-                            description: "容器端口",
-                            type: "integer"
-                          }
-                        },
-                        required: ["path", "port"]
-                      }
-                    ]
-                  }
-                }
-              ]
-            }
-          ],
+          description: '{"title":"探针类型"}',
           title: "probeConfig",
           type: "object"
         },
         timeoutSeconds: {
           default: 10,
-          description: "超时时间(秒)",
+          description: '{"title":"超时时间(秒)"}',
           maximum: 2147483647,
           minimum: -2147483648,
           title: "timeoutSeconds",
           type: "integer"
         }
       },
-      required: ["probeConfig", "initialDelaySeconds", "timeoutSeconds"],
+      required: ["initialDelaySeconds", "timeoutSeconds", "probeConfig"],
       title: "readinessProbe",
       type: "object"
     },
     replicas: {
       default: 1,
-      description: "副本数",
+      description: '{"title":"副本数"}',
+      exclusiveMinimum: true,
       maximum: 2147483647,
-      minimum: -2147483648,
+      minimum: 0,
       title: "replicas",
-      type: "integer",
-      "ui:options": {
-        width: "33.33%"
-      }
+      type: "integer"
     },
     volumeMountsConfigmap: {
-      description: "挂载配置文件",
+      description: '{"title":"挂载配置文件"}',
       items: {
         properties: {
-          readOnly: {
-            default: false,
-            description: "只读",
-            title: "只读",
-            type: "boolean",
-            "ui:options": {
-              width: "100%",
-              display: "block"
-            }
-          },
           mountPath: {
-            description: "挂载路径",
+            description: '{"title":"挂载路径"}',
             title: "mountPath",
-            type: "string",
-            "ui:options": {
-              width: "50%"
-            }
+            type: "string"
           },
           name: {
-            description: "配置文件名称",
+            description: '{"title":"配置文件名称"}',
             title: "name",
-            type: "string",
-            "ui:options": {
-              width: "50%"
-            }
+            type: "string"
           },
-
+          readOnly: {
+            default: false,
+            description: '{"title":"只读"}',
+            title: "readOnly",
+            type: "boolean"
+          },
           subPath: {
-            description: "子路径",
+            description: '{"title":"子路径"}',
             title: "subPath",
-            type: "string",
-            "ui:options": {
-              width: "50%"
-            }
+            type: "string"
           },
           volumeName: {
-            description: "挂载名称",
+            description: '{"title":"挂载名称"}',
             title: "volumeName",
-            type: "string",
-            "ui:options": {
-              width: "50%"
-            }
+            type: "string"
           }
         },
         required: ["name", "volumeName", "readOnly", "mountPath"],
         type: "object"
       },
-      title: "挂载配置文件",
+      title: "volumeMountsConfigmap",
       type: "array"
     },
     volumeMountsPvc: {
-      description: "挂载磁盘",
+      description: '{"title":"挂载磁盘"}',
       items: {
         properties: {
           mountPath: {
-            description: "挂载路径",
+            description: '{"title":"挂载路径"}',
             title: "mountPath",
             type: "string"
           },
           name: {
-            description: "磁盘名称(空，挂载宿主机上的目录或文件)",
+            description: '{"title":"磁盘名称(空代表挂载宿主机上的目录或文件)"}',
             title: "name",
             type: "string"
           },
           readOnly: {
             default: false,
-            description: "只读",
+            description: '{"title":"只读"}',
             title: "readOnly",
             type: "boolean"
           },
           subPath: {
-            description: "子路径",
+            description: '{"title":"子路径"}',
             title: "subPath",
             type: "string"
           },
           volumeName: {
-            description: "挂载名称",
+            description: '{"title":"挂载名称"}',
             title: "volumeName",
             type: "string"
           }
@@ -424,32 +327,32 @@ export default {
       type: "array"
     },
     volumeMountsSecret: {
-      description: "挂载加密文件",
+      description: '{"title":"挂载加密文件"}',
       items: {
         properties: {
           mountPath: {
-            description: "挂载路径",
+            description: '{"title":"挂载路径"}',
             title: "mountPath",
             type: "string"
           },
           name: {
-            description: "加密文件名称",
+            description: '{"title":"加密文件名称"}',
             title: "name",
             type: "string"
           },
           readOnly: {
             default: false,
-            description: "只读",
+            description: '{"title":"只读"}',
             title: "readOnly",
             type: "boolean"
           },
           subPath: {
-            description: "子路径",
+            description: '{"title":"子路径"}',
             title: "subPath",
             type: "string"
           },
           volumeName: {
-            description: "挂载名称",
+            description: '{"title":"挂载名称"}',
             title: "volumeName",
             type: "string"
           }
@@ -457,46 +360,10 @@ export default {
         required: ["name", "volumeName", "readOnly", "mountPath"],
         type: "object"
       },
-      title: "挂载加密文件",
+      title: "volumeMountsSecret",
       type: "array"
     }
   },
   required: ["replicas", "image", "http", "quotaModel", "domain"],
   type: "object"
 };
-
-// export default {
-//   labelWidth: "120px",
-//   properties: {
-//     domain: {
-//       description: '{"title":"域名","description":"域名描述"}',
-//       title: "domain",
-//       type: "array",
-//       items: {
-//         type: "object"
-//       }
-//     },
-//     dddd: {
-//       type: "object",
-//       description: "dddd",
-//       title: "dd",
-//       properties: {
-//         args: {
-//           description: "参数",
-//           options: [
-//             {
-//               label: "xx",
-//               value: 1
-//             },
-//             {
-//               label: "xx1",
-//               value: 11
-//             }
-//           ],
-//           title: "args",
-//           type: "checkbox"
-//         }
-//       }
-//     }
-//   }
-// };

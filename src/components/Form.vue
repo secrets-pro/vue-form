@@ -477,7 +477,7 @@ export default {
       // console.log(this.currentScheme);
       this.rules = rules;
       this.currentModel = model;
-      // console.log(rules);
+      console.log(rules);
       // console.log(model);
     }
   }
