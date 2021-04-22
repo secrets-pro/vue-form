@@ -223,9 +223,9 @@ export default {
         [
           h(`${this.prefix}-tooltip`,{
             props:{
-              content:config.description,
+              content:extraOptions(config.description).title,
               placement:"top",
-              disabled:!config.description
+              disabled:!extraOptions(config.description).title
             }
           }, [   h(
            "div",
