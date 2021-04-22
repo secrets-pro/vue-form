@@ -87,6 +87,8 @@ const { set, get } = require("lodash");
 // import util from "element-ui/lib/utils/date.js";
 import FormItemPlugin from "./FormItem.vue";
 const util = require("element-ui/lib/utils/date.js");
+import setting from "../config";
+const extraOptions = setting.extraOptions;
 
 export default {
   components: { "form-item-plugin": FormItemPlugin },
@@ -117,14 +119,6 @@ export default {
     this.setSortProperties();
   },
   computed: {
-    // prop_name: {
-    //   get() {
-    //     return get(this.currentModel, "prop.name");
-    //   },
-    //   set(value) {
-    //     set(this.currentModel, "prop.name", value);
-    //   }
-    // },
     rowSize() {
       return !this.schema.layout
         ? 1
@@ -217,9 +211,7 @@ export default {
       }
     },
     getData() {
-      let obj = {
-        ...this.currentModel
-      };
+      let obj = JSON.parse(JSON.stringify(this.currentModel));
       let result = {};
       Object.keys(obj).forEach((el) => {
         let value = obj[el];
@@ -239,14 +231,16 @@ export default {
       });
       if (this.special.length) {
         this.special.forEach((el) => {
-          let v = JSON.parse(JSON.stringify(obj[el]));
+          let v = JSON.parse(JSON.stringify(get(obj, el)));
           let value = {};
           v.forEach((els) => {
             if (els.key) {
               value[els.key] = els.value;
             }
           });
-          result[el] = value;
+          // debugger;
+          // result[el] = value;
+          set(result, el, value);
         });
       }
       return result;
@@ -315,9 +309,15 @@ export default {
       props.forEach((el) => {
         let prop = el;
         let config = properties[el];
-        let defaultValue = this.model[el] || config.defaultValue || config.default;
-        if (this.model[el] === false || this.model[el] === 0) {
-          defaultValue = this.model[el]
+
+        let defaultValue = get(
+          this.model,
+          parentProp ? parentProp + "." + el : el,
+          config.defaultValue || config.default
+        );
+        let d = get(this.model, parentProp ? parentProp + "." + el : el);
+        if (d === false || d === 0) {
+          defaultValue = d;
         }
 
         if (config.type === "checkbox") {
@@ -336,11 +336,15 @@ export default {
           }
         } else if (config.type === "boolean") {
           if (config.children) {
-            let values = this.setModel({ properties: config.children }, config.children.rules || {}, el)
+            let values = this.setModel(
+              { properties: config.children },
+              config.children.rules || {},
+              el
+            );
             // 将children的值平铺开放到model里
-            Object.keys(values).map(el => {
-              model[el] = values[el]
-            })
+            Object.keys(values).map((el) => {
+              model[el] = values[el];
+            });
           }
           model[prop] = !!defaultValue;
         } else {
@@ -352,11 +356,15 @@ export default {
 
           if (config.children) {
             Object.keys(config.children).forEach((pProp) => {
-              let values = this.setModel({ properties: config.children[pProp] }, config.children[pProp].rules || {}, pProp)
+              let values = this.setModel(
+                { properties: config.children[pProp] },
+                config.children[pProp].rules || {},
+                pProp
+              );
               // 将children的值平铺开放到model里
-              Object.keys(values).map(el => {
-                model[el] = values[el]
-              })
+              Object.keys(values).map((el) => {
+                model[el] = values[el];
+              });
             });
           }
         }
@@ -366,7 +374,7 @@ export default {
         } else if (config.type === "object" && !config.properties) {
           // debugger;
           // currentScheme.type = "array";
-          this.special.push(prop);
+          this.special.push(parentProp ? parentProp + "." + prop : prop);
           let properties = {
             key: {
               type: "string",
@@ -420,7 +428,9 @@ export default {
                   : false,
 
                 type: ruleType[config.type] || "string",
-                message: config.description || `${text}${config.title || prop}`
+                message:
+                  extraOptions(config.description).description ||
+                  `${text}${config.title || prop}`
               }
             ];
 
@@ -460,12 +470,11 @@ export default {
         throw new Error("请配置schema");
       }
       // 解析 shceme
-      const { properties, required } = this.currentScheme;
-      let props = Object.keys(properties);
-      let model = {}; // 准备model
+      // let props = Object.keys(this.currentScheme.properties);
+      // let model = {}; // 准备model
       let rules = {}; //  准备rules
-      model = this.setModel(this.currentScheme, rules);
-      console.log(this.currentScheme);
+      let model = this.setModel(this.currentScheme, rules);
+      // console.log(this.currentScheme);
       this.rules = rules;
       this.currentModel = model;
       // console.log(rules);
@@ -482,7 +491,6 @@ export default {
       width: 100%;
     }
   }
-
   .el-form-item__label {
     word-break: break-all;
   }

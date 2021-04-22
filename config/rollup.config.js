@@ -9,23 +9,23 @@ let baseconfig = (format) => {
     output: {
       name: "vue-form",
       globals: {
-        vue: "Vue",
+        vue: "Vue"
       },
       extend: true,
       format,
       sourceMap: true,
       file:
-        format === "iife" ? "dist/vue-form.js" : `dist/vue-form.${format}.js`,
+        format === "iife" ? "dist/vue-form.js" : `dist/vue-form.${format}.js`
     },
-    external: ["vue", "lodash"],
+    external: ["vue", "lodash", "vue-monaco"],
     plugins: [
       resolve(),
       babel({
-        exclude: "node_modules/**", // 只编译我们的源代码
+        exclude: "node_modules/**" // 只编译我们的源代码
       }),
       vueplugin({ css: true }),
-      uglify(),
-    ],
+      uglify()
+    ]
   };
 };
 export default [baseconfig("esm"), baseconfig("cjs"), baseconfig("iife")];

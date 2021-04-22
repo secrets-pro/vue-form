@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 const MonacoEditor = require("vue-monaco");
 import setting from "../config";
-
+const extraOptions = setting.extraOptions;
 export default {
   name: "vue-form-item",
   inject: ["Form"],
@@ -98,7 +98,7 @@ export default {
             {
               style: {
                 flex: 1,
-                flexWrap: 'wrap',
+                flexWrap: "wrap",
                 display: prop.indexOf(".") > -1 ? "flex" : "initial"
               }
             },
@@ -161,6 +161,29 @@ export default {
               }
             },
             `新增${title}`
+          ),
+          h(
+            "el-button",
+            {
+              props: {
+                type: "danger",
+                size: "small"
+              },
+              on: {
+                click: () => {
+                  const { minItems } = config;
+                  if (
+                    (minItems && model.length <= minItems) ||
+                    model.length <= 1
+                  ) {
+                    console.warn(`最小数量限制为${minItems}`);
+                    return;
+                  }
+                  model.pop();
+                }
+              }
+            },
+            `删除${title}`
           )
         ]
       );
@@ -201,7 +224,7 @@ export default {
                 width: "100px"
               }
             },
-            config.title || prop
+            extraOptions(config.description).title || config.title || prop
           ),
           h(
             "div",
@@ -212,7 +235,12 @@ export default {
             },
             [
               ...children,
-              this.renderArrayButton(h, config, model, config.title || prop)
+              this.renderArrayButton(
+                h,
+                config,
+                model,
+                extraOptions(config.description).title || config.title || prop
+              )
             ]
           )
         ]
@@ -220,11 +248,18 @@ export default {
     },
     renderFun(h, config, prop, currentValue, _arrayIndex) {
       let type = config.type;
+      // 解析description
+      let extra = extraOptions(config.description);
       let style = {};
       let props = {
         value:
           _arrayIndex !== undefined ? currentValue[_arrayIndex] : currentValue
       };
+      // ui 配置
+      let uiOptions = config["ui:options"] || extra["ui:options"];
+      if (uiOptions) {
+        style = Object.assign(style, uiOptions);
+      }
       if (config.maxLength) {
         props.maxlength = config.maxLength;
       }
@@ -303,20 +338,22 @@ export default {
       } else if (type === "object") {
         return this.renderObject(h, config, prop, currentValue);
       }
+
       return h(
         "el-form-item",
         {
           props: {
             prop: prop,
-            label: config.title || prop
-          }
+            label: extra.title || config.title || prop
+          },
+          style: type === "edit" ? {} : style
         },
         [
           h(
             `el-${type}`,
             {
               props,
-              style,
+              style: type !== "edit" ? {} : style,
               on: {
                 change: (value) => {
                   if (type === "editor") {
@@ -338,11 +375,15 @@ export default {
             },
             children
           ),
-          this.renderLabel(config.title || prop, config.description)
+          this.renderLabel(
+            extra.title || config.title || (_arrayIndex > -1 ? "" : prop),
+            extra.description
+          )
         ]
       );
     },
     renderLabel(title, description) {
+      // let exp = extraOptions(description);
       return (
         <span slot="label">
           <span>{title}</span>
