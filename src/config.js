@@ -3,7 +3,7 @@ export default {
   format: "yyyy-MM-dd",
   options:{
     elementUI:true,
-    IView:false
+    iView:false
   },
   extraOptions(description) {
     let rtn = {};
