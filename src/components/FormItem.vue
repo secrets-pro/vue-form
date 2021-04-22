@@ -21,7 +21,7 @@ export default {
   },
   computed:{
     prefix(){
-      return setting.options.elementUI?"el":"I"
+      return setting.options[Object.keys(setting.options)[0]]?"el":"i"
     }
   },
   data() {
