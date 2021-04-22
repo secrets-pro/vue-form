@@ -13,7 +13,7 @@
         </el-row>
       </template>-->
       <template v-for="prop in propertiesSorted">
-        <form-item-plugin
+       <form-item-plugin
           v-model="currentModel[prop.name]"
           :config="prop"
           :prop="prop.name"
@@ -243,6 +243,18 @@ export default {
           set(result, el, value);
         });
       }
+      result = this.removeOneOfOption(result);
+      return result;
+    },
+    // 移除记住oneof选项
+    removeOneOfOption(result) {
+      Object.keys(result).forEach(el => {
+        if (el.includes('-option')) {
+          delete result[el]
+        } else if (typeof result[el] === 'object') {
+          this.removeOneOfOption(result[el])
+        }
+      });
       return result;
     },
     randomId() {
@@ -369,9 +381,30 @@ export default {
           }
         }
         if (config.type === "object" && config.properties) {
-          // model.prop =
           model[prop] = this.setModel(config, rules, prop);
-        } else if (config.type === "object" && !config.properties) {
+        } else if (config.type === "object" && config.oneOf) {
+          // 通过比较属性key，确定选中的是哪一个。
+          let configOneOfModelArray = [];
+          config.oneOf.forEach(oneOfItem => {
+            const oneOfItemMoel = this.setModel(oneOfItem, {});
+            oneOfItem.defaultModel = oneOfItemMoel
+            configOneOfModelArray.push(oneOfItemMoel)
+          });
+          let selectedIndex = 0;
+          if (defaultValue) {
+            configOneOfModelArray.forEach((modelItem, index) => {
+              const modelItemKeys = Object.keys(modelItem);
+              const defaultValueKeys = Object.keys(defaultValue);
+              if (!_.difference(modelItemKeys, defaultValueKeys).length && !_.difference(defaultValueKeys, modelItemKeys).length) {
+                selectedIndex = index
+              }
+            });
+            config.oneOf[selectedIndex].defaultModel = defaultValue;
+          }
+          config.selectedIndex = selectedIndex;
+          model[`${prop}-option`] = selectedIndex;
+          model[prop] = config.oneOf[selectedIndex].defaultModel;
+        } else if (config.type === "object" && (!config.properties && !config.oneOf)) {
           // debugger;
           // currentScheme.type = "array";
           this.special.push(parentProp ? parentProp + "." + prop : prop);

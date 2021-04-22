@@ -19,6 +19,11 @@ export default {
       this.currentValue = n;
     }
   },
+  computed:{
+    prefix(){
+      return setting.options[Object.keys(setting.options)[0]]?"el":"i"
+    }
+  },
   data() {
     return {
       currentValue: this.value
@@ -29,14 +34,14 @@ export default {
       if (groups) {
         return options.map((el) => {
           return h(
-            "el-option-group",
+            `${this.prefix}-option-group`,
             {
               props: {
                 label: el.label
               }
             },
             el.options.map((op) => {
-              return h(`el-option`, {
+              return h(`${this.prefix}-option`, {
                 props: {
                   label: op.label,
                   value: op.value
@@ -47,7 +52,7 @@ export default {
         });
       }
       return options.map((el) => {
-        return h(`el-option`, {
+        return h(`${this.prefix}-option`, {
           props: {
             label: el.label,
             value: el.value
@@ -58,7 +63,7 @@ export default {
     renderRadioCheckbox(h, type, options) {
       return options.map((el) => {
         return h(
-          `el-${type}`,
+          `${this.prefix}-${type}`,
           {
             props: {
               label: el.value
@@ -71,8 +76,13 @@ export default {
     renderObject(h, config, prop, model) {
       // 渲染对象，根据字段的position进行排序，position越小排前面
       let modelKeysSorted = Object.keys(model).sort(
-        (a, b) => config.properties[a].position - config.properties[b].position
+        (a, b) => {
+          if (config.properties[a] && config.properties[a].position && config.properties[b] && config.properties[b].position) {
+            return config.properties[a].position - config.properties[b].position
+          }
+        } 
       );
+
       return h(
         "div",
         {
@@ -86,7 +96,7 @@ export default {
             : h(
                 "div",
                 {
-                  class: ["el-form-item__label"],
+                  class: [`${this.prefix}-form-item__label`],
                   style: {
                     width: "100px"
                   }
@@ -103,15 +113,35 @@ export default {
               }
             },
             modelKeysSorted.map((el) => {
+              let configResult = config.properties[el];
+              if (el.includes('-option')) {
+                // 是oneof选项
+                const oneOfName = el.split('-')[0];
+                configResult = {
+                  type: 'select',
+                  options: config.properties[oneOfName].oneOf.map((oneOfItem, index) => ({
+                    label: oneOfItem.description,
+                    value: index
+                  }))
+                }
+              }
               return h("vue-form-item", {
                 props: {
                   prop: `${this.prop}.${el}`,
                   value: model[el],
-                  config: config.properties[el]
+                  config: configResult
                 },
                 on: {
                   input: (value) => {
                     model[el] = value;
+                    // oneof选项变化
+                    if (el.includes('-option')) {
+                      config.properties[el.split('-')[0]].selectedIndex = value;
+                      model[el.split('-')[0]] = config.properties[el.split('-')[0]].oneOf[value].defaultModel;
+                    }
+                  },
+                  arrayInput: (key, value) => {
+                    this.$emit("arrayInput", key, value);
                   }
                 }
               });
@@ -130,7 +160,7 @@ export default {
         },
         [
           h(
-            "el-button",
+            `${this.prefix}-button`,
             {
               props: {
                 type: "primary",
@@ -163,7 +193,7 @@ export default {
             `新增${title}`
           ),
           h(
-            "el-button",
+            `${this.prefix}-button`,
             {
               props: {
                 type: "danger",
@@ -212,25 +242,66 @@ export default {
         "div",
         {
           style: {
-            display: "flex"
+            display: "flex",
           }
         },
         [
-          h(
-            "div",
+          h(`${this.prefix}-tooltip`,{
+            props:{
+              content:extraOptions(config.description).title,
+              placement:"top",
+              disabled:!extraOptions(config.description).title
+            }
+          }, [   h(
+           "div",
             {
-              class: ["el-form-item__label"],
+             class: [`${this.prefix}-form-item__label`],
               style: {
                 width: "100px"
-              }
-            },
-            extraOptions(config.description).title || config.title || prop
-          ),
+              },
+              
+             },
+             extraOptions(config.description).title || config.title || prop
+           )]),
+          
+          // h(
+          //   "div",
+          //   {
+          //     class: [`${this.prefix}-form-item__label`],
+          //     style: {
+          //       width: "100px"
+          //     },
+              
+          //   },
+          //   extraOptions(config.description).title || config.title || prop
+          // ),
+
+          // h(`${this.prefix}-tooltip`,{
+          //   props:{
+          //     content:config.description,
+          //     placement:"top"
+          //   }
+          // }, [ h(
+          //   `${this.prefix}-button`,
+          //   {
+          //     style: {
+          //       padding:0,
+          //       border:0,
+          //       color:"#409eff",
+          //       display:"flex",
+          //       alignItems:"start"
+          //     },
+          //     props:{
+          //       icon:`${this.prefix}-icon-info`
+          //     }
+          //   },
+          // )]),
           h(
             "div",
             {
               style: {
-                flex: 1
+                flex: 1,
+                padding:"10px 5px"
               }
             },
             [
@@ -276,6 +347,12 @@ export default {
             options: el.enum.map((ele) => ({ label: ele, value: ele }))
           };
         });
+      }
+      if (config.oneOf) {
+        config = {
+          oneOf: config.oneOf,
+          ...config.oneOf[config.selectedIndex]
+        } 
       }
       let children = [];
 
@@ -340,7 +417,7 @@ export default {
       }
 
       return h(
-        "el-form-item",
+        `${this.prefix}-form-item`,
         {
           props: {
             prop: prop,
@@ -350,7 +427,7 @@ export default {
         },
         [
           h(
-            `el-${type}`,
+            `${this.prefix}-${type}`,
             {
               props,
               style: type !== "edit" ? {} : style,
