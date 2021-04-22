@@ -8,7 +8,9 @@ function resolve(_path) {
   return path.resolve(__dirname, _path);
 }
 module.exports = {
-  entry: "./example/index.js",
+  entry: "./exampleIview/index.js",
+  mode: "development",
+
   output: {
     filename: "index.js",
     chunkFilename: "[name].[hash:8].bundle.js",
@@ -22,6 +24,12 @@ module.exports = {
         use: [
           {
             loader: "vue-loader"
+          },
+          {
+            loader: "iview-loader",
+            options: {
+              prefix: true
+            }
           }
         ]
       },
@@ -68,5 +76,12 @@ module.exports = {
     alias: {
       "@": resolve("../src")
     }
+  },
+  devServer: {
+    contentBase: path.join(__dirname, "docs"),
+    compress: true,
+    port: 8081,
+    hot: true,
+    open: true //默认打开浏览器
   }
 };
