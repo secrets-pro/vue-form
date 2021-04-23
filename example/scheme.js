@@ -45,7 +45,7 @@ export default {
       type: "array"
     },
     domain: {
-      description: '{"title":"域名"}',
+      description: '{"title":"域名","description":"域名"}',
       title: "domain",
       type: "string"
     },

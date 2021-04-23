@@ -5,7 +5,7 @@
       :model="currentModel"
       :ref="formId"
       :rules="rules"
-      :label-width="schema.labelWidth || 100"
+      :label-width="schema.labelWidth || '100px'"
     >
       <template v-for="prop in propertiesSorted">
         <form-item-plugin
