@@ -3,9 +3,7 @@
     <div style="display:flex;">
       <div style="width:40%;">
         <!-- <el-input type="textarea" :rows="100" v-model="schemaString" /> -->
-        <i-tooltip content="bbb">
-          <div>aaaa</div>
-        </i-tooltip>
+        <i-input type="textarea" :rows="100" v-model="schemaString" />
       </div>
       <vue-form
         @on-confirm="confirm"

@@ -2,7 +2,7 @@ export default {
   language: "json",
   format: "yyyy-MM-dd",
   options:{
-    elementUI:true,
+    elementUI:false,
     iView:false
   },
   extraOptions(description) {

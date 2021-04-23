@@ -19,9 +19,9 @@ export default {
       this.currentValue = n;
     }
   },
-  computed:{
-    prefix(){
-      return setting.options[Object.keys(setting.options)[0]]?"el":"i"
+  computed: {
+    prefix() {
+      return setting.options[Object.keys(setting.options)[0]] ? "el" : "i";
     }
   },
   data() {
@@ -75,13 +75,16 @@ export default {
     },
     renderObject(h, config, prop, model) {
       // 渲染对象，根据字段的position进行排序，position越小排前面
-      let modelKeysSorted = Object.keys(model).sort(
-        (a, b) => {
-          if (config.properties[a] && config.properties[a].position && config.properties[b] && config.properties[b].position) {
-            return config.properties[a].position - config.properties[b].position
-          }
-        } 
-      );
+      let modelKeysSorted = Object.keys(model).sort((a, b) => {
+        if (
+          config.properties[a] &&
+          config.properties[a].position &&
+          config.properties[b] &&
+          config.properties[b].position
+        ) {
+          return config.properties[a].position - config.properties[b].position;
+        }
+      });
 
       return h(
         "div",
@@ -114,16 +117,18 @@ export default {
             },
             modelKeysSorted.map((el) => {
               let configResult = config.properties[el];
-              if (el.includes('-option')) {
+              if (el.includes("-option")) {
                 // 是oneof选项
-                const oneOfName = el.split('-')[0];
+                const oneOfName = el.split("-")[0];
                 configResult = {
-                  type: 'select',
-                  options: config.properties[oneOfName].oneOf.map((oneOfItem, index) => ({
-                    label: oneOfItem.description,
-                    value: index
-                  }))
-                }
+                  type: "select",
+                  options: config.properties[oneOfName].oneOf.map(
+                    (oneOfItem, index) => ({
+                      label: oneOfItem.description,
+                      value: index
+                    })
+                  )
+                };
               }
               return h("vue-form-item", {
                 props: {
@@ -135,9 +140,11 @@ export default {
                   input: (value) => {
                     model[el] = value;
                     // oneof选项变化
-                    if (el.includes('-option')) {
-                      config.properties[el.split('-')[0]].selectedIndex = value;
-                      model[el.split('-')[0]] = config.properties[el.split('-')[0]].oneOf[value].defaultModel;
+                    if (el.includes("-option")) {
+                      let __prop__ = el.split("-")[0];
+                      config.properties[__prop__].selectedIndex = value;
+                      model[__prop__] =
+                        config.properties[__prop__].oneOf[value].defaultModel;
                     }
                   },
                   arrayInput: (key, value) => {
@@ -196,7 +203,7 @@ export default {
             `${this.prefix}-button`,
             {
               props: {
-                type: "danger",
+                type: "error",
                 size: "small"
               },
               on: {
@@ -242,7 +249,7 @@ export default {
         "div",
         {
           style: {
-            display: "flex",
+            display: "flex"
           }
         },
         [
@@ -256,23 +263,33 @@ export default {
           }, [   h(
            "div",
             {
-             class: [`${this.prefix}-form-item__label`],
-              style: {
-                width: "100px"
-              },
-              
-             },
-             extraOptions(config.description).title || config.title || prop
-           )]),
-          
-          // h(
+              props: {
+                content: extraOptions(config.description).title,
+                placement: "top",
+                disabled: !extraOptions(config.description).title
+              }
+            },
+            [
+              h(
+                "div",
+                {
+                  class: [`${this.prefix}-form-item__label`],
+                  style: {
+                    width: "100px"
+                  }
+                },
+                extraOptions(config.description).title || config.title || prop
+              )
+            ]
+          ),
+  // h(
           //   "div",
           //   {
           //     class: [`${this.prefix}-form-item__label`],
           //     style: {
           //       width: "100px"
           //     },
-              
+
           //   },
           //   extraOptions(config.description).title || config.title || prop
           // ),
@@ -297,12 +314,13 @@ export default {
           //     }
           //   },
           // )]),
+        
           h(
             "div",
             {
               style: {
                 flex: 1,
-                padding:"10px 5px"
+                padding: "10px 5px"
               }
             },
             [
@@ -316,8 +334,8 @@ export default {
             ]
           )
         ]
-      );
-    },
+      )
+        ])},
     renderFun(h, config, prop, currentValue, _arrayIndex) {
       let type = config.type;
       // 解析description
@@ -353,7 +371,7 @@ export default {
         config = {
           oneOf: config.oneOf,
           ...config.oneOf[config.selectedIndex]
-        } 
+        };
       }
       let children = [];
 
@@ -465,17 +483,7 @@ export default {
       return (
         <span slot="label">
           <span>{title}</span>
-          {description ? (
-            <el-tooltip class="item" effect="dark" placement="top">
-              <span slot="content" style={{ whiteSpace: "pre" }}>
-                {description}
-              </span>
-              <el-button
-                icon="el-icon-info"
-                style={{ padding: 0, border: 0, color: "#409eff" }}
-              ></el-button>
-            </el-tooltip>
-          ) : null}
+         
         </span>
       );
     }
