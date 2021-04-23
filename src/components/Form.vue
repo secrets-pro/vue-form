@@ -1,11 +1,11 @@
 <template>
   <div v-if="Object.keys(currentModel).length" class="vue-form" v-show="show">
-    <el-form
+    <i-form
       size="medium"
       :model="currentModel"
       :ref="formId"
       :rules="rules"
-      :label-width="schema.labelWidth || '100px'"
+      :label-width="schema.labelWidth || 100"
     >
       <!-- <template v-if="scheme.layout">
         <el-row :gutter="scheme.layout.gutter||20" v-for="row in rowSize" :key="row">
@@ -69,15 +69,14 @@
           v-show="schema.buttons.includes('confirm')"
           >确定</el-button
         >
-        <el-button
+       <el-button
           type="default"
           size="mini"
           @click="reset"
           v-show="schema.buttons.includes('reset')"
-          >重置</el-button
-        >
+          >重置</el-button>
       </div>
-    </el-form>
+    </i-form>
   </div>
 </template>
 <script>
@@ -115,6 +114,7 @@ export default {
   },
 
   mounted() {
+    console.log(this.prefix,"111121212");
     this.validateScheme();
     this.setSortProperties();
   },
@@ -126,6 +126,9 @@ export default {
             Object.keys(this.currentModel).length /
               (24 / (this.schema.layout.span || 8))
           );
+    },
+    prefix(){
+      return setting.options[Object.keys(setting.options)[0]]?"el":"i"
     }
   },
   watch: {
@@ -518,13 +521,13 @@ export default {
 </script>
 <style lang="less">
 .vue-form {
-  .el-form-item__content {
+  .i-form-item__content {
     .el-select,
     .el-input-number {
       width: 100%;
     }
   }
-  .el-form-item__label {
+  .i-form-item__label {
     word-break: break-all;
   }
 }
