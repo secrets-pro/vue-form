@@ -1,6 +1,6 @@
 <template>
   <div v-if="Object.keys(currentModel).length" class="vue-form" v-show="show">
-    <i-form
+    <el-form
       size="medium"
       :model="currentModel"
       :ref="formId"
@@ -72,7 +72,7 @@
           >重置</el-button
         >
       </div>
-    </i-form>
+    </el-form>
   </div>
 </template>
 <script>
