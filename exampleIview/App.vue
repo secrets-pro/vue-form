@@ -13,13 +13,13 @@
         style="min-height:400px;max-width:50%;"
       ></vue-form>
     </div>
- 
+
     <!-- <el-button @click="getData">获取数据</el-button> -->
     <!-- <el-input type="textarea" v-model="data1" :rows="10" /> -->
   </div>
 </template>
 <script>
-import scheme from "./scheme";
+import scheme from "../example/scheme";
 export default {
   data() {
     return {
@@ -34,7 +34,7 @@ export default {
           initialDelaySeconds: 60,
           timeoutSeconds: 10,
           probeConfig: {
-            command: ['1', '2', '3']
+            command: ["1", "2", "3"]
           }
         }
       },
@@ -57,6 +57,3 @@ export default {
   }
 };
 </script>
-<style lang="less" scoped>
-@import url("./style.less");
-</style>

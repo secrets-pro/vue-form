@@ -21,7 +21,7 @@ export default {
   },
   computed: {
     prefix() {
-      return setting.options[Object.keys(setting.options)[0]] ? "el" : "i";
+      return !setting.options.iView ? "el" : "i";
     }
   },
   data() {
@@ -253,74 +253,21 @@ export default {
           }
         },
         [
-          h(`${this.prefix}-tooltip`,{
-            props:{
-              content:extraOptions(config.description).title,
-              placement:"top",
-              disabled:!extraOptions(config.description).title,
-              name:"aaa"
-            }
-          }, [   h(
-           "div",
+          h(
+            "div",
             {
-              props: {
-                content: extraOptions(config.description).title,
-                placement: "top",
-                disabled: !extraOptions(config.description).title
+              class: ["el-form-item__label"],
+              style: {
+                width: "100px"
               }
             },
-            [
-              h(
-                "div",
-                {
-                  class: [`${this.prefix}-form-item__label`],
-                  style: {
-                    width: "100px"
-                  }
-                },
-                extraOptions(config.description).title || config.title || prop
-              )
-            ]
+            extraOptions(config.description).title || config.title || prop
           ),
-  // h(
-          //   "div",
-          //   {
-          //     class: [`${this.prefix}-form-item__label`],
-          //     style: {
-          //       width: "100px"
-          //     },
-
-          //   },
-          //   extraOptions(config.description).title || config.title || prop
-          // ),
-
-          // h(`${this.prefix}-tooltip`,{
-          //   props:{
-          //     content:config.description,
-          //     placement:"top"
-          //   }
-          // }, [ h(
-          //   `${this.prefix}-button`,
-          //   {
-          //     style: {
-          //       padding:0,
-          //       border:0,
-          //       color:"#409eff",
-          //       display:"flex",
-          //       alignItems:"start"
-          //     },
-          //     props:{
-          //       icon:`${this.prefix}-icon-info`
-          //     }
-          //   },
-          // )]),
-        
           h(
             "div",
             {
               style: {
-                flex: 1,
-                padding: "10px 5px"
+                flex: 1
               }
             },
             [
@@ -334,8 +281,8 @@ export default {
             ]
           )
         ]
-      )
-        ])},
+      );
+    },
     renderFun(h, config, prop, currentValue, _arrayIndex) {
       let type = config.type;
       // 解析description
@@ -483,7 +430,6 @@ export default {
       return (
         <span slot="label">
           <span>{title}</span>
-         
         </span>
       );
     }
