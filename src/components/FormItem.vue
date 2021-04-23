@@ -1,14 +1,11 @@
 <script>
 /* eslint-disable no-unused-vars */
-const MonacoEditor = require("vue-monaco");
 import setting from "../config";
 const extraOptions = setting.extraOptions;
 export default {
   name: "vue-form-item",
   inject: ["Form"],
-  components: {
-    "el-editor": MonacoEditor.default
-  },
+
   props: {
     value: [String, Number, Boolean, Array, Date, Object],
     config: Object,
@@ -30,7 +27,7 @@ export default {
     };
   },
   methods: {
-    renderSelectOptions(h, options, groups) {
+    renderSelectOptions(h, options = [], groups) {
       if (groups) {
         return options.map((el) => {
           return h(
@@ -41,6 +38,7 @@ export default {
               }
             },
             el.options.map((op) => {
+              // 检查 options
               return h(`${this.prefix}-option`, {
                 props: {
                   label: op.label,
@@ -60,7 +58,8 @@ export default {
         });
       });
     },
-    renderRadioCheckbox(h, type, options) {
+    renderRadioCheckbox(h, type, options = []) {
+      // option [{ label: "类型1", value: "type1"}] ==> option[1.2] enum[1,2] enumNames["xx","yyy"]
       return options.map((el) => {
         return h(
           `${this.prefix}-${type}`,
@@ -99,9 +98,9 @@ export default {
             : h(
                 "div",
                 {
-                  class: [`${this.prefix}-form-item__label`],
+                  class: [`${this.prefix}-form-item__label`], // FIXME class
                   style: {
-                    width: "100px"
+                    width: "100px" // 配置
                   }
                 },
                 config.title
@@ -118,6 +117,7 @@ export default {
             modelKeysSorted.map((el) => {
               let configResult = config.properties[el];
               if (el.includes("-option")) {
+                //  oneOf 才会有的属性  基础属性路径b-option
                 // 是oneof选项
                 const oneOfName = el.split("-")[0];
                 configResult = {
@@ -170,8 +170,8 @@ export default {
             `${this.prefix}-button`,
             {
               props: {
-                type: "primary",
-                size: "small"
+                type: "primary"
+                // size: "small"
               },
               on: {
                 click: () => {
@@ -203,8 +203,8 @@ export default {
             `${this.prefix}-button`,
             {
               props: {
-                type: "error",
-                size: "small"
+                type: "error" // error类型  判断
+                // size: "small"
               },
               on: {
                 click: () => {
@@ -228,10 +228,11 @@ export default {
     renderArray(h, config, prop, model) {
       const { items } = config;
       let { type } = items;
-      let that = this;
+      // let that = this;
       let children =
         type === "object"
           ? model.map((el, index) => {
+              // TODO model 类型
               // model是当前构造出来的数组对象 el就是子项 如果el不是object类型
 
               return h("div", {}, [
@@ -256,7 +257,7 @@ export default {
           h(
             "div",
             {
-              class: ["el-form-item__label"],
+              class: [`${this.prefix}-form-item__label`], // class判断
               style: {
                 width: "100px"
               }
@@ -316,6 +317,7 @@ export default {
       }
       if (config.oneOf) {
         config = {
+          //  config 临时记录 现有选择的oneOf字段
           oneOf: config.oneOf,
           ...config.oneOf[config.selectedIndex]
         };
@@ -371,6 +373,7 @@ export default {
           formatOnPaste: true,
           formatOnType: true
         };
+        // TODO  优先级
         style.width = "100%";
         style.height = "400px";
         style.minHeight = "400px";
@@ -393,7 +396,7 @@ export default {
         },
         [
           h(
-            `${this.prefix}-${type}`,
+            `${type === "edit" ? "my" : this.prefix}-${type}`,
             {
               props,
               style: type !== "edit" ? {} : style,
@@ -425,11 +428,23 @@ export default {
         ]
       );
     },
+    // 修改成render
     renderLabel(title, description) {
       // let exp = extraOptions(description);
       return (
         <span slot="label">
           <span>{title}</span>
+          {description ? (
+            <el-tooltip class="item" effect="dark" placement="top">
+              <span slot="content" style={{ whiteSpace: "pre" }}>
+                {description}
+              </span>
+              <el-button
+                icon="el-icon-info" //  icon类型
+                style={{ padding: 0, border: 0, color: "#409eff" }}
+              ></el-button>
+            </el-tooltip>
+          ) : null}
         </span>
       );
     }
