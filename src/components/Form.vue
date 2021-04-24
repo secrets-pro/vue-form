@@ -82,10 +82,9 @@
 /* eslint-disable no-unused-vars */
 const letters = "abcdefghijklmn".split("");
 import { set, get, difference } from "lodash";
-// import util from "element-ui/lib/utils/date.js";
 import FormItemPlugin from "./FormItem.vue";
-const util = require("element-ui/lib/utils/date.js"); // FIXME  强依赖
 import setting from "../config";
+const formatDate = setting.formatDate;
 const extraOptions = setting.extraOptions;
 
 export default {
@@ -126,7 +125,7 @@ export default {
           );
     },
     prefix() {
-      return setting.options[Object.keys(setting.options)[0]] ? "el" : "i"; // FIXME 判断逻辑
+      return !setting.options.iView ? "el" : "i";
     }
   },
   watch: {
@@ -218,7 +217,7 @@ export default {
       Object.keys(obj).forEach((el) => {
         let value = obj[el];
         if (value instanceof Date) {
-          result[el] = util.format(value, "yyyy-MM-dd");
+          result[el] = formatDate(value, "yyyy-MM-dd");
         } else if (Array.isArray(value)) {
           // 空数组 或者 数组里的值都是空
           // if (value.length === 0 || value.join("").length === 0) {
@@ -275,7 +274,7 @@ export default {
             Object.keys(model).forEach((el) => {
               let value = model[el];
               if (value instanceof Date) {
-                model[el] = util.format(value, "yyyy-MM-dd");
+                model[el] = formatDate(value, "yyyy-MM-dd");
               }
               if (el.indexOf(".") > -1) {
                 delete model[el];
