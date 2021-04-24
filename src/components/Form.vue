@@ -1,11 +1,12 @@
 <template>
   <div v-if="Object.keys(currentModel).length" class="vue-form" v-show="show">
-    <el-form
+    <component
+      :is="`${this.prefix}-form`"
       size="medium"
       :model="currentModel"
       :ref="formId"
       :rules="rules"
-      :label-width="schema.labelWidth || '100px'"
+      :label-width="schema.labelWidth || this.defaultWidth"
     >
       <template v-for="prop in propertiesSorted">
         <form-item-plugin
@@ -57,22 +58,24 @@
         </div>
       </template>
       <div style="text-align:right;padding-right:12px;" v-if="schema.buttons">
-        <el-button
+        <component
+          :is="`${this.prefix}-button`"
           type="primary"
           size="mini"
           @click="confirm"
           v-show="schema.buttons.includes('confirm')"
-          >确定</el-button
+          >确定</component
         >
-        <el-button
+        <component
+          :is="`${this.prefix}-button`"
           type="default"
           size="mini"
           @click="reset"
           v-show="schema.buttons.includes('reset')"
-          >重置</el-button
+          >重置</component
         >
       </div>
-    </el-form>
+    </component>
   </div>
 </template>
 <script>
@@ -145,6 +148,7 @@ export default {
   },
   data() {
     return {
+      defaultWidth: this.prefix === "el" ? "100px" : 100,
       currentScheme: this.schema,
       currentModel: {},
       formId: this.randomId(),

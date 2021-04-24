@@ -23,6 +23,7 @@ export default {
   },
   data() {
     return {
+      icon: this.prefix === "el" ? "el-icon-info" : "ios-information-circle",
       currentValue: this.value
     };
   },
@@ -431,19 +432,27 @@ export default {
     // 修改成render
     renderLabel(title, description) {
       // let exp = extraOptions(description);
+      let Tag = this.prefix + "-tooltip";
+      let ButtonTag = this.prefix + "-button";
       return (
         <span slot="label">
           <span>{title}</span>
           {description ? (
-            <el-tooltip class="item" effect="dark" placement="top">
+            <Tag class="item" effect="dark" placement="top">
               <span slot="content" style={{ whiteSpace: "pre" }}>
                 {description}
               </span>
-              <el-button
-                icon="el-icon-info" //  icon类型
-                style={{ padding: 0, border: 0, color: "#409eff" }}
-              ></el-button>
-            </el-tooltip>
+              <ButtonTag
+                icon={this.icon} //  icon类型
+                style={{
+                  padding: 0,
+                  border: 0,
+                  width: "auto",
+                  height: "auto",
+                  color: "#409eff"
+                }}
+              ></ButtonTag>
+            </Tag>
           ) : null}
         </span>
       );
