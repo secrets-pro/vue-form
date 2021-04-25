@@ -522,8 +522,8 @@ export default {
 <style lang="less">
 .vue-form {
   .i-form-item__content {
-    .el-select,
-    .el-input-number {
+    .i-select,
+    .i-input-number {
       width: 100%;
     }
   }

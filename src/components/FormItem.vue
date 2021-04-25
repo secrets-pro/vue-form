@@ -483,7 +483,17 @@ export default {
       return (
         <span slot="label">
           <span>{title}</span>
-         
+          {description ? (
+            <el-tooltip class="item" effect="dark" placement="top">
+              <span slot="content" style={{ whiteSpace: "pre" }}>
+                {description}
+              </span>
+              <el-button
+                icon="el-icon-info"
+                style={{ padding: 0, border: 0, color: "#409eff" }}
+              ></el-button>
+            </el-tooltip>
+          ) : null}
         </span>
       );
     }
