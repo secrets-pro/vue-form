@@ -1,19 +1,15 @@
 <template>
   <div v-if="Object.keys(currentModel).length" class="vue-form" v-show="show">
-    <i-form
+    <component
+      :is="`${this.prefix}-form`"
       size="medium"
       :model="currentModel"
       :ref="formId"
       :rules="rules"
-      :label-width="schema.labelWidth || 100"
+      :label-width="schema.labelWidth || this.defaultWidth"
     >
-      <!-- <template v-if="scheme.layout">
-        <el-row :gutter="scheme.layout.gutter||20" v-for="row in rowSize" :key="row">
-           <el-col v-for=""></el-col>
-        </el-row>
-      </template>-->
       <template v-for="prop in propertiesSorted">
-       <form-item-plugin
+        <form-item-plugin
           v-model="currentModel[prop.name]"
           :config="prop"
           :prop="prop.name"
@@ -62,31 +58,33 @@
         </div>
       </template>
       <div style="text-align:right;padding-right:12px;" v-if="schema.buttons">
-        <el-button
+        <component
+          :is="`${this.prefix}-button`"
           type="primary"
           size="mini"
           @click="confirm"
           v-show="schema.buttons.includes('confirm')"
-          >确定</el-button
+          >确定</component
         >
-       <el-button
+        <component
+          :is="`${this.prefix}-button`"
           type="default"
           size="mini"
           @click="reset"
           v-show="schema.buttons.includes('reset')"
-          >重置</el-button>
+          >重置</component
+        >
       </div>
-    </i-form>
+    </component>
   </div>
 </template>
 <script>
 /* eslint-disable no-unused-vars */
 const letters = "abcdefghijklmn".split("");
-const { set, get } = require("lodash");
-// import util from "element-ui/lib/utils/date.js";
+import { set, get, difference } from "lodash";
 import FormItemPlugin from "./FormItem.vue";
-const util = require("element-ui/lib/utils/date.js");
 import setting from "../config";
+const formatDate = setting.formatDate;
 const extraOptions = setting.extraOptions;
 
 export default {
@@ -114,7 +112,6 @@ export default {
   },
 
   mounted() {
-    console.log(this.prefix,"111121212");
     this.validateScheme();
     this.setSortProperties();
   },
@@ -127,14 +124,13 @@ export default {
               (24 / (this.schema.layout.span || 8))
           );
     },
-    prefix(){
-      return setting.options[Object.keys(setting.options)[0]]?"el":"i"
+    prefix() {
+      return !setting.options.iView ? "el" : "i";
     }
   },
   watch: {
     schema(n) {
       this.currentScheme = n;
-
       this.validateScheme();
       this.setSortProperties();
     },
@@ -151,6 +147,7 @@ export default {
   },
   data() {
     return {
+      defaultWidth: this.prefix === "el" ? "100px" : 100,
       currentScheme: this.schema,
       currentModel: {},
       formId: this.randomId(),
@@ -198,6 +195,7 @@ export default {
       });
       this.propertiesSorted = JSON.parse(JSON.stringify(propertiesSorted));
     },
+    // FIXME  优化
     input(key, value) {
       if (key.indexOf(".") > -1) {
         let keys = key.split(".");
@@ -219,7 +217,7 @@ export default {
       Object.keys(obj).forEach((el) => {
         let value = obj[el];
         if (value instanceof Date) {
-          result[el] = util.format(value, "yyyy-MM-dd");
+          result[el] = formatDate(value, "yyyy-MM-dd");
         } else if (Array.isArray(value)) {
           // 空数组 或者 数组里的值都是空
           // if (value.length === 0 || value.join("").length === 0) {
@@ -251,11 +249,11 @@ export default {
     },
     // 移除记住oneof选项
     removeOneOfOption(result) {
-      Object.keys(result).forEach(el => {
-        if (el.includes('-option')) {
-          delete result[el]
-        } else if (typeof result[el] === 'object') {
-          this.removeOneOfOption(result[el])
+      Object.keys(result).forEach((el) => {
+        if (el.includes("-option")) {
+          delete result[el];
+        } else if (typeof result[el] === "object") {
+          this.removeOneOfOption(result[el]);
         }
       });
       return result;
@@ -276,7 +274,7 @@ export default {
             Object.keys(model).forEach((el) => {
               let value = model[el];
               if (value instanceof Date) {
-                model[el] = util.format(value, "yyyy-MM-dd");
+                model[el] = formatDate(value, "yyyy-MM-dd");
               }
               if (el.indexOf(".") > -1) {
                 delete model[el];
@@ -388,18 +386,21 @@ export default {
         } else if (config.type === "object" && config.oneOf) {
           // 通过比较属性key，确定选中的是哪一个。
           let configOneOfModelArray = [];
-          config.oneOf.forEach(oneOfItem => {
+          config.oneOf.forEach((oneOfItem) => {
             const oneOfItemMoel = this.setModel(oneOfItem, {});
-            oneOfItem.defaultModel = oneOfItemMoel
-            configOneOfModelArray.push(oneOfItemMoel)
+            oneOfItem.defaultModel = oneOfItemMoel;
+            configOneOfModelArray.push(oneOfItemMoel);
           });
           let selectedIndex = 0;
           if (defaultValue) {
             configOneOfModelArray.forEach((modelItem, index) => {
               const modelItemKeys = Object.keys(modelItem);
               const defaultValueKeys = Object.keys(defaultValue);
-              if (!_.difference(modelItemKeys, defaultValueKeys).length && !_.difference(defaultValueKeys, modelItemKeys).length) {
-                selectedIndex = index
+              if (
+                !difference(modelItemKeys, defaultValueKeys).length &&
+                !difference(defaultValueKeys, modelItemKeys).length
+              ) {
+                selectedIndex = index;
               }
             });
             config.oneOf[selectedIndex].defaultModel = defaultValue;
@@ -407,7 +408,11 @@ export default {
           config.selectedIndex = selectedIndex;
           model[`${prop}-option`] = selectedIndex;
           model[prop] = config.oneOf[selectedIndex].defaultModel;
-        } else if (config.type === "object" && (!config.properties && !config.oneOf)) {
+        } else if (
+          config.type === "object" &&
+          !config.properties &&
+          !config.oneOf
+        ) {
           // debugger;
           // currentScheme.type = "array";
           this.special.push(parentProp ? parentProp + "." + prop : prop);
@@ -455,6 +460,7 @@ export default {
             let required_ = config.minLength || config.maxLength || config.enum;
             //  || config.pattern;
             let text = config.enum || config.options ? "请选择" : "请输入";
+            // FXIME 如果是数组嵌套object的时候 prop--> a.0.b==>rule
             let baseRule = [
               {
                 required: required_
@@ -513,21 +519,36 @@ export default {
       // console.log(this.currentScheme);
       this.rules = rules;
       this.currentModel = model;
-      console.log(rules);
+      // console.log(rules);
       // console.log(model);
     }
   }
 };
 </script>
 <style lang="less">
+// class  看 iview 和 element-ui的名称
 .vue-form {
-  .i-form-item__content {
-    .i-select,
-    .i-input-number {
+  .ivu-form-item__content {
+    .ivu-select,
+    .ivu-input-number {
       width: 100%;
     }
   }
-  .i-form-item__label {
+  .ivu-form-item-label {
+    word-break: break-all;
+  }
+  .ivu-btn+.ivu-btn{
+    margin-left: 10px;
+  }
+}
+.vue-form {
+  .el-form-item__content {
+    .el-select,
+    .el-input-number {
+      width: 100%;
+    }
+  }
+  .el-form-item__label {
     word-break: break-all;
   }
 }

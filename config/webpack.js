@@ -8,7 +8,7 @@ function resolve(_path) {
   return path.resolve(__dirname, _path);
 }
 module.exports = {
-  entry: "./example/index.js",
+  entry: `./${process.env.entry}/index.js`,
   output: {
     filename: "index.js",
     chunkFilename: "[name].[hash:8].bundle.js",

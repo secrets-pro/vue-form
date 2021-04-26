@@ -1,14 +1,12 @@
 <script>
 /* eslint-disable no-unused-vars */
-const MonacoEditor = require("vue-monaco");
 import setting from "../config";
+import styleCfg from "../styleCfg"
 const extraOptions = setting.extraOptions;
 export default {
   name: "vue-form-item",
   inject: ["Form"],
-  components: {
-    "el-editor": MonacoEditor.default
-  },
+
   props: {
     value: [String, Number, Boolean, Array, Date, Object],
     config: Object,
@@ -21,16 +19,17 @@ export default {
   },
   computed: {
     prefix() {
-      return setting.options[Object.keys(setting.options)[0]] ? "el" : "i";
+      return !setting.options.iView ? "el" : "i";
     }
   },
   data() {
     return {
-      currentValue: this.value
+      icon: this.prefix === "el" ? "el-icon-info" : "ios-information-circle",
+      currentValue: this.value,
     };
   },
   methods: {
-    renderSelectOptions(h, options, groups) {
+    renderSelectOptions(h, options = [], groups) {
       if (groups) {
         return options.map((el) => {
           return h(
@@ -41,6 +40,7 @@ export default {
               }
             },
             el.options.map((op) => {
+              // 检查 options
               return h(`${this.prefix}-option`, {
                 props: {
                   label: op.label,
@@ -60,7 +60,8 @@ export default {
         });
       });
     },
-    renderRadioCheckbox(h, type, options) {
+    renderRadioCheckbox(h, type, options = []) {
+      // option [{ label: "类型1", value: "type1"}] ==> option[1.2] enum[1,2] enumNames["xx","yyy"]
       return options.map((el) => {
         return h(
           `${this.prefix}-${type}`,
@@ -99,9 +100,9 @@ export default {
             : h(
                 "div",
                 {
-                  class: [`${this.prefix}-form-item__label`],
+                  class: [this.prefix=='i'?'ivu-form-item-label':'el-form-item__label'], // FIXME class
                   style: {
-                    width: "100px"
+                    width: styleCfg.titleWidth,
                   }
                 },
                 config.title
@@ -118,6 +119,7 @@ export default {
             modelKeysSorted.map((el) => {
               let configResult = config.properties[el];
               if (el.includes("-option")) {
+                //  oneOf 才会有的属性  基础属性路径b-option
                 // 是oneof选项
                 const oneOfName = el.split("-")[0];
                 configResult = {
@@ -170,8 +172,8 @@ export default {
             `${this.prefix}-button`,
             {
               props: {
-                type: "primary",
-                size: "small"
+                type: "primary"
+                // size: "small"
               },
               on: {
                 click: () => {
@@ -203,8 +205,8 @@ export default {
             `${this.prefix}-button`,
             {
               props: {
-                type: "error",
-                size: "small"
+                type: this.prefix=='i'?"error":"danger" // error类型  判断
+                // size: "small"
               },
               on: {
                 click: () => {
@@ -228,10 +230,11 @@ export default {
     renderArray(h, config, prop, model) {
       const { items } = config;
       let { type } = items;
-      let that = this;
+      // let that = this;
       let children =
         type === "object"
           ? model.map((el, index) => {
+              // TODO model 类型
               // model是当前构造出来的数组对象 el就是子项 如果el不是object类型
 
               return h("div", {}, [
@@ -253,74 +256,21 @@ export default {
           }
         },
         [
-          h(`${this.prefix}-tooltip`,{
-            props:{
-              content:extraOptions(config.description).title,
-              placement:"top",
-              disabled:!extraOptions(config.description).title,
-              name:"aaa"
-            }
-          }, [   h(
-           "div",
+          h(
+            "div",
             {
-              props: {
-                content: extraOptions(config.description).title,
-                placement: "top",
-                disabled: !extraOptions(config.description).title
+              class: [this.prefix=='i'?'ivu-form-item-label':'el-form-item__label'], // class判断
+              style: {
+                width: styleCfg.titleWidth,
               }
             },
-            [
-              h(
-                "div",
-                {
-                  class: [`${this.prefix}-form-item__label`],
-                  style: {
-                    width: "100px"
-                  }
-                },
-                extraOptions(config.description).title || config.title || prop
-              )
-            ]
+            extraOptions(config.description).title || config.title || prop
           ),
-  // h(
-          //   "div",
-          //   {
-          //     class: [`${this.prefix}-form-item__label`],
-          //     style: {
-          //       width: "100px"
-          //     },
-
-          //   },
-          //   extraOptions(config.description).title || config.title || prop
-          // ),
-
-          // h(`${this.prefix}-tooltip`,{
-          //   props:{
-          //     content:config.description,
-          //     placement:"top"
-          //   }
-          // }, [ h(
-          //   `${this.prefix}-button`,
-          //   {
-          //     style: {
-          //       padding:0,
-          //       border:0,
-          //       color:"#409eff",
-          //       display:"flex",
-          //       alignItems:"start"
-          //     },
-          //     props:{
-          //       icon:`${this.prefix}-icon-info`
-          //     }
-          //   },
-          // )]),
-        
           h(
             "div",
             {
               style: {
                 flex: 1,
-                padding: "10px 5px"
               }
             },
             [
@@ -334,8 +284,8 @@ export default {
             ]
           )
         ]
-      )
-        ])},
+      );
+    },
     renderFun(h, config, prop, currentValue, _arrayIndex) {
       let type = config.type;
       // 解析description
@@ -369,6 +319,7 @@ export default {
       }
       if (config.oneOf) {
         config = {
+          //  config 临时记录 现有选择的oneOf字段
           oneOf: config.oneOf,
           ...config.oneOf[config.selectedIndex]
         };
@@ -424,6 +375,7 @@ export default {
           formatOnPaste: true,
           formatOnType: true
         };
+        // TODO  优先级
         style.width = "100%";
         style.height = "400px";
         style.minHeight = "400px";
@@ -434,19 +386,10 @@ export default {
       } else if (type === "object") {
         return this.renderObject(h, config, prop, currentValue);
       }
-
-      return h(
-        `${this.prefix}-form-item`,
-        {
-          props: {
-            prop: prop,
-            label: extra.title || config.title || prop
-          },
-          style: type === "edit" ? {} : style
-        },
-        [
+      let labelArr =  extra.title || config.title || (_arrayIndex > -1 ? "" : prop)
+      let arr = [
           h(
-            `${this.prefix}-${type}`,
+            `${type === "edit" ? "my" : this.prefix}-${type}`,
             {
               props,
               style: type !== "edit" ? {} : style,
@@ -471,28 +414,51 @@ export default {
             },
             children
           ),
-          this.renderLabel(
-            extra.title || config.title || (_arrayIndex > -1 ? "" : prop),
+         ];
+         if(labelArr){
+           arr.push(this.renderLabel(
+            labelArr,
             extra.description
-          )
-        ]
+          ));
+         }
+      return h(
+        `${this.prefix}-form-item`,
+        {
+          props: {
+            prop: prop,
+            labelWidth:_arrayIndex>-1?0:styleCfg.labelWidth,
+            // label: extra.title || config.title || prop
+          },
+          style: type === "edit" ? {} : style
+        },
+        arr
       );
     },
+    // 修改成render
     renderLabel(title, description) {
       // let exp = extraOptions(description);
-      return (
-        <span slot="label">
+      let Tag = this.prefix + "-tooltip";
+      let ButtonTag = this.prefix + "-button";
+     return (
+       <span slot="label">
           <span>{title}</span>
           {description ? (
-            <el-tooltip class="item" effect="dark" placement="top">
+            <Tag class="item" effect="dark" placement="top">
               <span slot="content" style={{ whiteSpace: "pre" }}>
                 {description}
               </span>
-              <el-button
-                icon="el-icon-info"
-                style={{ padding: 0, border: 0, color: "#409eff" }}
-              ></el-button>
-            </el-tooltip>
+              <ButtonTag
+                icon={this.icon} //  icon类型
+                style={{
+                  padding: 0,
+                  border: 0,
+                  width: "auto",
+                  height: "auto",
+                  color: "#409eff",
+                  // marginTop:"-2px"
+                }}
+              ></ButtonTag>
+            </Tag>
           ) : null}
         </span>
       );
