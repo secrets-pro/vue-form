@@ -1,33 +1,5 @@
 export default {
   properties: {
-    radio: {
-      type: "radio",
-      title: "类型",
-      options: [
-        {
-          label: "类型1",
-          value: "type1"
-        },
-        {
-          label: "类型2",
-          value: "type2"
-        }
-      ]
-    },
-    checkbox: {
-      type: "checkbox",
-      title: "类型1",
-      options: [
-        {
-          label: "类型1",
-          value: "type1"
-        },
-        {
-          label: "类型2",
-          value: "type2"
-        }
-      ]
-    },
     args: {
       description: '{"title":"参数"}',
       items: {
@@ -45,7 +17,7 @@ export default {
       type: "array"
     },
     domain: {
-      description: '{"title":"域名","description":"域名"}',
+      description: '{"title":"域名"}',
       title: "domain",
       type: "string"
     },
@@ -228,38 +200,71 @@ export default {
       properties: {
         probeConfig: {
           description: '{"title":"探针类型"}',
-          title: "probeConfig",
-          type: "object",
           oneOf: [
             {
               description: "命令",
               properties: {
                 command: {
-                  description: "命令",
+                  description: '{"title":"命令"}',
                   items: {
                     type: "string"
                   },
                   type: "array"
+                },
+                type: {
+                  description: '{"title":"类型"}',
+                  enum: ["EXEC"],
+                  type: "string"
                 }
               },
-              type: "object"
+              required: ["type"]
             },
             {
+              description: "httpGet",
               properties: {
                 path: {
                   default: "/",
-                  description: "路径",
+                  description: '{"title":"路径"}',
                   type: "string"
                 },
                 port: {
-                  description: "容器端口",
+                  description: '{"title":"容器端口"}',
+                  exclusiveMaximum: true,
+                  exclusiveMinimum: true,
+                  maximum: 65536,
+                  minimum: 0,
                   type: "integer"
+                },
+                type: {
+                  description: '{"title":"类型"}',
+                  enum: ["HTTP"],
+                  type: "string"
                 }
               },
-              required: ["path", "port"],
-              type: "object"
+              required: ["path", "type", "port"]
+            },
+            {
+              description: "Socket",
+              properties: {
+                port: {
+                  description: '{"title":"容器端口"}',
+                  exclusiveMaximum: true,
+                  exclusiveMinimum: true,
+                  maximum: 65536,
+                  minimum: 0,
+                  type: "integer"
+                },
+                type: {
+                  description: '{"title":"类型"}',
+                  enum: ["TCP"],
+                  type: "string"
+                }
+              },
+              required: ["type", "port"]
             }
-          ]
+          ],
+          title: "probeConfig",
+          type: "object"
         }
       },
       required: ["probeConfig"],
@@ -285,6 +290,69 @@ export default {
         },
         probeConfig: {
           description: '{"title":"探针类型"}',
+          oneOf: [
+            {
+              description: "命令",
+              properties: {
+                command: {
+                  description: '{"title":"命令"}',
+                  items: {
+                    type: "string"
+                  },
+                  type: "array"
+                },
+                type: {
+                  description: '{"title":"类型"}',
+                  enum: ["EXEC"],
+                  type: "string"
+                }
+              },
+              required: ["type"]
+            },
+            {
+              description: "httpGet",
+              properties: {
+                path: {
+                  default: "/",
+                  description: '{"title":"路径"}',
+                  type: "string"
+                },
+                port: {
+                  description: '{"title":"容器端口"}',
+                  exclusiveMaximum: true,
+                  exclusiveMinimum: true,
+                  maximum: 65536,
+                  minimum: 0,
+                  type: "integer"
+                },
+                type: {
+                  description: '{"title":"类型"}',
+                  enum: ["HTTP"],
+                  type: "string"
+                }
+              },
+              required: ["path", "type", "port"]
+            },
+            {
+              description: "Socket",
+              properties: {
+                port: {
+                  description: '{"title":"容器端口"}',
+                  exclusiveMaximum: true,
+                  exclusiveMinimum: true,
+                  maximum: 65536,
+                  minimum: 0,
+                  type: "integer"
+                },
+                type: {
+                  description: '{"title":"类型"}',
+                  enum: ["TCP"],
+                  type: "string"
+                }
+              },
+              required: ["type", "port"]
+            }
+          ],
           title: "probeConfig",
           type: "object"
         },
