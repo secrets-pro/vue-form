@@ -6,6 +6,7 @@
       </div>
       <vue-form
         @on-confirm="confirm"
+        :initinal="true"
         ref="form"
         :schema="schema"
         :model="model"
@@ -33,7 +34,7 @@ export default {
           initialDelaySeconds: 60,
           timeoutSeconds: 10,
           probeConfig: {
-            command: ['1', '2', '3']
+            command: ["1", "2", "3"]
           }
         }
       },

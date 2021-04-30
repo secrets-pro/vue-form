@@ -6,7 +6,10 @@
       :model="currentModel"
       :ref="formId"
       :rules="rules"
-      :label-width="schema.labelWidth || this.defaultWidth"
+      :label-width="
+        (this.prefix === 'el' ? schema.labelWidth + 'px' : schema.labelWidth) ||
+          this.defaultWidth
+      "
     >
       <template v-for="prop in propertiesSorted">
         <form-item-plugin
@@ -108,10 +111,14 @@ export default {
       default() {
         return true;
       }
+    },
+    initinal: {
+      type: Boolean,
+      default: true
     }
   },
 
-  mounted() {
+  created() {
     this.validateScheme();
     this.setSortProperties();
   },
@@ -297,20 +304,35 @@ export default {
     setArrayModal(currentScheme, rules, parentProp) {
       const { items } = currentScheme;
       let _value = [];
+
       if (items.type === "string") {
-        _value.push("");
+        set(currentScheme, "item", "");
+        if (this.initinal) {
+          _value.push("");
+        }
       }
       if (items.type === "boolean") {
-        _value.push(true);
+        set(currentScheme, "item", true);
+        if (this.initinal) {
+          _value.push(true);
+        }
       } else if (items.type === "number" || items.type === "integer") {
-        _value.push(0);
+        set(currentScheme, "item", 0);
+        if (this.initinal) {
+          _value.push(0);
+        }
       } else if (items.type === "object") {
         let obj = this.setModel(items, {}, parentProp);
-        _value.push(obj);
+        set(currentScheme, "item", obj);
+        if (this.initinal) {
+          _value.push(obj);
+        }
       }
       if (currentScheme.minItems > 1) {
-        for (let j = 0; j < currentScheme.minItems - 1; j++) {
-          _value.push(_value[0]);
+        if (this.initinal) {
+          for (let j = 0; j < currentScheme.minItems - 1; j++) {
+            _value.push(_value[0]);
+          }
         }
       }
       return _value;
@@ -343,6 +365,7 @@ export default {
           // 数组类型
           // 设置默认的格式 config.items
           let _value = this.setArrayModal(config, rules, prop);
+
           set(model, prop, defaultValue || _value || "");
           if (prop.indexOf(".") > -1) {
             model[prop] = defaultValue || _value || "";
@@ -408,6 +431,7 @@ export default {
           config.selectedIndex = selectedIndex;
           model[`${prop}-option`] = selectedIndex;
           model[prop] = config.oneOf[selectedIndex].defaultModel;
+          console.log(config);
         } else if (
           config.type === "object" &&
           !config.properties &&
@@ -537,7 +561,7 @@ export default {
   .ivu-form-item-label {
     word-break: break-all;
   }
-  .ivu-btn+.ivu-btn{
+  .ivu-btn + .ivu-btn {
     margin-left: 10px;
   }
 }

@@ -1,7 +1,7 @@
 <script>
 /* eslint-disable no-unused-vars */
 import setting from "../config";
-import styleCfg from "../styleCfg"
+import styleCfg from "../styleCfg";
 const extraOptions = setting.extraOptions;
 export default {
   name: "vue-form-item",
@@ -25,7 +25,7 @@ export default {
   data() {
     return {
       icon: this.prefix === "el" ? "el-icon-info" : "ios-information-circle",
-      currentValue: this.value,
+      currentValue: this.value
     };
   },
   methods: {
@@ -77,6 +77,9 @@ export default {
     renderObject(h, config, prop, model) {
       // 渲染对象，根据字段的position进行排序，position越小排前面
       let modelKeysSorted = Object.keys(model).sort((a, b) => {
+        if (a.includes(b)) {
+          return -1;
+        }
         if (
           config.properties[a] &&
           config.properties[a].position &&
@@ -86,7 +89,6 @@ export default {
           return config.properties[a].position - config.properties[b].position;
         }
       });
-
       return h(
         "div",
         {
@@ -100,9 +102,13 @@ export default {
             : h(
                 "div",
                 {
-                  class: [this.prefix=='i'?'ivu-form-item-label':'el-form-item__label'], // FIXME class
+                  class: [
+                    this.prefix == "i"
+                      ? "ivu-form-item-label"
+                      : "el-form-item__label"
+                  ], // FIXME class
                   style: {
-                    width: styleCfg.titleWidth,
+                    width: styleCfg.titleWidth
                   }
                 },
                 config.title
@@ -134,7 +140,7 @@ export default {
               }
               return h("vue-form-item", {
                 props: {
-                  prop: `${this.prop}.${el}`,
+                  prop: `类型选择`,
                   value: model[el],
                   config: configResult
                 },
@@ -177,14 +183,14 @@ export default {
               },
               on: {
                 click: () => {
-                  const { minItems, maxItems } = config;
+                  const { minItems, maxItems, item } = config;
                   if (maxItems && model.length >= maxItems) {
                     console.warn(`最大数量限制为${maxItems}`);
                     return;
                   }
-                  let zore = model[0];
+                  let zore = model[0] || item;
                   if (typeof zore === "object") {
-                    let keys = Object.keys(model[0]);
+                    let keys = Object.keys(zore);
                     let obj = {};
                     keys.forEach((els) => {
                       obj[els] = "";
@@ -205,16 +211,13 @@ export default {
             `${this.prefix}-button`,
             {
               props: {
-                type: this.prefix=='i'?"error":"danger" // error类型  判断
+                type: this.prefix == "i" ? "error" : "danger" // error类型  判断
                 // size: "small"
               },
               on: {
                 click: () => {
                   const { minItems } = config;
-                  if (
-                    (minItems && model.length <= minItems) ||
-                    model.length <= 1
-                  ) {
+                  if (minItems && model.length <= minItems) {
                     console.warn(`最小数量限制为${minItems}`);
                     return;
                   }
@@ -231,22 +234,25 @@ export default {
       const { items } = config;
       let { type } = items;
       // let that = this;
-      let children =
-        type === "object"
-          ? model.map((el, index) => {
-              // TODO model 类型
-              // model是当前构造出来的数组对象 el就是子项 如果el不是object类型
+      let children = [];
+      if (model) {
+        children =
+          type === "object"
+            ? model.map((el, index) => {
+                // TODO model 类型
+                // model是当前构造出来的数组对象 el就是子项 如果el不是object类型
 
-              return h("div", {}, [
-                this.renderFun(h, items, `${prop}.${index}`, model[index])
-              ]);
-            })
-          : model.map((el, index) => {
-              // model是当前构造出来的数组对象 el就是子项 如果el不是object类型
-              return h("div", {}, [
-                this.renderFun(h, items, `${prop}.${index}`, model, index)
-              ]);
-            });
+                return h("div", {}, [
+                  this.renderFun(h, items, `${prop}.${index}`, model[index])
+                ]);
+              })
+            : model.map((el, index) => {
+                // model是当前构造出来的数组对象 el就是子项 如果el不是object类型
+                return h("div", {}, [
+                  this.renderFun(h, items, `${prop}.${index}`, model, index)
+                ]);
+              });
+      }
 
       return h(
         "div",
@@ -259,9 +265,13 @@ export default {
           h(
             "div",
             {
-              class: [this.prefix=='i'?'ivu-form-item-label':'el-form-item__label'], // class判断
+              class: [
+                this.prefix == "i"
+                  ? "ivu-form-item-label"
+                  : "el-form-item__label"
+              ], // class判断
               style: {
-                width: styleCfg.titleWidth,
+                width: styleCfg.titleWidth
               }
             },
             extraOptions(config.description).title || config.title || prop
@@ -270,7 +280,7 @@ export default {
             "div",
             {
               style: {
-                flex: 1,
+                flex: 1
               }
             },
             [
@@ -386,47 +396,47 @@ export default {
       } else if (type === "object") {
         return this.renderObject(h, config, prop, currentValue);
       }
-      let labelArr =  extra.title || config.title || (_arrayIndex > -1 ? "" : prop)
+      let labelArr =
+        extra.title || config.title || (_arrayIndex > -1 ? "" : prop);
       let arr = [
-          h(
-            `${type === "edit" ? "my" : this.prefix}-${type}`,
-            {
-              props,
-              style: type !== "edit" ? {} : style,
-              on: {
-                change: (value) => {
-                  if (type === "editor") {
-                    this.$emit("input", value);
-                  }
-                },
-                editorDidMount: (editor) => {
-                  editor.layout();
-                },
-                input: (value) => {
-                  if (_arrayIndex !== undefined) {
-                    currentValue[_arrayIndex] = value;
-                    this.$emit("arrayInput", prop, currentValue[_arrayIndex]);
-                  } else {
-                    this.$emit("input", value);
-                  }
+        h(
+          `${type === "edit" ? "my" : this.prefix}-${type}`,
+          {
+            props,
+            style: type !== "edit" ? {} : style,
+            on: {
+              change: (value) => {
+                if (type === "editor") {
+                  this.$emit("input", value);
+                }
+              },
+              editorDidMount: (editor) => {
+                editor.layout();
+              },
+              input: (value) => {
+                if (_arrayIndex !== undefined) {
+                  currentValue[_arrayIndex] = value;
+                  this.$emit("arrayInput", prop, currentValue[_arrayIndex]);
+                } else {
+                  this.$emit("input", value);
                 }
               }
-            },
-            children
-          ),
-         ];
-         if(labelArr){
-           arr.push(this.renderLabel(
-            labelArr,
-            extra.description
-          ));
-         }
+            }
+          },
+          children
+        )
+      ];
+      if (labelArr) {
+        arr.push(this.renderLabel(labelArr, extra.description));
+      }
+      let width = _arrayIndex > -1 ? 0 : styleCfg.labelWidth;
       return h(
         `${this.prefix}-form-item`,
         {
           props: {
             prop: prop,
-            labelWidth:_arrayIndex>-1?0:styleCfg.labelWidth,
+            labelWidth: this.prefix === "el" ? width + "px" : width
+
             // label: extra.title || config.title || prop
           },
           style: type === "edit" ? {} : style
@@ -439,8 +449,8 @@ export default {
       // let exp = extraOptions(description);
       let Tag = this.prefix + "-tooltip";
       let ButtonTag = this.prefix + "-button";
-     return (
-       <span slot="label">
+      return (
+        <span slot="label">
           <span>{title}</span>
           {description ? (
             <Tag class="item" effect="dark" placement="top">
@@ -454,7 +464,7 @@ export default {
                   border: 0,
                   width: "auto",
                   height: "auto",
-                  color: "#409eff",
+                  color: "#409eff"
                   // marginTop:"-2px"
                 }}
               ></ButtonTag>

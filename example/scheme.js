@@ -17,7 +17,7 @@ export default {
       type: "array"
     },
     domain: {
-      description: '{"title":"域名"}',
+      description: '{"title":"域名","description":"域名"}',
       title: "domain",
       type: "string"
     },
@@ -44,7 +44,8 @@ export default {
       type: "array"
     },
     envFromConfigmap: {
-      description: '{"title":"整个配置文件作为环境变量"}',
+      description:
+        '{"description":"整个配置文件作为环境变量","title":"配置挂载"}',
       items: {
         type: "string"
       },
@@ -52,7 +53,8 @@ export default {
       type: "array"
     },
     envFromConfigmapRef: {
-      description: '{"title":"引用配置文件中的key对应的value,作为环境变量"}',
+      description:
+        '{"description":"引用配置文件中的key对应的value,作为环境变量","title":"配置引用"}',
       items: {
         properties: {
           key: {
@@ -109,7 +111,8 @@ export default {
       type: "array"
     },
     envFromSecret: {
-      description: '{"title":"整个加密文件作为环境变量"}',
+      description:
+        '{"description":"整个加密文件作为环境变量","title":"挂载密钥"}',
       items: {
         type: "string"
       },
@@ -118,7 +121,7 @@ export default {
     },
     envFromSecretRef: {
       description:
-        '{"title":"引用加密配置文件中的key对应的value,作为环境变量"}',
+        '{"description":"引用加密配置文件中的key对应的value,作为环境变量","title":"挂载密钥key"}',
       items: {
         properties: {
           key: {
@@ -191,12 +194,12 @@ export default {
       additionalProperties: {
         type: "string"
       },
-      description: '{"title":"域名访问相关注释"}',
+      description: '{"description":"域名访问相关注释","title":"域名注释"}',
       title: "ingressAnnotations",
       type: "object"
     },
     livenessProbe: {
-      description: '{"title":"存活性探针"}"}',
+      description: '{"title":"存活性探针","description":"存活性探针"}',
       properties: {
         probeConfig: {
           description: '{"title":"探针类型"}',
@@ -268,7 +271,7 @@ export default {
         }
       },
       required: ["probeConfig"],
-      title: "livenessProbe",
+      title: "存活性探针",
       type: "object"
     },
     quotaModel: {
@@ -425,7 +428,8 @@ export default {
             type: "string"
           },
           name: {
-            description: '{"title":"磁盘名称(空代表挂载宿主机上的目录或文件)"}',
+            description:
+              '{"description":"磁盘名称(空代表挂载宿主机上的目录或文件)","title":"名称"}',
             title: "name",
             type: "string"
           },
