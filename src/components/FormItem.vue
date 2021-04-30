@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 import setting from "../config";
 import styleCfg from "../styleCfg";
-const extraOptions = setting.extraOptions;
+const { extraOptions, generateRule } = setting;
 export default {
   name: "vue-form-item",
   inject: ["Form"],
@@ -130,6 +130,7 @@ export default {
                 const oneOfName = el.split("-")[0];
                 configResult = {
                   type: "select",
+                  title: "类型选择",
                   options: config.properties[oneOfName].oneOf.map(
                     (oneOfItem, index) => ({
                       label: oneOfItem.description,
@@ -140,7 +141,7 @@ export default {
               }
               return h("vue-form-item", {
                 props: {
-                  prop: `类型选择`,
+                  prop: `${prop}.${el}`,
                   value: model[el],
                   config: configResult
                 },
@@ -300,6 +301,7 @@ export default {
       let type = config.type;
       // 解析description
       let extra = extraOptions(config.description);
+      let rules = generateRule(config, prop);
       let style = {};
       let props = {
         value:
@@ -319,6 +321,7 @@ export default {
       if (config.anyOf) {
         // TODO 可能不是enum
         type = "select";
+
         config.groups = true;
         config.options = config.anyOf.map((el) => {
           return {
@@ -435,8 +438,8 @@ export default {
         {
           props: {
             prop: prop,
-            labelWidth: this.prefix === "el" ? width + "px" : width
-
+            labelWidth: this.prefix === "el" ? width + "px" : width,
+            rules
             // label: extra.title || config.title || prop
           },
           style: type === "edit" ? {} : style

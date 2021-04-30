@@ -5,7 +5,6 @@
       size="medium"
       :model="currentModel"
       :ref="formId"
-      :rules="rules"
       :label-width="
         (this.prefix === 'el' ? schema.labelWidth + 'px' : schema.labelWidth) ||
           this.defaultWidth
@@ -344,7 +343,9 @@ export default {
       props.forEach((el) => {
         let prop = el;
         let config = properties[el];
-
+        if (required && required.includes(prop)) {
+          config.required = true;
+        }
         let defaultValue = get(
           this.model,
           parentProp ? parentProp + "." + el : el,
@@ -431,7 +432,6 @@ export default {
           config.selectedIndex = selectedIndex;
           model[`${prop}-option`] = selectedIndex;
           model[prop] = config.oneOf[selectedIndex].defaultModel;
-          console.log(config);
         } else if (
           config.type === "object" &&
           !config.properties &&
@@ -470,64 +470,12 @@ export default {
             model[prop] = defaultValue || _value || [];
           }
           // throw new Error(`类型为object的属性${parentProp}没有properties配置`);
-        } else {
-          let ruleType = {
-            checkbox: "array",
-            array: "array",
-            number: "number",
-            integer: "number",
-            date: "date",
-            switch: "boolean",
-            boolean: "boolean"
-          };
-          if (config.type !== "array") {
-            let required_ = config.minLength || config.maxLength || config.enum;
-            //  || config.pattern;
-            let text = config.enum || config.options ? "请选择" : "请输入";
-            // FXIME 如果是数组嵌套object的时候 prop--> a.0.b==>rule
-            let baseRule = [
-              {
-                required: required_
-                  ? true
-                  : required
-                  ? required.includes(prop)
-                  : false,
-
-                type: ruleType[config.type] || "string",
-                message:
-                  extraOptions(config.description).description ||
-                  `${text}${config.title || prop}`
-              }
-            ];
-
-            // 更多校验规则
-            if (config.minLength || config.maxLength) {
-              let ruleMinlength = {
-                min: config.minLength || 1,
-                message: "长度至少" + (config.minLength || 1),
-                trigger: "blur"
-              };
-              if (config.maxlength) {
-                ruleMinlength["max"] = config.maxLength;
-                ruleMinlength["message"] =
-                  "长度在" +
-                  (config.minLength || 1) +
-                  "和" +
-                  config.maxLength +
-                  "之间";
-              }
-              baseRule.push(ruleMinlength);
-            }
-            if (config.pattern) {
-              baseRule.push({
-                pattern: new RegExp(config.pattern),
-                message: `格式需要满足正则${config.pattern}`,
-                trigger: "blur"
-              });
-            }
-            set(rules, parentProp ? parentProp + "." + prop : prop, baseRule);
-          }
         }
+        // else {
+
+        //   set(rules, parentProp ? parentProp + "." + prop : prop, baseRule);
+        // }
+        // }
       });
       return model;
     },
@@ -540,11 +488,7 @@ export default {
       // let model = {}; // 准备model
       let rules = {}; //  准备rules
       let model = this.setModel(this.currentScheme, rules);
-      // console.log(this.currentScheme);
-      this.rules = rules;
       this.currentModel = model;
-      // console.log(rules);
-      // console.log(model);
     }
   }
 };

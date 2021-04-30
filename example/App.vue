@@ -51,8 +51,10 @@ export default {
       console.log(model);
     },
     getData() {
-      let data = this.$refs.form.getData();
-      this.data1 = JSON.stringify(data, null, "\t");
+      this.$refs.form.validate().then((el) => {
+        let data = this.$refs.form.getData();
+        this.data1 = JSON.stringify(data, null, "\t");
+      });
     }
   }
 };
