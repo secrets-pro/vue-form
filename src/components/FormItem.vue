@@ -105,7 +105,7 @@ export default {
                     this.prefix == "i"
                       ? "ivu-form-item-label"
                       : "el-form-item__label"
-                  ], // FIXME class
+                  ],
                   style: {
                     width: styleCfg.titleWidth
                   }

@@ -496,20 +496,12 @@ export default {
 <style lang="less">
 // class  看 iview 和 element-ui的名称
 .vue-form {
-  .ivu-form-item__content {
-    .ivu-select,
-    .ivu-input-number {
-      width: 100%;
-    }
-  }
   .ivu-form-item-label {
     word-break: break-all;
   }
   .ivu-btn + .ivu-btn {
     margin-left: 10px;
   }
-}
-.vue-form {
   .el-form-item__content {
     .el-select,
     .el-input-number {
@@ -518,6 +510,12 @@ export default {
   }
   .el-form-item__label {
     word-break: break-all;
+  }
+  .ivu-form-item-content {
+    .ivu-select,
+    .ivu-input-number {
+      width: 100%;
+    }
   }
   .ivu-btn > .ivu-icon {
     line-height: 1;
