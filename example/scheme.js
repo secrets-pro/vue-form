@@ -492,6 +492,9 @@ export default {
       },
       title: "volumeMountsSecret",
       type: "array"
+    },
+    code: {
+      type: "editor"
     }
   },
   required: ["replicas", "image", "http", "quotaModel", "domain"],

@@ -519,5 +519,9 @@ export default {
   .el-form-item__label {
     word-break: break-all;
   }
+  .ivu-btn > .ivu-icon {
+    line-height: 1;
+    vertical-align: unset;
+  }
 }
 </style>

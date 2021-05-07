@@ -24,7 +24,6 @@ export default {
   },
   data() {
     return {
-      icon: this.prefix === "el" ? "el-icon-info" : "ios-information-circle",
       currentValue: this.value
     };
   },
@@ -403,10 +402,10 @@ export default {
         extra.title || config.title || (_arrayIndex > -1 ? "" : prop);
       let arr = [
         h(
-          `${type === "edit" ? "my" : this.prefix}-${type}`,
+          `${type === "editor" ? "my" : this.prefix}-${type}`,
           {
             props,
-            style: type !== "edit" ? {} : style,
+            style: type !== "editor" ? {} : style,
             on: {
               change: (value) => {
                 if (type === "editor") {
@@ -442,7 +441,7 @@ export default {
             rules
             // label: extra.title || config.title || prop
           },
-          style: type === "edit" ? {} : style
+          style: type === "editor" ? {} : style
         },
         arr
       );
@@ -452,16 +451,21 @@ export default {
       // let exp = extraOptions(description);
       let Tag = this.prefix + "-tooltip";
       let ButtonTag = this.prefix + "-button";
+      let icon =
+        this.prefix === "el" ? "el-icon-info" : "ios-information-circle";
       return (
         <span slot="label">
           <span>{title}</span>
           {description ? (
-            <Tag class="item" effect="dark" placement="top">
-              <span slot="content" style={{ whiteSpace: "pre" }}>
-                {description}
-              </span>
+            <Tag
+              class="item"
+              effect="dark"
+              placement="top"
+              max-width="200"
+              content={description}
+            >
               <ButtonTag
-                icon={this.icon} //  icon类型
+                icon={icon} //  icon类型
                 style={{
                   padding: 0,
                   border: 0,
