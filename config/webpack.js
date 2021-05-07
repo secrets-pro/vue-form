@@ -12,7 +12,7 @@ module.exports = {
   output: {
     filename: "index.js",
     chunkFilename: "[name].[hash:8].bundle.js",
-    path: resolve("../docs")
+    path: resolve(`../docs/${process.env.output}`)
   },
   devtool: "source-map",
   module: {

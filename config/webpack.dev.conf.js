@@ -4,7 +4,7 @@ const base = require("./webpack");
 module.exports = merge(base, {
   mode: "development",
   devServer: {
-    contentBase: path.join(__dirname, "docs"),
+    contentBase: path.join(__dirname, `docs/${process.env.output}`),
     compress: true,
     port: 8081,
     hot: true,

@@ -16,9 +16,10 @@
     "lint": "eslint --ext .vue,.js src/",
     "release": "npm publish --access public --registry  https://registry.npmjs.org/",
     "build:style": "gulp --gulpfile ./config/gulp.js",
-    "serve": "entry=example webpack-dev-server  --config ./config/webpack.dev.conf.js",
-    "serve:iview": "entry=exampleIview webpack-dev-server  --config ./config/webpack.dev.conf.js",
-    "build:demo": "entry=example webpack --config ./config/webpack.prod.conf.js"
+    "serve": "entry=example output=element webpack-dev-server  --config ./config/webpack.dev.conf.js",
+    "serve:iview": "entry=exampleIview output=iview  webpack-dev-server  --config ./config/webpack.dev.conf.js",
+    "build:element": "entry=example output=element  webpack --config ./config/webpack.prod.conf.js",
+    "build:iview": "entry=exampleIview output=iview webpack --config ./config/webpack.prod.conf.js"
   },
   "keywords": [
     "rollup",
