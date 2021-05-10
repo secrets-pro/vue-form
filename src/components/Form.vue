@@ -87,7 +87,7 @@ import { set, get, difference } from "lodash";
 import FormItemPlugin from "./FormItem.vue";
 import setting from "../config";
 const formatDate = setting.formatDate;
-const extraOptions = setting.extraOptions;
+// const extraOptions = setting.extraOptions;
 
 export default {
   components: { "form-item-plugin": FormItemPlugin },
@@ -241,11 +241,12 @@ export default {
           let v = JSON.parse(JSON.stringify(get(obj, el)));
           let value = {};
           v.forEach((els) => {
-            if (els.key) {
-              value[els.key] = els.value;
+            let key = els.key;
+            if (key) {
+              delete els.key;
+              value[key] = { ...els };
             }
           });
-          // debugger;
           // result[el] = value;
           set(result, el, value);
         });
@@ -437,29 +438,56 @@ export default {
           !config.properties &&
           !config.oneOf
         ) {
-          // debugger;
-          // currentScheme.type = "array";
-          this.special.push(parentProp ? parentProp + "." + prop : prop);
-          let properties = {
-            key: {
-              type: "string",
-              title: "键"
-            },
-            value: {
-              type: "string",
-              title: "值"
+          let properties = {};
+          if (config.additionalProperties) {
+            if (config.additionalProperties.type === "object") {
+              properties = {
+                key: {
+                  type: "string",
+                  title: "键",
+                  description: '{"title":"key"}',
+                  "ui:options": {
+                    width: "100%"
+                  }
+                },
+                ...config.additionalProperties.properties
+              };
+            } else if (config.additionalProperties.type === "string") {
+              properties = {
+                key: {
+                  type: "string",
+                  title: "键"
+                },
+                value: {
+                  type: "string",
+                  title: "值"
+                }
+              };
             }
-          };
+          } else {
+            properties = {
+              key: {
+                type: "string",
+                title: "键"
+              },
+              value: {
+                type: "string",
+                title: "值"
+              }
+            };
+          }
           config.type = "array";
           config.items = {
             type: "object",
             properties
           };
+          this.special.push(parentProp ? parentProp + "." + prop : prop);
+
           let _value = this.setArrayModal(config, rules, prop);
           if (defaultValue && !Array.isArray(defaultValue)) {
             let value = Object.keys(defaultValue).map((k) => ({
               key: k,
-              value: defaultValue[k]
+              ...defaultValue[k]
             }));
             set(model, prop, value || _value || []);
           } else {

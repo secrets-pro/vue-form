@@ -170,10 +170,17 @@ export default {
           }
         },
         required: ["port", "targetPort"],
+
         type: "object"
       },
       description: '{"title":"路径与端口"}',
       title: "http",
+      default: {
+        xxxx: {
+          targetPort: 90,
+          port: 9090
+        }
+      },
       type: "object"
     },
     image: {
