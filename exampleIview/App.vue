@@ -2,11 +2,11 @@
   <div class="test">
     <div style="display:flex;">
       <div style="width:40%;">
-        <el-input type="textarea" :rows="100" v-model="schemaString" />
+        <!-- <el-input type="textarea" :rows="100" v-model="schemaString" /> -->
+        <i-input type="textarea" :rows="100" v-model="schemaString" />
       </div>
       <vue-form
         @on-confirm="confirm"
-        :initinal="true"
         ref="form"
         :schema="schema"
         :model="model"
@@ -14,12 +14,12 @@
       ></vue-form>
     </div>
 
-    <el-button @click="getData">获取数据</el-button>
-    <el-input type="textarea" v-model="data1" :rows="10" />
+    <!-- <el-button @click="getData">获取数据</el-button> -->
+    <!-- <el-input type="textarea" v-model="data1" :rows="10" /> -->
   </div>
 </template>
 <script>
-import scheme from "./scheme";
+import scheme from "../example/scheme";
 export default {
   data() {
     return {
@@ -51,14 +51,9 @@ export default {
       console.log(model);
     },
     getData() {
-      this.$refs.form.validate().then((el) => {
-        let data = this.$refs.form.getData();
-        this.data1 = JSON.stringify(data, null, "\t");
-      });
+      let data = this.$refs.form.getData();
+      this.data1 = JSON.stringify(data, null, "\t");
     }
   }
 };
 </script>
-<style lang="less" scoped>
-@import url("./style.less");
-</style>

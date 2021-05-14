@@ -147,7 +147,7 @@ this.$refs.form.validate(); // validate the form
 ```
 
 ```js
-this.$ref.form.getData(); // get the realtime data
+this.$refs.form.getData(); // get the realtime data
 ```
 
 ![demo.png](demo.png)

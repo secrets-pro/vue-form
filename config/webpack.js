@@ -8,19 +8,22 @@ function resolve(_path) {
   return path.resolve(__dirname, _path);
 }
 module.exports = {
-  entry: "./example/index.js",
+  entry: `./${process.env.entry}/index.js`,
   output: {
     filename: "index.js",
     chunkFilename: "[name].[hash:8].bundle.js",
-    path: resolve("../example/dist")
+    path: resolve(`../docs/${process.env.output}`)
   },
-  mode: "development",
   devtool: "source-map",
   module: {
     rules: [
       {
         test: /\.vue$/,
-        use: ["vue-loader"]
+        use: [
+          {
+            loader: "vue-loader"
+          }
+        ]
       },
       {
         test: /\.js$/,
@@ -65,12 +68,5 @@ module.exports = {
     alias: {
       "@": resolve("../src")
     }
-  },
-  devServer: {
-    contentBase: path.join(__dirname, "example/dist"),
-    compress: true,
-    port: 8081,
-    hot: true,
-    open: true //默认打开浏览器
   }
 };

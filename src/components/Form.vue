@@ -1,17 +1,15 @@
 <template>
   <div v-if="Object.keys(currentModel).length" class="vue-form" v-show="show">
-    <el-form
+    <component
+      :is="`${this.prefix}-form`"
       size="medium"
       :model="currentModel"
       :ref="formId"
-      :rules="rules"
-      :label-width="schema.labelWidth || '100px'"
+      :label-width="
+        (this.prefix === 'el' ? schema.labelWidth + 'px' : schema.labelWidth) ||
+          this.defaultWidth
+      "
     >
-      <!-- <template v-if="scheme.layout">
-        <el-row :gutter="scheme.layout.gutter||20" v-for="row in rowSize" :key="row">
-           <el-col v-for=""></el-col>
-        </el-row>
-      </template>-->
       <template v-for="prop in propertiesSorted">
         <form-item-plugin
           v-model="currentModel[prop.name]"
@@ -62,31 +60,34 @@
         </div>
       </template>
       <div style="text-align:right;padding-right:12px;" v-if="schema.buttons">
-        <el-button
+        <component
+          :is="`${this.prefix}-button`"
           type="primary"
           size="mini"
           @click="confirm"
           v-show="schema.buttons.includes('confirm')"
-          >确定</el-button
+          >确定</component
         >
-        <el-button
+        <component
+          :is="`${this.prefix}-button`"
           type="default"
           size="mini"
           @click="reset"
           v-show="schema.buttons.includes('reset')"
-          >重置</el-button
+          >重置</component
         >
       </div>
-    </el-form>
+    </component>
   </div>
 </template>
 <script>
 /* eslint-disable no-unused-vars */
 const letters = "abcdefghijklmn".split("");
-const { set, get } = require("lodash");
-// import util from "element-ui/lib/utils/date.js";
+import { set, get, difference } from "lodash";
 import FormItemPlugin from "./FormItem.vue";
-const util = require("element-ui/lib/utils/date.js");
+import setting from "../config";
+const formatDate = setting.formatDate;
+// const extraOptions = setting.extraOptions;
 
 export default {
   components: { "form-item-plugin": FormItemPlugin },
@@ -109,22 +110,18 @@ export default {
       default() {
         return true;
       }
+    },
+    initinal: {
+      type: Boolean,
+      default: true
     }
   },
 
-  mounted() {
+  created() {
     this.validateScheme();
     this.setSortProperties();
   },
   computed: {
-    // prop_name: {
-    //   get() {
-    //     return get(this.currentModel, "prop.name");
-    //   },
-    //   set(value) {
-    //     set(this.currentModel, "prop.name", value);
-    //   }
-    // },
     rowSize() {
       return !this.schema.layout
         ? 1
@@ -132,12 +129,14 @@ export default {
             Object.keys(this.currentModel).length /
               (24 / (this.schema.layout.span || 8))
           );
+    },
+    prefix() {
+      return !setting.options.iView ? "el" : "i";
     }
   },
   watch: {
     schema(n) {
       this.currentScheme = n;
-
       this.validateScheme();
       this.setSortProperties();
     },
@@ -154,6 +153,7 @@ export default {
   },
   data() {
     return {
+      defaultWidth: this.prefix === "el" ? "100px" : 100,
       currentScheme: this.schema,
       currentModel: {},
       formId: this.randomId(),
@@ -201,6 +201,7 @@ export default {
       });
       this.propertiesSorted = JSON.parse(JSON.stringify(propertiesSorted));
     },
+    // FIXME  优化
     input(key, value) {
       if (key.indexOf(".") > -1) {
         let keys = key.split(".");
@@ -217,14 +218,12 @@ export default {
       }
     },
     getData() {
-      let obj = {
-        ...this.currentModel
-      };
+      let obj = JSON.parse(JSON.stringify(this.currentModel));
       let result = {};
       Object.keys(obj).forEach((el) => {
         let value = obj[el];
         if (value instanceof Date) {
-          result[el] = util.format(value, "yyyy-MM-dd");
+          result[el] = formatDate(value, "yyyy-MM-dd");
         } else if (Array.isArray(value)) {
           // 空数组 或者 数组里的值都是空
           // if (value.length === 0 || value.join("").length === 0) {
@@ -239,16 +238,31 @@ export default {
       });
       if (this.special.length) {
         this.special.forEach((el) => {
-          let v = JSON.parse(JSON.stringify(obj[el]));
+          let v = JSON.parse(JSON.stringify(get(obj, el)));
           let value = {};
           v.forEach((els) => {
-            if (els.key) {
-              value[els.key] = els.value;
+            let key = els.key;
+            if (key) {
+              delete els.key;
+              value[key] = { ...els };
             }
           });
-          result[el] = value;
+          // result[el] = value;
+          set(result, el, value);
         });
       }
+      result = this.removeOneOfOption(result);
+      return result;
+    },
+    // 移除记住oneof选项
+    removeOneOfOption(result) {
+      Object.keys(result).forEach((el) => {
+        if (el.includes("-option")) {
+          delete result[el];
+        } else if (typeof result[el] === "object") {
+          this.removeOneOfOption(result[el]);
+        }
+      });
       return result;
     },
     randomId() {
@@ -267,7 +281,7 @@ export default {
             Object.keys(model).forEach((el) => {
               let value = model[el];
               if (value instanceof Date) {
-                model[el] = util.format(value, "yyyy-MM-dd");
+                model[el] = formatDate(value, "yyyy-MM-dd");
               }
               if (el.indexOf(".") > -1) {
                 delete model[el];
@@ -290,20 +304,35 @@ export default {
     setArrayModal(currentScheme, rules, parentProp) {
       const { items } = currentScheme;
       let _value = [];
+
       if (items.type === "string") {
-        _value.push("");
+        set(currentScheme, "item", "");
+        if (this.initinal) {
+          _value.push("");
+        }
       }
       if (items.type === "boolean") {
-        _value.push(true);
+        set(currentScheme, "item", true);
+        if (this.initinal) {
+          _value.push(true);
+        }
       } else if (items.type === "number" || items.type === "integer") {
-        _value.push(0);
+        set(currentScheme, "item", 0);
+        if (this.initinal) {
+          _value.push(0);
+        }
       } else if (items.type === "object") {
         let obj = this.setModel(items, {}, parentProp);
-        _value.push(obj);
+        set(currentScheme, "item", obj);
+        if (this.initinal) {
+          _value.push(obj);
+        }
       }
       if (currentScheme.minItems > 1) {
-        for (let j = 0; j < currentScheme.minItems - 1; j++) {
-          _value.push(_value[0]);
+        if (this.initinal) {
+          for (let j = 0; j < currentScheme.minItems - 1; j++) {
+            _value.push(_value[0]);
+          }
         }
       }
       return _value;
@@ -315,9 +344,17 @@ export default {
       props.forEach((el) => {
         let prop = el;
         let config = properties[el];
-        let defaultValue = this.model[el] || config.defaultValue || config.default;
-        if (this.model[el] === false || this.model[el] === 0) {
-          defaultValue = this.model[el]
+        if (required && required.includes(prop)) {
+          config.required = true;
+        }
+        let defaultValue = get(
+          this.model,
+          parentProp ? parentProp + "." + el : el,
+          config.defaultValue || config.default
+        );
+        let d = get(this.model, parentProp ? parentProp + "." + el : el);
+        if (d === false || d === 0) {
+          defaultValue = d;
         }
 
         if (config.type === "checkbox") {
@@ -330,17 +367,22 @@ export default {
           // 数组类型
           // 设置默认的格式 config.items
           let _value = this.setArrayModal(config, rules, prop);
+
           set(model, prop, defaultValue || _value || "");
           if (prop.indexOf(".") > -1) {
             model[prop] = defaultValue || _value || "";
           }
         } else if (config.type === "boolean") {
           if (config.children) {
-            let values = this.setModel({ properties: config.children }, config.children.rules || {}, el)
+            let values = this.setModel(
+              { properties: config.children },
+              config.children.rules || {},
+              el
+            );
             // 将children的值平铺开放到model里
-            Object.keys(values).map(el => {
-              model[el] = values[el]
-            })
+            Object.keys(values).map((el) => {
+              model[el] = values[el];
+            });
           }
           model[prop] = !!defaultValue;
         } else {
@@ -352,41 +394,100 @@ export default {
 
           if (config.children) {
             Object.keys(config.children).forEach((pProp) => {
-              let values = this.setModel({ properties: config.children[pProp] }, config.children[pProp].rules || {}, pProp)
+              let values = this.setModel(
+                { properties: config.children[pProp] },
+                config.children[pProp].rules || {},
+                pProp
+              );
               // 将children的值平铺开放到model里
-              Object.keys(values).map(el => {
-                model[el] = values[el]
-              })
+              Object.keys(values).map((el) => {
+                model[el] = values[el];
+              });
             });
           }
         }
         if (config.type === "object" && config.properties) {
-          // model.prop =
           model[prop] = this.setModel(config, rules, prop);
-        } else if (config.type === "object" && !config.properties) {
-          // debugger;
-          // currentScheme.type = "array";
-          this.special.push(prop);
-          let properties = {
-            key: {
-              type: "string",
-              title: "键"
-            },
-            value: {
-              type: "string",
-              title: "值"
+        } else if (config.type === "object" && config.oneOf) {
+          // 通过比较属性key，确定选中的是哪一个。
+          let configOneOfModelArray = [];
+          config.oneOf.forEach((oneOfItem) => {
+            const oneOfItemMoel = this.setModel(oneOfItem, {});
+            oneOfItem.defaultModel = oneOfItemMoel;
+            configOneOfModelArray.push(oneOfItemMoel);
+          });
+          let selectedIndex = 0;
+          if (defaultValue) {
+            configOneOfModelArray.forEach((modelItem, index) => {
+              const modelItemKeys = Object.keys(modelItem);
+              const defaultValueKeys = Object.keys(defaultValue);
+              if (
+                !difference(modelItemKeys, defaultValueKeys).length &&
+                !difference(defaultValueKeys, modelItemKeys).length
+              ) {
+                selectedIndex = index;
+              }
+            });
+            config.oneOf[selectedIndex].defaultModel = defaultValue;
+          }
+          config.selectedIndex = selectedIndex;
+          model[`${prop}-option`] = selectedIndex;
+          model[prop] = config.oneOf[selectedIndex].defaultModel;
+        } else if (
+          config.type === "object" &&
+          !config.properties &&
+          !config.oneOf
+        ) {
+          let properties = {};
+          if (config.additionalProperties) {
+            if (config.additionalProperties.type === "object") {
+              properties = {
+                key: {
+                  type: "string",
+                  title: "键",
+                  description: '{"title":"key"}',
+                  "ui:options": {
+                    width: "100%"
+                  }
+                },
+                ...config.additionalProperties.properties
+              };
+            } else if (config.additionalProperties.type === "string") {
+              properties = {
+                key: {
+                  type: "string",
+                  title: "键"
+                },
+                value: {
+                  type: "string",
+                  title: "值"
+                }
+              };
             }
-          };
+          } else {
+            properties = {
+              key: {
+                type: "string",
+                title: "键"
+              },
+              value: {
+                type: "string",
+                title: "值"
+              }
+            };
+          }
           config.type = "array";
           config.items = {
             type: "object",
             properties
           };
+          this.special.push(parentProp ? parentProp + "." + prop : prop);
+
           let _value = this.setArrayModal(config, rules, prop);
           if (defaultValue && !Array.isArray(defaultValue)) {
             let value = Object.keys(defaultValue).map((k) => ({
               key: k,
-              value: defaultValue[k]
+              ...defaultValue[k]
             }));
             set(model, prop, value || _value || []);
           } else {
@@ -397,61 +498,12 @@ export default {
             model[prop] = defaultValue || _value || [];
           }
           // throw new Error(`类型为object的属性${parentProp}没有properties配置`);
-        } else {
-          let ruleType = {
-            checkbox: "array",
-            array: "array",
-            number: "number",
-            integer: "number",
-            date: "date",
-            switch: "boolean",
-            boolean: "boolean"
-          };
-          if (config.type !== "array") {
-            let required_ = config.minLength || config.maxLength || config.enum;
-            //  || config.pattern;
-            let text = config.enum || config.options ? "请选择" : "请输入";
-            let baseRule = [
-              {
-                required: required_
-                  ? true
-                  : required
-                  ? required.includes(prop)
-                  : false,
-
-                type: ruleType[config.type] || "string",
-                message: config.description || `${text}${config.title || prop}`
-              }
-            ];
-
-            // 更多校验规则
-            if (config.minLength || config.maxLength) {
-              let ruleMinlength = {
-                min: config.minLength || 1,
-                message: "长度至少" + (config.minLength || 1),
-                trigger: "blur"
-              };
-              if (config.maxlength) {
-                ruleMinlength["max"] = config.maxLength;
-                ruleMinlength["message"] =
-                  "长度在" +
-                  (config.minLength || 1) +
-                  "和" +
-                  config.maxLength +
-                  "之间";
-              }
-              baseRule.push(ruleMinlength);
-            }
-            if (config.pattern) {
-              baseRule.push({
-                pattern: new RegExp(config.pattern),
-                message: `格式需要满足正则${config.pattern}`,
-                trigger: "blur"
-              });
-            }
-            set(rules, parentProp ? parentProp + "." + prop : prop, baseRule);
-          }
         }
+        // else {
+
+        //   set(rules, parentProp ? parentProp + "." + prop : prop, baseRule);
+        // }
+        // }
       });
       return model;
     },
@@ -460,31 +512,42 @@ export default {
         throw new Error("请配置schema");
       }
       // 解析 shceme
-      const { properties, required } = this.currentScheme;
-      let props = Object.keys(properties);
-      let model = {}; // 准备model
+      // let props = Object.keys(this.currentScheme.properties);
+      // let model = {}; // 准备model
       let rules = {}; //  准备rules
-      model = this.setModel(this.currentScheme, rules);
-      console.log(this.currentScheme);
-      this.rules = rules;
+      let model = this.setModel(this.currentScheme, rules);
       this.currentModel = model;
-      // console.log(rules);
-      // console.log(model);
     }
   }
 };
 </script>
 <style lang="less">
+// class  看 iview 和 element-ui的名称
 .vue-form {
+  .ivu-form-item-label {
+    word-break: break-all;
+  }
+  .ivu-btn + .ivu-btn {
+    margin-left: 10px;
+  }
   .el-form-item__content {
     .el-select,
     .el-input-number {
       width: 100%;
     }
   }
-
   .el-form-item__label {
     word-break: break-all;
+  }
+  .ivu-form-item-content {
+    .ivu-select,
+    .ivu-input-number {
+      width: 100%;
+    }
+  }
+  .ivu-btn > .ivu-icon {
+    line-height: 1;
+    vertical-align: unset;
   }
 }
 </style>
