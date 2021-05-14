@@ -5534,8 +5534,8 @@ nan@^2.12.1:
 
 nano-assign@^1.0.0:
   version "1.0.1"
-  resolved "https://registry.npm.taobao.org/nano-assign/download/nano-assign-1.0.1.tgz#abb1c50d0416b865fb37bbd155c5368bb54378e5"
-  integrity sha1-q7HFDQQWuGX7N7vRVcU2i7VDeOU=
+  resolved "https://registry.npmjs.org/nano-assign/-/nano-assign-1.0.1.tgz#abb1c50d0416b865fb37bbd155c5368bb54378e5"
+  integrity sha512-1K8ncUoAYFPYcCZqrB+K2XQaFCmA35rryJCtPkGrG3zYkwm+iIUZRIHyaAfuy6zxaK9siPdjeJq7+Inijm6xhw==
 
 nanomatch@^1.2.9:
   version "1.2.13"
@@ -8237,10 +8237,10 @@ vue-loader@^15.7.2:
     vue-hot-reload-api "^2.3.0"
     vue-style-loader "^4.1.0"
 
-vue-monaco@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.npm.taobao.org/vue-monaco/download/vue-monaco-1.2.1.tgz#b44d6f2af080103c9412cb89be43c849c323b636"
-  integrity sha1-tE1vKvCAEDyUEsuJvkPIScMjtjY=
+vue-monaco@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.npmjs.org/vue-monaco/-/vue-monaco-1.2.2.tgz#5e88bd25bf013a32d8fb051acab7bc186c3753e4"
+  integrity sha512-+BhCHeAuDmjtCUP9MUxan6OjGgOqDR7xHlNScZ8Cfq32iac76Fv7z6RfC+lSrp0YpCjEPl6bvpY21N11UBRmMg==
   dependencies:
     monaco-editor "^0.20.0"
     nano-assign "^1.0.0"

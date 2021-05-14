@@ -73,7 +73,7 @@ export default {
         );
       });
     },
-    renderObject(h, config, prop, model) {
+    renderObject(h, config, prop, model, slot) {
       // 渲染对象，根据字段的position进行排序，position越小排前面
       let modelKeysSorted = Object.keys(model).sort((a, b) => {
         if (a.includes(b)) {
@@ -91,6 +91,7 @@ export default {
       return h(
         "div",
         {
+          class: ["item-object"],
           style: {
             display: "flex"
           }
@@ -115,119 +116,121 @@ export default {
           h(
             "div",
             {
+              class: ["flex-object"],
               style: {
                 flex: 1,
                 flexWrap: "wrap",
                 display: prop.indexOf(".") > -1 ? "flex" : "initial"
               }
             },
-            modelKeysSorted.map((el) => {
-              let configResult = config.properties[el];
-              if (el.includes("-option")) {
-                //  oneOf 才会有的属性  基础属性路径b-option
-                // 是oneof选项
-                const oneOfName = el.split("-")[0];
-                configResult = {
-                  type: "select",
-                  title: "类型选择",
-                  options: config.properties[oneOfName].oneOf.map(
-                    (oneOfItem, index) => ({
-                      label: oneOfItem.description,
-                      value: index
-                    })
-                  )
-                };
-              }
-              return h("vue-form-item", {
-                props: {
-                  prop: `${prop}.${el}`,
-                  value: model[el],
-                  config: configResult
-                },
-                on: {
-                  input: (value) => {
-                    model[el] = value;
-                    // oneof选项变化
-                    if (el.includes("-option")) {
-                      let __prop__ = el.split("-")[0];
-                      config.properties[__prop__].selectedIndex = value;
-                      model[__prop__] =
-                        config.properties[__prop__].oneOf[value].defaultModel;
-                    }
-                  },
-                  arrayInput: (key, value) => {
-                    this.$emit("arrayInput", key, value);
-                  }
+            [
+              ...modelKeysSorted.map((el) => {
+                let configResult = config.properties[el];
+                if (el.includes("-option")) {
+                  //  oneOf 才会有的属性  基础属性路径b-option
+                  // 是oneof选项
+                  const oneOfName = el.split("-")[0];
+                  configResult = {
+                    type: "select",
+                    title: "类型选择",
+                    options: config.properties[oneOfName].oneOf.map(
+                      (oneOfItem, index) => ({
+                        label: oneOfItem.description,
+                        value: index
+                      })
+                    )
+                  };
                 }
-              });
-            })
+                return h("vue-form-item", {
+                  props: {
+                    prop: `${prop}.${el}`,
+                    value: model[el],
+                    config: configResult
+                  },
+                  on: {
+                    input: (value) => {
+                      model[el] = value;
+                      // oneof选项变化
+                      if (el.includes("-option")) {
+                        let __prop__ = el.split("-")[0];
+                        config.properties[__prop__].selectedIndex = value;
+                        model[__prop__] =
+                          config.properties[__prop__].oneOf[value].defaultModel;
+                      }
+                    },
+                    arrayInput: (key, value) => {
+                      this.$emit("arrayInput", key, value);
+                    }
+                  }
+                });
+              }),
+              slot
+            ]
           )
         ]
       );
     },
-    renderArrayButton(h, config, model, title) {
+    renderArrayButton(h, config, model, title, index, length) {
+      let add = h(
+        `${this.prefix}-button`,
+        {
+          props: {
+            type: "primary"
+            // size: "small"
+          },
+          on: {
+            click: () => {
+              const { minItems, maxItems, item } = config;
+              if (maxItems && model.length >= maxItems) {
+                console.warn(`最大数量限制为${maxItems}`);
+                return;
+              }
+              let zore = model[0] || item;
+              if (typeof zore === "object") {
+                //  let keys = Object.keys(zore);
+                // let obj = {};
+                // keys.forEach((els) => {
+                //   obj[els] = "";
+                // });
+                model.push(JSON.parse(JSON.stringify(zore)));
+              } else if (typeof zore === "string" || typeof zore === "number") {
+                model.push("");
+              }
+            }
+          }
+        },
+        `新增` // ${title}
+      );
+      let remove = h(
+        `${this.prefix}-button`,
+        {
+          props: {
+            type: this.prefix == "i" ? "error" : "danger" // error类型  判断
+            // size: "small"
+          },
+          on: {
+            click: () => {
+              const { minItems } = config;
+              if (minItems && model.length <= minItems) {
+                console.warn(`最小数量限制为${minItems}`);
+                return;
+              }
+              model.pop();
+            }
+          }
+        },
+        `删除` //${title}
+      );
+      // return index === 0 ? add : remove;
       return h(
         "div",
         {
+          class: "item-button",
           style: {
             textAlign: "right"
           }
         },
-        [
-          h(
-            `${this.prefix}-button`,
-            {
-              props: {
-                type: "primary"
-                // size: "small"
-              },
-              on: {
-                click: () => {
-                  const { minItems, maxItems, item } = config;
-                  if (maxItems && model.length >= maxItems) {
-                    console.warn(`最大数量限制为${maxItems}`);
-                    return;
-                  }
-                  let zore = model[0] || item;
-                  if (typeof zore === "object") {
-                    let keys = Object.keys(zore);
-                    let obj = {};
-                    keys.forEach((els) => {
-                      obj[els] = "";
-                    });
-                    model.push(obj);
-                  } else if (
-                    typeof zore === "string" ||
-                    typeof zore === "number"
-                  ) {
-                    model.push("");
-                  }
-                }
-              }
-            },
-            `新增${title}`
-          ),
-          h(
-            `${this.prefix}-button`,
-            {
-              props: {
-                type: this.prefix == "i" ? "error" : "danger" // error类型  判断
-                // size: "small"
-              },
-              on: {
-                click: () => {
-                  const { minItems } = config;
-                  if (minItems && model.length <= minItems) {
-                    console.warn(`最小数量限制为${minItems}`);
-                    return;
-                  }
-                  model.pop();
-                }
-              }
-            },
-            `删除${title}`
-          )
-        ]
+        [index === 0 ? add : remove]
       );
     },
     renderArray(h, config, prop, model) {
@@ -242,21 +245,60 @@ export default {
                 // TODO model 类型
                 // model是当前构造出来的数组对象 el就是子项 如果el不是object类型
 
-                return h("div", {}, [
-                  this.renderFun(h, items, `${prop}.${index}`, model[index])
-                ]);
+                return h(
+                  "div",
+                  {
+                    class: "flex-div"
+                  },
+                  [
+                    this.renderFun(
+                      h,
+                      items,
+                      `${prop}.${index}`,
+                      model[index],
+                      undefined,
+                      this.renderArrayButton(
+                        h,
+                        config,
+                        model,
+                        extraOptions(config.description).title ||
+                          config.title ||
+                          prop,
+                        index,
+                        model.length
+                      )
+                    )
+                  ]
+                );
               })
             : model.map((el, index) => {
                 // model是当前构造出来的数组对象 el就是子项 如果el不是object类型
-                return h("div", {}, [
-                  this.renderFun(h, items, `${prop}.${index}`, model, index)
-                ]);
+                return h(
+                  "div",
+                  {
+                    class: ["flex-div"]
+                  },
+                  [
+                    this.renderFun(h, items, `${prop}.${index}`, model, index),
+                    this.renderArrayButton(
+                      h,
+                      config,
+                      model,
+                      extraOptions(config.description).title ||
+                        config.title ||
+                        prop,
+                      index,
+                      model.length
+                    )
+                  ]
+                );
               });
       }
 
       return h(
         "div",
         {
+          class: ["item-array"],
           style: {
             display: "flex"
           }
@@ -284,19 +326,19 @@ export default {
               }
             },
             [
-              ...children,
-              this.renderArrayButton(
-                h,
-                config,
-                model,
-                extraOptions(config.description).title || config.title || prop
-              )
+              ...children
+              // this.renderArrayButton(
+              //   h,
+              //   config,
+              //   model,
+              //   extraOptions(config.description).title || config.title || prop
+              // )
             ]
           )
         ]
       );
     },
-    renderFun(h, config, prop, currentValue, _arrayIndex) {
+    renderFun(h, config, prop, currentValue, _arrayIndex, slot) {
       let type = config.type;
       // 解析description
       let extra = extraOptions(config.description);
@@ -396,7 +438,7 @@ export default {
       if (type === "array") {
         return this.renderArray(h, config, prop, currentValue);
       } else if (type === "object") {
-        return this.renderObject(h, config, prop, currentValue);
+        return this.renderObject(h, config, prop, currentValue, slot);
       }
       let labelArr =
         extra.title || config.title || (_arrayIndex > -1 ? "" : prop);
@@ -489,3 +531,32 @@ export default {
   }
 };
 </script>
+<style lang="less">
+.flex-div {
+  display: flex;
+  & > div:not(.item-button) {
+    flex: 1;
+    min-width: 0;
+  }
+  & > .item-button {
+    width: 80px;
+    height: 36px;
+  }
+}
+.flex-object {
+  & > .item-button {
+    width: 80px;
+    height: 36px;
+    flex: 1;
+  }
+}
+// .item-array {
+//   &::after {
+//     content: " ";
+//     display: block;
+//     width: 100%;
+//     height: 1px;
+//     background-color: red;
+//   }
+// }
+</style>
