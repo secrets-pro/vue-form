@@ -33,7 +33,8 @@
   "dependencies": {
     "@vue/babel-preset-jsx": "^1.1.2",
     "vuedraggable": "^2.24.1",
-    "webpack-merge": "^5.7.3"
+    "webpack-merge": "^5.7.3",
+    "vue-monaco": "^1.2.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.0",
@@ -76,7 +77,6 @@
     "view-design": "^4.5.0",
     "vue": "^2.6.10",
     "vue-loader": "^15.7.2",
-    "vue-monaco": "^1.2.2",
     "vue-style-loader": "^4.1.2",
     "vue-template-compiler": "^2.6.10",
     "webpack": "^4.41.2",
