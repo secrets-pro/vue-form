@@ -244,7 +244,12 @@ export default {
             let key = els.key;
             if (key) {
               delete els.key;
-              value[key] = { ...els };
+              // 这里判断一下 字符串
+              if (Object.keys(els).length === 1) {
+                value[key] = els[Object.keys(els)[0]];
+              } else {
+                value[key] = { ...els };
+              }
             }
           });
           // result[el] = value;
