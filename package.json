@@ -58,8 +58,6 @@
     "jest-transform-stub": "^2.0.0",
     "less-loader": "^5.0.0",
     "lodash": "^4.17.15",
-    "monaco-editor": "^0.20.0",
-    "monaco-editor-webpack-plugin": "^1.9.0",
     "postcss-loader": "^3.0.0",
     "rollup": "^1.27.2",
     "rollup-plugin-babel": "^4.3.3",

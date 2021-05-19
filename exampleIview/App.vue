@@ -7,6 +7,7 @@
       </div>
       <vue-form
         @on-confirm="confirm"
+        :split="false"
         ref="form"
         :schema="schema"
         :model="model"

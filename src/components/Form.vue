@@ -1,5 +1,6 @@
 <template>
   <div v-if="Object.keys(currentModel).length" class="vue-form" v-show="show">
+    {{ currentModel }}
     <component
       :is="`${this.prefix}-form`"
       size="medium"
@@ -10,7 +11,7 @@
           this.defaultWidth
       "
     >
-      <div class="h5">基础配置</div>
+      <div class="h5" v-if="split">基础配置</div>
       <div class="card">
         <template v-for="prop in propertiesSorted">
           <form-item-plugin
@@ -36,7 +37,9 @@
           ></form-item-plugin>
         </template>
         <div v-if="!settings.length" style="padding:12px;">
-          <sm-nodata>没有可展示的配置项目，请点击设置按钮添加</sm-nodata>
+          <div style="text-align:center;">
+            没有可展示的配置项目，请点击设置按钮添加
+          </div>
         </div>
         <div style="text-align:center;">
           <sm-button @on-click="settingModal">设置</sm-button>
@@ -96,6 +99,10 @@ export default {
       }
     },
     initinal: {
+      type: Boolean,
+      default: true
+    },
+    split: {
       type: Boolean,
       default: true
     }
@@ -170,6 +177,7 @@ export default {
       // lastKeys = required.concat(
       //   lastKeys.sort((a, b) => properties[a].position - properties[b].position)
       // );
+
       let propertiesSorted = required.map((el) => ({
         name: el,
         ...properties[el]
@@ -186,8 +194,19 @@ export default {
 
       // 父子段为下拉选项，根据父子段的值渲染不同的子字段，同样需要对其子字段根据position排序
 
-      this.propertiesSorted = JSON.parse(JSON.stringify(propertiesSorted));
-      this.lastKeysProperties = JSON.parse(JSON.stringify(lastKeysProperties));
+      if (this.split) {
+        this.propertiesSorted = JSON.parse(JSON.stringify(propertiesSorted));
+        this.lastKeysProperties = JSON.parse(
+          JSON.stringify(lastKeysProperties)
+        );
+      } else {
+        this.propertiesSorted = Object.assign(
+          {},
+          JSON.parse(JSON.stringify(propertiesSorted)),
+          JSON.parse(JSON.stringify(lastKeysProperties))
+        );
+        this.lastKeysProperties = {};
+      }
     },
     // FIXME  优化
     input(key, value) {
@@ -206,7 +225,6 @@ export default {
       }
     },
     getData() {
-      console.log(this.currentModel);
       let obj = JSON.parse(JSON.stringify(this.currentModel));
       let result = {};
       Object.keys(obj).forEach((el) => {
@@ -252,7 +270,6 @@ export default {
       ks.forEach((el) => {
         retn[el] = result[el];
       });
-      console.log(JSON.stringify(retn));
       return retn;
     },
     // 移除记住oneof选项
@@ -325,6 +342,9 @@ export default {
     },
     setModel(currentScheme, rules, parentProp) {
       let { properties, required } = currentScheme;
+      if (!properties) {
+        return {};
+      }
       let model = {};
       let props = Object.keys(properties);
       props.forEach((el) => {
@@ -417,8 +437,10 @@ export default {
             config.oneOf[selectedIndex].defaultModel = defaultValue;
           }
           config.selectedIndex = selectedIndex;
-          model[`${prop}-option`] = selectedIndex;
-          model[prop] = config.oneOf[selectedIndex].defaultModel;
+          // model[`${prop}-option`] = selectedIndex;
+          let defa = config.oneOf[selectedIndex].defaultModel;
+          defa[`${prop}-option`] = selectedIndex;
+          model[prop] = defa;
         } else if (
           config.type === "object" &&
           !config.properties &&

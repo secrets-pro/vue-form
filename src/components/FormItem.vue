@@ -85,7 +85,7 @@ export default {
     renderObject(h, config, prop, model, slot) {
       // 渲染对象，根据字段的position进行排序，position越小排前面
       let modelKeysSorted = Object.keys(model).sort((a, b) => {
-        if (a.includes(b)) {
+        if (a.includes("-option")) {
           return -1;
         }
         if (
@@ -135,21 +135,22 @@ export default {
             [
               ...modelKeysSorted.map((el) => {
                 let configResult = config.properties[el];
-                if (el.includes("-option")) {
-                  //  oneOf 才会有的属性  基础属性路径b-option
-                  // 是oneof选项
-                  const oneOfName = el.split("-")[0];
-                  configResult = {
-                    type: "select",
-                    title: "类型选择",
-                    options: config.properties[oneOfName].oneOf.map(
-                      (oneOfItem, index) => ({
-                        label: oneOfItem.description,
-                        value: index
-                      })
-                    )
-                  };
-                }
+                // if (el.includes("-option")) {
+                //   //  oneOf 才会有的属性  基础属性路径b-option
+                //   // 是oneof选项
+                //   const oneOfName = el.split("-")[0];
+                //   configResult = {
+                //     type: "select",
+                //     title: "类型选择",
+                //     options: config.properties[oneOfName].oneOf.map(
+                //       (oneOfItem, index) => ({
+                //         label: oneOfItem.description,
+                //         value: index
+                //       })
+                //     )
+                //   };
+                // }
+                // console.log(`config`, config);
                 return h("vue-form-item", {
                   props: {
                     prop: `${prop}.${el}`,
@@ -161,10 +162,18 @@ export default {
                       model[el] = value;
                       // oneof选项变化
                       if (el.includes("-option")) {
-                        let __prop__ = el.split("-")[0];
-                        config.properties[__prop__].selectedIndex = value;
-                        model[__prop__] =
-                          config.properties[__prop__].oneOf[value].defaultModel;
+                        // let __prop__ = el.split("-")[0];
+                        config.selectedIndex = value;
+                        config.type = "object";
+                        // model[el] = value;
+                        // debugger;
+                        model = config.oneOf[value].defaultModel;
+                        model[el] = value;
+                        this.currentValue = model;
+                        this.$emit("input", this.currentValue);
+                        this.$emit("update:config", config);
+                        // model[__prop__] =
+                        //   config.properties[__prop__].oneOf[value].defaultModel;
                       }
                     },
                     arrayInput: (key, value) => {
@@ -382,12 +391,22 @@ export default {
         });
       }
       if (config.oneOf) {
+        let selectedIndex =
+          currentValue[prop + "-option"] || config.selectedIndex;
         config = {
           //  config 临时记录 现有选择的oneOf字段
           oneOf: config.oneOf,
-          ...config.oneOf[config.selectedIndex]
+          ...config.oneOf[selectedIndex]
         };
+        config.properties[prop + "-option"] = {
+          type: "select",
+          enum: config.oneOf.map((el, index) => index),
+          enumNames: config.oneOf.map((el, index) => `选项${index}`)
+        };
+        currentValue = config.oneOf[selectedIndex].defaultModel;
+        currentValue[prop + "-option"] = selectedIndex;
       }
+      // console.log(config);
       let children = [];
 
       if (type === "radio" || type === "checkbox") {

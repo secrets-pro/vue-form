@@ -17,7 +17,7 @@ let baseconfig = (format) => {
       file:
         format === "iife" ? "dist/vue-form.js" : `dist/vue-form.${format}.js`
     },
-    external: ["vue", "lodash", "vue-monaco"],
+    external: ["vue", "lodash"],
     plugins: [
       resolve(),
       babel({

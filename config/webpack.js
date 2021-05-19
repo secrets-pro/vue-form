@@ -1,7 +1,6 @@
 const path = require("path");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
 const htmlWebpackPlugin = require("html-webpack-plugin");
-const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
 
 const webpack = require("webpack");
 function resolve(_path) {
@@ -59,10 +58,10 @@ module.exports = {
       inject: true,
       template: "public/index.html"
     }),
-    new VueLoaderPlugin(),
-    new MonacoWebpackPlugin({
-      languages: ["javascript", "css", "html", "typescript", "json"]
-    })
+    new VueLoaderPlugin()
+    // new MonacoWebpackPlugin({
+    //   languages: ["javascript", "css", "html", "typescript", "json"]
+    // })
   ],
   resolve: {
     alias: {
