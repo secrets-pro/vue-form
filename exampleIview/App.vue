@@ -14,7 +14,7 @@
       ></vue-form>
     </div>
 
-    <!-- <el-button @click="getData">获取数据</el-button> -->
+    <i-button @click="getData">获取数据</i-button>
     <!-- <el-input type="textarea" v-model="data1" :rows="10" /> -->
   </div>
 </template>
@@ -48,11 +48,16 @@ export default {
   },
   methods: {
     confirm(model) {
-      console.log(model);
+      // console.log(model);
     },
-    getData() {
-      let data = this.$refs.form.getData();
-      this.data1 = JSON.stringify(data, null, "\t");
+    async getData() {
+      let data = await this.$refs.form.validate();
+      console.log(data);
+      if (data) {
+        let data1 = this.$refs.form.getData();
+        console.log(data1);
+      }
+      // this.data1 = JSON.stringify(data, null, "\t");
     }
   }
 };

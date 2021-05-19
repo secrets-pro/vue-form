@@ -32,9 +32,7 @@
   "license": "MIT",
   "dependencies": {
     "@vue/babel-preset-jsx": "^1.1.2",
-    "vuedraggable": "^2.24.1",
-    "webpack-merge": "^5.7.3",
-    "vue-monaco": "^1.2.2"
+    "webpack-merge": "^5.7.3"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.0",

@@ -10,74 +10,52 @@
           this.defaultWidth
       "
     >
-      <template v-for="prop in propertiesSorted">
-        <form-item-plugin
-          v-model="currentModel[prop.name]"
-          :config="prop"
-          :prop="prop.name"
-          :key="prop.name"
-          @arrayInput="input"
-        ></form-item-plugin>
-        <!-- 下拉选项，选择不同的值，渲染不同的子字段 -->
-        <div
-          v-if="
-            prop.enum && prop.children && prop.children[currentModel[prop.name]]
-          "
-          :key="'children' + prop.name"
-        >
-          <div
-            v-for="childrenProp in prop.children[currentModel[prop.name]]"
-            :key="childrenProp.name"
-          >
-            <form-item-plugin
-              v-model="currentModel[childrenProp.name]"
-              :config="childrenProp"
-              :prop="childrenProp.name"
-              :key="childrenProp.name"
-              @arrayInput="input"
-            ></form-item-plugin>
-          </div>
+      <div class="h5">基础配置</div>
+      <div class="card">
+        <template v-for="prop in propertiesSorted">
+          <form-item-plugin
+            :key="prop.name"
+            v-model="currentModel[prop.name]"
+            :config="prop"
+            :prop="prop.name"
+            @arrayInput="input"
+          ></form-item-plugin>
+        </template>
+      </div>
+      <div class="card" v-if="Object.keys(lastKeysProperties).length">
+        <div class="h5">
+          高级配置
         </div>
-        <!-- 布尔类型，为true渲染子字段 -->
-        <div
-          v-if="
-            prop.type === 'boolean' && prop.children && currentModel[prop.name]
-          "
-          :key="'children' + prop.name"
-        >
-          <div
-            v-for="(childrenProp, childrenKey) in prop.children"
-            :key="childrenKey"
-          >
-            <form-item-plugin
-              v-model="currentModel[childrenKey]"
-              :config="childrenProp"
-              :prop="childrenKey"
-              :key="childrenKey"
-              @arrayInput="input"
-            ></form-item-plugin>
-          </div>
+        <template v-for="prop in settings">
+          <form-item-plugin
+            :key="prop"
+            v-model="currentModel[prop]"
+            :config="lastKeysProperties[prop]"
+            :prop="prop"
+            @arrayInput="input"
+          ></form-item-plugin>
+        </template>
+        <div v-if="!settings.length" style="padding:12px;">
+          <sm-nodata>没有可展示的配置项目，请点击设置按钮添加</sm-nodata>
         </div>
-      </template>
-      <div style="text-align:right;padding-right:12px;" v-if="schema.buttons">
-        <component
-          :is="`${this.prefix}-button`"
-          type="primary"
-          size="mini"
-          @click="confirm"
-          v-show="schema.buttons.includes('confirm')"
-          >确定</component
-        >
-        <component
-          :is="`${this.prefix}-button`"
-          type="default"
-          size="mini"
-          @click="reset"
-          v-show="schema.buttons.includes('reset')"
-          >重置</component
-        >
+        <div style="text-align:center;">
+          <sm-button @on-click="settingModal">设置</sm-button>
+        </div>
       </div>
     </component>
+    <Modal v-model="modal">
+      <div>
+        <CheckboxGroup v-model="settings">
+          <Checkbox
+            v-for="i in lastKeysProperties"
+            :label="i.name"
+            :key="i.name"
+          >
+            <span>{{ i.name }}</span>
+          </Checkbox>
+        </CheckboxGroup>
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
@@ -99,6 +77,12 @@ export default {
   name: "vue-form",
   props: {
     schema: Object,
+    request: {
+      type: Function,
+      default() {
+        return () => {};
+      }
+    },
     model: {
       type: Object,
       default() {
@@ -153,6 +137,7 @@ export default {
   },
   data() {
     return {
+      modal: false,
       defaultWidth: this.prefix === "el" ? "100px" : 100,
       currentScheme: this.schema,
       currentModel: {},
@@ -162,44 +147,47 @@ export default {
       rules: {},
       special: [],
       once: false,
-      propertiesSorted: []
+      propertiesSorted: [],
+      lastKeysProperties: [],
+      settings: [],
+      required: []
     };
   },
   methods: {
+    settingModal() {
+      this.modal = true;
+    },
     setSortProperties() {
       let properties = this.currentScheme.properties
         ? JSON.parse(JSON.stringify(this.currentScheme.properties))
         : {};
       // 对最外层properties进行排序（position越小排前面）
-      let propertiesSorted = Object.keys(properties)
-        .sort((a, b) => properties[a].position - properties[b].position)
-        .map((el) => ({
+      let required = this.currentScheme.required || [];
+      let lastKeys = Object.keys(properties);
+      for (let i = required.length - 1; i > -1; i--) {
+        lastKeys.splice(lastKeys.indexOf(required[i]), 1);
+      }
+      // lastKeys = required.concat(
+      //   lastKeys.sort((a, b) => properties[a].position - properties[b].position)
+      // );
+      let propertiesSorted = required.map((el) => ({
+        name: el,
+        ...properties[el]
+      }));
+      let lastKeysProperties = {};
+      lastKeys.forEach((el) => {
+        let obj = {
           name: el,
           ...properties[el]
-        }));
+        };
+        lastKeysProperties[el] = obj;
+      });
+      this.required = required;
 
       // 父子段为下拉选项，根据父子段的值渲染不同的子字段，同样需要对其子字段根据position排序
-      propertiesSorted.forEach((el) => {
-        if (el.enum && el.children && Object.keys(el.children).length) {
-          Object.keys(el.children).forEach((key) => {
-            let childrenProperties = el.children[key];
-            let childrenPropertiesSorted = Object.keys(childrenProperties)
-              .sort(
-                (a, b) =>
-                  childrenProperties[a].position -
-                  childrenProperties[b].position
-              )
-              .map((childrenPropertiesName) => ({
-                name: childrenPropertiesName,
-                ...childrenProperties[childrenPropertiesName]
-              }));
-            el.children[key] = JSON.parse(
-              JSON.stringify(childrenPropertiesSorted)
-            );
-          });
-        }
-      });
+
       this.propertiesSorted = JSON.parse(JSON.stringify(propertiesSorted));
+      this.lastKeysProperties = JSON.parse(JSON.stringify(lastKeysProperties));
     },
     // FIXME  优化
     input(key, value) {
@@ -218,6 +206,7 @@ export default {
       }
     },
     getData() {
+      console.log(this.currentModel);
       let obj = JSON.parse(JSON.stringify(this.currentModel));
       let result = {};
       Object.keys(obj).forEach((el) => {
@@ -257,7 +246,14 @@ export default {
         });
       }
       result = this.removeOneOfOption(result);
-      return result;
+      // 只返回配置的key
+      let retn = {};
+      let ks = [].concat(this.required).concat(this.settings);
+      ks.forEach((el) => {
+        retn[el] = result[el];
+      });
+      console.log(JSON.stringify(retn));
+      return retn;
     },
     // 移除记住oneof选项
     removeOneOfOption(result) {
@@ -281,22 +277,7 @@ export default {
     validate() {
       return new Promise((resolve, reject) => {
         this.$refs[this.formId].validate((el) => {
-          if (el) {
-            let model = this.getData();
-            Object.keys(model).forEach((el) => {
-              let value = model[el];
-              if (value instanceof Date) {
-                model[el] = formatDate(value, "yyyy-MM-dd");
-              }
-              if (el.indexOf(".") > -1) {
-                delete model[el];
-              }
-            });
-            this.$emit("on-confirm", model);
-            resolve(model);
-          } else {
-            resolve(null);
-          }
+          resolve(el);
         });
       });
     },

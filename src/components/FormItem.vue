@@ -3,6 +3,14 @@
 import setting from "../config";
 import styleCfg from "../styleCfg";
 const { extraOptions, generateRule } = setting;
+function formatUrl(url, params) {
+  if (params) {
+    for (let k in params) {
+      url = url.replace(new RegExp("\\{" + k + "\\}", "g"), params[k]);
+    }
+  }
+  return url;
+}
 export default {
   name: "vue-form-item",
   inject: ["Form"],
@@ -24,7 +32,8 @@ export default {
   },
   data() {
     return {
-      currentValue: this.value
+      currentValue: this.value,
+      requests: {}
     };
   },
   methods: {
@@ -341,6 +350,7 @@ export default {
     renderFun(h, config, prop, currentValue, _arrayIndex, slot) {
       let type = config.type;
       // 解析description
+
       let extra = extraOptions(config.description);
       let rules = generateRule(config, prop);
       let style = {};
@@ -403,9 +413,9 @@ export default {
         type = "input-number";
       } else if (type === "select" || config.enum) {
         if (config.enum) {
-          config.options = config.enum.map((el) => {
+          config.options = config.enum.map((el, index) => {
             return {
-              label: el,
+              label: config.enumNames ? config.enumNames[index] : el,
               value: el
             };
           });
@@ -523,7 +533,33 @@ export default {
       );
     }
   },
+  async created() {
+    // console.log("created");
+    let extra = extraOptions(this.config.description);
+    if (extra.url) {
+      let data = await this.Form.request(
+        formatUrl(extra.url, {
+          ...this.$route.params
+        })
+      );
+      if (data.data) {
+        this.config.enum = data.data.map((el) => el[extra.return]);
+        this.config.enumNames = data.data.map((el) => el[extra.show]);
+        this.config.type = "select";
+      }
+
+      // this.Form.addRequest(prop, {
+      //   url: extra.url,
+      //   key: extra.key,
+      //   show: extra.show
+      // });
+    }
+  },
+  mounted() {
+    // console.log("mounted");
+  },
   render(h) {
+    // console.log("render");
     if (this.Form.visiableStatus) {
       return this.renderFun(h, this.config, this.prop, this.currentValue);
     }
