@@ -1,5 +1,7 @@
 <template>
   <div class="test">
+    {{ model }}
+    <i-button @click="setModal" type="primary">setModal</i-button>
     <div style="display:flex;">
       <div style="width:40%;">
         <!-- <el-input type="textarea" :rows="100" v-model="schemaString" /> -->
@@ -26,19 +28,7 @@ export default {
     return {
       data1: null,
       active: "2",
-      model: {
-        // dddd: {
-        //   args: [1]
-        // }
-        domain: "xxxx",
-        livenessProbe: {
-          initialDelaySeconds: 60,
-          timeoutSeconds: 10,
-          probeConfig: {
-            command: ["1", "2", "3"]
-          }
-        }
-      },
+      model: {},
       schemaString: JSON.stringify(scheme, null, "\t")
     };
   },
@@ -48,6 +38,20 @@ export default {
     }
   },
   methods: {
+    setModal() {
+      this.model = {
+        replicasType: {
+          cpu: 1,
+          cpuUnit: "%",
+          customExpressions: [{ criticalValue: 0, expression: "xx" }],
+          maxReplicas: 1,
+          memory: 0,
+          memoryUnit: "Mi",
+          minReplicas: 1,
+          qps: 0
+        }
+      };
+    },
     confirm(model) {
       // console.log(model);
     },

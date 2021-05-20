@@ -1,6 +1,5 @@
 <template>
   <div v-if="Object.keys(currentModel).length" class="vue-form" v-show="show">
-    {{ currentModel }}
     <component
       :is="`${this.prefix}-form`"
       size="medium"
@@ -64,7 +63,7 @@
 <script>
 /* eslint-disable no-unused-vars */
 const letters = "abcdefghijklmn".split("");
-import { set, get, difference } from "lodash";
+import { set, get, difference, debounce } from "lodash";
 import FormItemPlugin from "./FormItem.vue";
 import setting from "../config";
 const formatDate = setting.formatDate;
@@ -109,8 +108,8 @@ export default {
   },
 
   created() {
-    this.validateScheme();
-    this.setSortProperties();
+    this.handleWatch = debounce(this.handleWatch, 500);
+    this.handleWatch();
   },
   computed: {
     rowSize() {
@@ -128,9 +127,16 @@ export default {
   watch: {
     schema(n) {
       this.currentScheme = n;
-      this.validateScheme();
-      this.setSortProperties();
+      this.handleWatch();
     },
+    model: {
+      deep: true,
+      handler(n) {
+        this.initModel = n;
+        this.handleWatch();
+      }
+    },
+
     show(n, o) {
       // 当状态变化
       if (!this.once) {
@@ -157,10 +163,16 @@ export default {
       propertiesSorted: [],
       lastKeysProperties: [],
       settings: [],
-      required: []
+      required: [],
+      initModel: this.model
     };
   },
   methods: {
+    handleWatch() {
+      console.log("handleWatch", +new Date());
+      this.validateScheme();
+      this.setSortProperties();
+    },
     settingModal() {
       this.modal = true;
     },
@@ -190,6 +202,11 @@ export default {
         };
         lastKeysProperties[el] = obj;
       });
+      let settings = Object.keys(this.initModel || {});
+      for (let i = required.length - 1; i > -1; i--) {
+        settings.splice(settings.indexOf(required[i]), 1);
+      }
+      this.settings = settings;
       this.required = required;
 
       // 父子段为下拉选项，根据父子段的值渲染不同的子字段，同样需要对其子字段根据position排序
@@ -245,22 +262,25 @@ export default {
       });
       if (this.special.length) {
         this.special.forEach((el) => {
-          let v = JSON.parse(JSON.stringify(get(obj, el)));
-          let value = {};
-          v.forEach((els) => {
-            let key = els.key;
-            if (key) {
-              delete els.key;
-              // 这里判断一下 字符串
-              if (Object.keys(els).length === 1) {
-                value[key] = els[Object.keys(els)[0]];
-              } else {
-                value[key] = { ...els };
+          let __temp__ = get(obj, el);
+          if (__temp__) {
+            let v = JSON.parse(JSON.stringify(__temp__));
+            let value = {};
+            v.forEach((els) => {
+              let key = els.key;
+              if (key) {
+                delete els.key;
+                // 这里判断一下 字符串
+                if (Object.keys(els).length === 1) {
+                  value[key] = els[Object.keys(els)[0]];
+                } else {
+                  value[key] = { ...els };
+                }
               }
-            }
-          });
-          // result[el] = value;
-          set(result, el, value);
+            });
+            // result[el] = value;
+            set(result, el, value);
+          }
         });
       }
       result = this.removeOneOfOption(result);
@@ -341,24 +361,30 @@ export default {
       return _value;
     },
     setModel(currentScheme, rules, parentProp) {
+      // console.log(`setModel`, currentScheme);
       let { properties, required } = currentScheme;
       if (!properties) {
         return {};
       }
       let model = {};
       let props = Object.keys(properties);
+
       props.forEach((el) => {
         let prop = el;
         let config = properties[el];
         if (required && required.includes(prop)) {
           config.required = true;
         }
+
         let defaultValue = get(
-          this.model,
+          this.initModel || {},
           parentProp ? parentProp + "." + el : el,
           config.defaultValue || config.default
         );
-        let d = get(this.model, parentProp ? parentProp + "." + el : el);
+        let d = get(
+          this.initModel || {},
+          parentProp ? parentProp + "." + el : el
+        );
         if (d === false || d === 0) {
           defaultValue = d;
         }
@@ -368,6 +394,12 @@ export default {
           set(model, prop, defaultValue || []);
           if (prop.indexOf(".") > -1) {
             model[prop] = defaultValue || [];
+          }
+        } else if (config.type === "integer" || config.type === "number") {
+          // model[prop] = defaultValue || [];
+          set(model, prop, defaultValue || 0);
+          if (prop.indexOf(".") > -1) {
+            model[prop] = defaultValue || 0;
           }
         } else if (config.type === "array") {
           // 数组类型
@@ -442,12 +474,12 @@ export default {
           defa[`${prop}-option`] = selectedIndex;
           model[prop] = defa;
         } else if (
-          config.type === "object" &&
-          !config.properties &&
-          !config.oneOf
+          (config.type === "object" && !config.properties && !config.oneOf) ||
+          config.additionalProperties
         ) {
           let properties = {};
           if (config.additionalProperties) {
+            console.log(`additionalProperties `);
             if (config.additionalProperties.type === "object") {
               properties = {
                 key: {

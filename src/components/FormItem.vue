@@ -22,8 +22,12 @@ export default {
   },
   watch: {
     value(n) {
+      // console.log(`watch currentValue `, this.currentValue);
       this.currentValue = n;
     }
+    // config(n) {
+    //   console.log(`watch config `, n);
+    // }
   },
   computed: {
     prefix() {
@@ -162,16 +166,19 @@ export default {
                       model[el] = value;
                       // oneof选项变化
                       if (el.includes("-option")) {
+                        // debugger;
                         // let __prop__ = el.split("-")[0];
-                        config.selectedIndex = value;
-                        config.type = "object";
+
                         // model[el] = value;
                         // debugger;
                         model = config.oneOf[value].defaultModel;
                         model[el] = value;
                         this.currentValue = model;
                         this.$emit("input", this.currentValue);
-                        this.$emit("update:config", config);
+                        // console.log(`update:config`, this.config, config);
+                        this.config.selectedIndex = value;
+                        this.config.type = "object";
+                        // this.$emit("update:config", config);
                         // model[__prop__] =
                         //   config.properties[__prop__].oneOf[value].defaultModel;
                       }
@@ -391,8 +398,8 @@ export default {
         });
       }
       if (config.oneOf) {
-        let selectedIndex =
-          currentValue[prop + "-option"] || config.selectedIndex;
+        // debugger;
+        let selectedIndex = config.selectedIndex; // currentValue[prop + "-option"] ||
         config = {
           //  config 临时记录 现有选择的oneOf字段
           oneOf: config.oneOf,
@@ -578,7 +585,8 @@ export default {
     // console.log("mounted");
   },
   render(h) {
-    // console.log("render");
+    // console.log("render", this.config, this.currentValue);
+    // debugger;
     if (this.Form.visiableStatus) {
       return this.renderFun(h, this.config, this.prop, this.currentValue);
     }
