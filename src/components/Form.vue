@@ -169,7 +169,6 @@ export default {
   },
   methods: {
     handleWatch() {
-      console.log("handleWatch", +new Date());
       this.validateScheme();
       this.setSortProperties();
     },
@@ -361,7 +360,6 @@ export default {
       return _value;
     },
     setModel(currentScheme, rules, parentProp) {
-      // console.log(`setModel`, currentScheme);
       let { properties, required } = currentScheme;
       if (!properties) {
         return {};
@@ -479,7 +477,6 @@ export default {
         ) {
           let properties = {};
           if (config.additionalProperties) {
-            console.log(`additionalProperties `);
             if (config.additionalProperties.type === "object") {
               properties = {
                 key: {
@@ -525,10 +522,21 @@ export default {
 
           let _value = this.setArrayModal(config, rules, prop);
           if (defaultValue && !Array.isArray(defaultValue)) {
-            let value = Object.keys(defaultValue).map((k) => ({
-              key: k,
-              ...defaultValue[k]
-            }));
+            // 这里 有问题
+            let __ks__ = Object.keys(defaultValue);
+            let value = __ks__.map((k) => {
+              let v = defaultValue[k];
+              if (Object.prototype.toString.call(v) === "[object Object]") {
+                return {
+                  key: k,
+                  ...defaultValue[k]
+                };
+              }
+              return {
+                key: k,
+                value: defaultValue[k]
+              };
+            });
             set(model, prop, value || _value || []);
           } else {
             set(model, prop, defaultValue || _value || []);

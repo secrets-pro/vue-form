@@ -560,7 +560,6 @@ export default {
     }
   },
   async created() {
-    // console.log("created");
     let extra = extraOptions(this.config.description);
     if (extra.url) {
       let data = await this.Form.request(
