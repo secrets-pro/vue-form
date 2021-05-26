@@ -32,6 +32,9 @@ export default {
   computed: {
     prefix() {
       return !setting.options.iView ? "el" : "i";
+    },
+    readonly() {
+      return this.Form.readonly;
     }
   },
   data() {
@@ -196,6 +199,9 @@ export default {
       );
     },
     renderArrayButton(h, config, model, title, index, length) {
+      if (this.readonly) {
+        return null;
+      }
       let add = h(
         `${this.prefix}-button`,
         {
@@ -269,7 +275,6 @@ export default {
             ? model.map((el, index) => {
                 // TODO model 类型
                 // model是当前构造出来的数组对象 el就是子项 如果el不是object类型
-
                 return h(
                   "div",
                   {
@@ -364,6 +369,10 @@ export default {
       );
     },
     renderFun(h, config, prop, currentValue, _arrayIndex, slot) {
+      if (!config) {
+        console.log(`没有参数`, config, prop);
+        return;
+      }
       let type = config.type;
       // 解析description
 
@@ -371,6 +380,7 @@ export default {
       let rules = generateRule(config, prop);
       let style = {};
       let props = {
+        readonly: this.readonly,
         value:
           _arrayIndex !== undefined ? currentValue[_arrayIndex] : currentValue
       };
@@ -405,13 +415,18 @@ export default {
           oneOf: config.oneOf,
           ...config.oneOf[selectedIndex]
         };
-        config.properties[prop + "-option"] = {
+        let k = prop + "-option";
+        let idx = prop.lastIndexOf(".");
+        if (idx > -1) {
+          k = prop.substring(idx + 1) + "-option";
+        }
+        config.properties[k] = {
           type: "select",
           enum: config.oneOf.map((el, index) => index),
           enumNames: config.oneOf.map((el, index) => `选项${index}`)
         };
         currentValue = config.oneOf[selectedIndex].defaultModel;
-        currentValue[prop + "-option"] = selectedIndex;
+        currentValue[k] = selectedIndex;
       }
       // console.log(config);
       let children = [];
@@ -436,7 +451,11 @@ export default {
         if (config.maximum !== undefined) {
           props["max"] = config.maximum;
         }
-        type = "input-number";
+        if (this.readonly) {
+          type = "input";
+        } else {
+          type = "input-number";
+        }
       } else if (type === "select" || config.enum) {
         if (config.enum) {
           config.options = config.enum.map((el, index) => {
@@ -510,6 +529,9 @@ export default {
         arr.push(this.renderLabel(labelArr, extra.description));
       }
       let width = _arrayIndex > -1 ? 0 : styleCfg.labelWidth;
+      if (this.readonly) {
+        rules = undefined;
+      }
       return h(
         `${this.prefix}-form-item`,
         {

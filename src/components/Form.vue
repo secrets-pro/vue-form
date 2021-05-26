@@ -104,7 +104,8 @@ export default {
     split: {
       type: Boolean,
       default: true
-    }
+    },
+    readonly: Boolean
   },
 
   created() {

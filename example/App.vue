@@ -7,6 +7,7 @@
       <vue-form
         @on-confirm="confirm"
         :initinal="true"
+        readonly
         ref="form"
         :schema="schema"
         :model="model"
