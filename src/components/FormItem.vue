@@ -643,4 +643,7 @@ export default {
 //     background-color: red;
 //   }
 // }
+input[readonly="readonly"] {
+  border: none;
+}
 </style>

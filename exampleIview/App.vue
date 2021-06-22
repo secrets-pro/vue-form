@@ -10,6 +10,7 @@
       <vue-form
         @on-confirm="confirm"
         :split="false"
+        readonly
         ref="form"
         :schema="schema"
         :model="model"
