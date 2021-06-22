@@ -41,11 +41,11 @@
           </div>
         </div>
         <div style="text-align:center;">
-          <sm-button @on-click="settingModal">设置</sm-button>
+          <slot name="setting"></slot>
         </div>
       </div>
     </component>
-    <Modal v-model="modal">
+    <!-- <Modal v-model="modal">
       <div>
         <CheckboxGroup v-model="settings">
           <Checkbox
@@ -57,7 +57,7 @@
           </Checkbox>
         </CheckboxGroup>
       </div>
-    </Modal>
+    </Modal> -->
   </div>
 </template>
 <script>
@@ -173,8 +173,14 @@ export default {
       this.validateScheme();
       this.setSortProperties();
     },
-    settingModal() {
-      this.modal = true;
+    changeSetting(setting) {
+      this.settings = setting;
+    },
+    getSetting() {
+      return {
+        settings: this.settings,
+        lastKeysProperties: this.lastKeysProperties
+      };
     },
     setSortProperties() {
       let properties = this.currentScheme.properties
