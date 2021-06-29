@@ -107,10 +107,15 @@ export default {
     },
     readonly: Boolean
   },
-
+  beforeCreate() {
+    this.$emit("on-create");
+  },
   created() {
     this.handleWatch = debounce(this.handleWatch, 500);
     this.handleWatch();
+  },
+  mounted() {
+    this.$emit("on-mounte");
   },
   computed: {
     rowSize() {

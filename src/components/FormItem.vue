@@ -535,6 +535,7 @@ export default {
       return h(
         `${this.prefix}-form-item`,
         {
+          class:['vue-form-item'],
           props: {
             prop: prop,
             labelWidth: this.prefix === "el" ? width + "px" : width,
@@ -584,14 +585,22 @@ export default {
   async created() {
     let extra = extraOptions(this.config.description);
     if (extra.url) {
-      let data = await this.Form.request(
+      let data = window.sessionStorage.getItem(extra.url);
+      if(data){
+        data = JSON.parse(data);
+      }else{
+        let res = await this.Form.request(
         formatUrl(extra.url, {
           ...this.$route.params
         })
       );
-      if (data.data) {
-        this.config.enum = data.data.map((el) => el[extra.return]);
-        this.config.enumNames = data.data.map((el) => el[extra.show]);
+       data = res.data;
+        window.sessionStorage.setItem(extra.url,JSON.stringify(data))
+      }
+      console.log(data);
+       if (data) {
+        this.config.enum = data.map((el) => el[extra.return]);
+        this.config.enumNames = data.map((el) => el[extra.show]);
         this.config.type = "select";
       }
 
@@ -616,6 +625,7 @@ export default {
 };
 </script>
 <style lang="less">
+.vue-form-item{
 .flex-div {
   display: flex;
   & > div:not(.item-button) {
@@ -645,5 +655,6 @@ export default {
 // }
 input[readonly="readonly"] {
   border: none;
+}
 }
 </style>
