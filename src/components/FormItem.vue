@@ -258,7 +258,8 @@ export default {
         {
           class: "item-button",
           style: {
-            textAlign: "right"
+            textAlign: "right",
+            flex: "1"
           }
         },
         [index === 0 ? add : remove]
@@ -535,7 +536,7 @@ export default {
       return h(
         `${this.prefix}-form-item`,
         {
-          class:['vue-form-item'],
+          class: ["vue-form-item"],
           props: {
             prop: prop,
             labelWidth: this.prefix === "el" ? width + "px" : width,
@@ -580,36 +581,42 @@ export default {
           ) : null}
         </span>
       );
+    },
+    async init() {
+      let extra = extraOptions(this.config.description);
+      if (extra.url) {
+        let data = window.sessionStorage.getItem(extra.url);
+        if (data) {
+          data = JSON.parse(data);
+        } else {
+          let res = await this.Form.request(
+            formatUrl(extra.url, {
+              ...this.$route.params
+            })
+          );
+          data = res.data;
+          window.sessionStorage.setItem(extra.url, JSON.stringify(data));
+        }
+        console.log(data);
+        if (data) {
+          this.config.enum = data.map((el) => el[extra.return]);
+          this.config.enumNames = data.map((el) => el[extra.show]);
+          this.config.type = "select";
+        }
+
+        // this.Form.addRequest(prop, {
+        //   url: extra.url,
+        //   key: extra.key,
+        //   show: extra.show
+        // });
+      }
     }
   },
   async created() {
-    let extra = extraOptions(this.config.description);
-    if (extra.url) {
-      let data = window.sessionStorage.getItem(extra.url);
-      if(data){
-        data = JSON.parse(data);
-      }else{
-        let res = await this.Form.request(
-        formatUrl(extra.url, {
-          ...this.$route.params
-        })
-      );
-       data = res.data;
-        window.sessionStorage.setItem(extra.url,JSON.stringify(data))
-      }
-      console.log(data);
-       if (data) {
-        this.config.enum = data.map((el) => el[extra.return]);
-        this.config.enumNames = data.map((el) => el[extra.show]);
-        this.config.type = "select";
-      }
-
-      // this.Form.addRequest(prop, {
-      //   url: extra.url,
-      //   key: extra.key,
-      //   show: extra.show
-      // });
-    }
+    this.init();
+  },
+  beforeUpdate() {
+    this.init();
   },
   mounted() {
     // console.log("mounted");
@@ -618,6 +625,7 @@ export default {
     // console.log("render", this.config, this.currentValue);
     // debugger;
     if (this.Form.visiableStatus) {
+      console.log(this.config, this.prop, this.currentValue);
       return this.renderFun(h, this.config, this.prop, this.currentValue);
     }
     return null;
@@ -625,36 +633,36 @@ export default {
 };
 </script>
 <style lang="less">
-.vue-form-item{
-.flex-div {
-  display: flex;
-  & > div:not(.item-button) {
-    flex: 1;
-    min-width: 0;
+.vue-form-item {
+  .flex-div {
+    display: flex;
+    & > div:not(.item-button) {
+      flex: 1;
+      min-width: 0;
+    }
+    & > .item-button {
+      width: 80px;
+      height: 36px;
+    }
   }
-  & > .item-button {
-    width: 80px;
-    height: 36px;
+  .flex-object {
+    & > .item-button {
+      width: 80px;
+      height: 36px;
+      flex: 1;
+    }
   }
-}
-.flex-object {
-  & > .item-button {
-    width: 80px;
-    height: 36px;
-    flex: 1;
+  // .item-array {
+  //   &::after {
+  //     content: " ";
+  //     display: block;
+  //     width: 100%;
+  //     height: 1px;
+  //     background-color: red;
+  //   }
+  // }
+  input[readonly="readonly"] {
+    border: none;
   }
-}
-// .item-array {
-//   &::after {
-//     content: " ";
-//     display: block;
-//     width: 100%;
-//     height: 1px;
-//     background-color: red;
-//   }
-// }
-input[readonly="readonly"] {
-  border: none;
-}
 }
 </style>

@@ -531,9 +531,12 @@ export default {
             properties
           };
           this.special.push(parentProp ? parentProp + "." + prop : prop);
-
           let _value = this.setArrayModal(config, rules, prop);
-          if (defaultValue && !Array.isArray(defaultValue)) {
+          if (
+            defaultValue &&
+            Object.keys(defaultValue).length &&
+            !Array.isArray(defaultValue)
+          ) {
             // 这里 有问题
             let __ks__ = Object.keys(defaultValue);
             let value = __ks__.map((k) => {
@@ -551,7 +554,11 @@ export default {
             });
             set(model, prop, value || _value || []);
           } else {
-            set(model, prop, defaultValue || _value || []);
+            let v =
+              defaultValue && Object.keys(defaultValue).length
+                ? defaultValue
+                : _value || [];
+            set(model, prop, v);
           }
 
           if (prop.indexOf(".") > -1) {
