@@ -1,8 +1,8 @@
 /*
  * @Author: bowen.xu
  * @Date: 2021-05-07 09:54:37
- * @Last Modified by:   bowen.xu
- * @Last Modified time: 2021-05-07 09:54:37
+ * @Last Modified by: bowen.xu
+ * @Last Modified time: 2021-07-07 15:25:54
  */
 
 function extraOptions(description) {
@@ -31,6 +31,9 @@ export default {
     return y + "-" + (m > 9 ? m : "0" + m) + "-" + (d > 9 ? d : "0" + d);
   },
   generateRule(config, prop) {
+    // if (prop === "imagePullSecrets") {
+    //   debugger;
+    // }
     if (prop.includes("-option")) {
       return [];
     }
@@ -49,11 +52,15 @@ export default {
     //  || config.pattern;
     let text = config.enum || config.options ? "请选择" : "请输入";
     // FXIME 如果是数组嵌套object的时候 prop--> a.0.b==>rule
+    let type = ruleType[config.type] || "string";
+    if (config.multiple) {
+      type = "array";
+    }
     let baseRule = [
       {
         required: required_ || required,
 
-        type: ruleType[config.type] || "string",
+        type: type,
         message:
           extraOptions(config.description).description ||
           `${text}${extraOptions(config.description).title ||

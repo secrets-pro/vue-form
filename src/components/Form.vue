@@ -120,12 +120,13 @@ export default {
   },
   computed: {
     settingcp() {
-      // console.log(this.config);
+      let config = this.schema.properties;
       let s = this.settings;
       return s.sort((a, b) => {
-        let pa = extraOptions(this.config.properties[a].description);
-        let pb = extraOptions(this.config.properties[b].description);
-        console.log(pa, pb);
+        // console.log(a, b);
+        let pa = extraOptions(config[a].description);
+        let pb = extraOptions(config[b].description);
+        // console.log(pa, pb);
         return pa.index - pb.index;
       });
     },
@@ -398,6 +399,9 @@ export default {
       props.forEach((el) => {
         let prop = el;
         let config = properties[el];
+        // if (extraOptions(config.description).multiple) {
+        //   debugger;
+        // }
         if (Array.isArray(required) && required.includes(prop)) {
           config.required = true;
         }
@@ -507,6 +511,7 @@ export default {
           config.additionalProperties
         ) {
           let properties = {};
+          let w = "calc(50% - 40px)";
           if (config.additionalProperties) {
             if (config.additionalProperties.type === "object") {
               properties = {
@@ -515,7 +520,7 @@ export default {
                   title: "键",
                   description: '{"title":"key"}',
                   "ui:options": {
-                    width: "100%"
+                    width: w
                   }
                 },
                 ...config.additionalProperties.properties
@@ -524,11 +529,17 @@ export default {
               properties = {
                 key: {
                   type: "string",
-                  title: "键"
+                  title: "键",
+                  "ui:options": {
+                    width: w
+                  }
                 },
                 value: {
                   type: "string",
-                  title: "值"
+                  title: "值",
+                  "ui:options": {
+                    width: w
+                  }
                 }
               };
             }
@@ -536,11 +547,17 @@ export default {
             properties = {
               key: {
                 type: "string",
-                title: "键"
+                title: "键",
+                "ui:options": {
+                  width: w
+                }
               },
               value: {
                 type: "string",
-                title: "值"
+                title: "值",
+                "ui:options": {
+                  width: w
+                }
               }
             };
           }

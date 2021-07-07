@@ -128,27 +128,12 @@ export default {
               style: {
                 flex: 1,
                 flexWrap: "wrap",
-                display: prop.indexOf(".") > -1 ? "flex" : "initial"
+                display: "flex" //prop.indexOf(".") > -1 ? "flex" : "initial"
               }
             },
             [
               ...modelKeysSorted.map((el) => {
                 let configResult = config.properties[el];
-                // if (el.includes("-option")) {
-                //   //  oneOf 才会有的属性  基础属性路径b-option
-                //   // 是oneof选项
-                //   const oneOfName = el.split("-")[0];
-                //   configResult = {
-                //     type: "select",
-                //     title: "类型选择",
-                //     options: config.properties[oneOfName].oneOf.map(
-                //       (oneOfItem, index) => ({
-                //         label: oneOfItem.description,
-                //         value: index
-                //       })
-                //     )
-                //   };
-                // }
                 return h("vue-form-item", {
                   props: {
                     prop: `${prop}.${el}`,
@@ -160,20 +145,12 @@ export default {
                       model[el] = value;
                       // oneof选项变化
                       if (el.includes("-option")) {
-                        // debugger;
-                        // let __prop__ = el.split("-")[0];
-
-                        // model[el] = value;
-                        // debugger;
                         model = config.oneOf[value].defaultModel;
                         model[el] = value;
                         this.currentValue = model;
                         this.$emit("input", this.currentValue);
                         this.config.selectedIndex = value;
                         this.config.type = "object";
-                        // this.$emit("update:config", config);
-                        // model[__prop__] =
-                        //   config.properties[__prop__].oneOf[value].defaultModel;
                       }
                     },
                     arrayInput: (key, value) => {
@@ -255,7 +232,6 @@ export default {
       );
     },
     renderArray(h, config, prop, model) {
-      // debugger;
       const { items } = config;
       let { type } = items;
       // let that = this;
@@ -297,7 +273,7 @@ export default {
                 return h(
                   "div",
                   {
-                    class: ["flex-div"]
+                    class: ["flex-div", "simple-div"]
                   },
                   [
                     this.renderFun(h, items, `${prop}.${index}`, model, index),
@@ -415,7 +391,11 @@ export default {
         }
         config.properties[k] = {
           title: extra.title,
+          description: "",
           type: "select",
+          "ui:options": {
+            width: "100%"
+          },
           enum: config.oneOf.map((el, index) => index),
           enumNames: config.oneOf.map((el, index) =>
             extra.items ? extra.items[index] : `选项${index}`
@@ -463,7 +443,7 @@ export default {
 
         children = this.renderSelectOptions(h, config.options, config.groups);
         type = "select";
-        style.width = "100%";
+        // style.width = "100%";
         props.multiple = config.multiple;
       } else if (type === "string") {
         type = "input";
@@ -591,7 +571,9 @@ export default {
             })
           );
           data = res.data;
-          window.sessionStorage.setItem(extra.url, JSON.stringify(data));
+          if (data) {
+            window.sessionStorage.setItem(extra.url, JSON.stringify(data));
+          }
         }
         if (data) {
           this.config.enum = data.map((el) => el[extra.return]);
@@ -633,6 +615,16 @@ export default {
     width: 80px;
     height: 36px;
   }
+  &.simple-div {
+    & > div {
+      max-width: 50%;
+    }
+  }
+  .flex-object {
+    & > div:first-child {
+      width: auto;
+    }
+  }
 }
 
 .vue-form-item {
@@ -642,17 +634,62 @@ export default {
 }
 .flex-object {
   // background-color: red;
-  & > div {
+  display: flex;
+  & > div.vue-form-item {
+    width: calc(50% - 40px);
+    // flex: 1;
+    // width: 33.33%;
+    // flex: 1;
+  }
+  & > div.form-item-array {
     width: 100%;
-    flex: 1;
   }
   & > .item-button {
     width: 80px;
     height: 36px;
-    flex: 1;
+    // flex: 1;
+  }
+  .flex-object {
+    & > div:first-child {
+      width: auto;
+    }
+  }
+}
+.item-object {
+  width: calc(100% - 80px) !important;
+  & > .flex-object {
+    & > div:first-child {
+      width: calc(100% - 80px);
+    }
   }
 }
 .form-item-array {
-  // background-color: red;
+  .flex-div {
+    .item-object {
+      width: calc(100% - 80px) !important;
+      & > .flex-object {
+        & > div:first-child {
+          width: 100%;
+        }
+      }
+    }
+  }
+  & + .item-button {
+    width: 100%;
+  }
+}
+.form-item-array {
+  .form-item-array {
+    .flex-div {
+      .item-object {
+        width: calc(100% - 80px) !important;
+        & > .flex-object {
+          & > div:first-child {
+            width: auto;
+          }
+        }
+      }
+    }
+  }
 }
 </style>
