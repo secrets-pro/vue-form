@@ -90,19 +90,16 @@ export default {
       });
     },
     renderObject(h, config, prop, model, slot) {
+      console.log(` config.properties `, config.properties);
       // 渲染对象，根据字段的position进行排序，position越小排前面
       let modelKeysSorted = Object.keys(model).sort((a, b) => {
+        let pa = extraOptions(config.properties[a].description);
+        let pb = extraOptions(config.properties[b].description);
         if (a.includes("-option")) {
           return -1;
         }
-        if (
-          config.properties[a] &&
-          config.properties[a].position &&
-          config.properties[b] &&
-          config.properties[b].position
-        ) {
-          return config.properties[a].position - config.properties[b].position;
-        }
+
+        return pa.index - pb.index;
       });
       return h(
         "div",
@@ -127,7 +124,7 @@ export default {
                     width: styleCfg.titleWidth
                   }
                 },
-                config.title
+                extraOptions(config.description).title || config.title
               ),
           h(
             "div",
@@ -329,7 +326,7 @@ export default {
       return h(
         "div",
         {
-          class: ["item-array"],
+          class: ["form-item-array"],
           style: {
             display: "flex"
           }
@@ -421,10 +418,14 @@ export default {
         if (idx > -1) {
           k = prop.substring(idx + 1) + "-option";
         }
+        // console.log(`----oneof-----`, config, extra);
         config.properties[k] = {
+          title: extra.title,
           type: "select",
           enum: config.oneOf.map((el, index) => index),
-          enumNames: config.oneOf.map((el, index) => `选项${index}`)
+          enumNames: config.oneOf.map((el, index) =>
+            extra.items ? extra.items[index] : `选项${index}`
+          )
         };
         currentValue = config.oneOf[selectedIndex].defaultModel;
         currentValue[k] = selectedIndex;
@@ -469,6 +470,8 @@ export default {
 
         children = this.renderSelectOptions(h, config.options, config.groups);
         type = "select";
+        style.width = "100%";
+        props.multiple = config.multiple;
       } else if (type === "string") {
         type = "input";
       } else if (type === "boolean") {
@@ -597,11 +600,12 @@ export default {
           data = res.data;
           window.sessionStorage.setItem(extra.url, JSON.stringify(data));
         }
-        console.log(data);
+        // console.log(data);
         if (data) {
           this.config.enum = data.map((el) => el[extra.return]);
           this.config.enumNames = data.map((el) => el[extra.show]);
           this.config.type = "select";
+          this.config.multiple = extra.multiple === "true";
         }
 
         // this.Form.addRequest(prop, {
@@ -624,45 +628,46 @@ export default {
   render(h) {
     // console.log("render", this.config, this.currentValue);
     // debugger;
+    console.log(" base render ", this.config);
     if (this.Form.visiableStatus) {
-      console.log(this.config, this.prop, this.currentValue);
+      // console.log(this.config, this.prop, this.currentValue);
       return this.renderFun(h, this.config, this.prop, this.currentValue);
     }
     return null;
   }
 };
 </script>
-<style lang="less">
+<style lang="less" scoped>
+.flex-div {
+  display: flex;
+  & > div:not(.item-button) {
+    flex: 1;
+    min-width: 0;
+  }
+  & > .item-button {
+    width: 80px;
+    height: 36px;
+  }
+}
+
 .vue-form-item {
-  .flex-div {
-    display: flex;
-    & > div:not(.item-button) {
-      flex: 1;
-      min-width: 0;
-    }
-    & > .item-button {
-      width: 80px;
-      height: 36px;
-    }
-  }
-  .flex-object {
-    & > .item-button {
-      width: 80px;
-      height: 36px;
-      flex: 1;
-    }
-  }
-  // .item-array {
-  //   &::after {
-  //     content: " ";
-  //     display: block;
-  //     width: 100%;
-  //     height: 1px;
-  //     background-color: red;
-  //   }
-  // }
   input[readonly="readonly"] {
     border: none;
   }
+}
+.flex-object {
+  // background-color: red;
+  & > div {
+    width: 100%;
+    flex: 1;
+  }
+  & > .item-button {
+    width: 80px;
+    height: 36px;
+    flex: 1;
+  }
+}
+.form-item-array {
+  // background-color: red;
 }
 </style>

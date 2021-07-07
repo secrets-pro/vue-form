@@ -3,6 +3,7 @@
     <component
       :is="`${this.prefix}-form`"
       size="medium"
+      class="vue-form"
       :model="currentModel"
       :ref="formId"
       :label-width="
@@ -297,10 +298,14 @@ export default {
       result = this.removeOneOfOption(result);
       // 只返回配置的key
       let retn = {};
-      let ks = [].concat(this.required).concat(this.settings);
-      ks.forEach((el) => {
-        retn[el] = result[el];
-      });
+      if (this.split) {
+        let ks = [].concat(this.required).concat(this.settings);
+        ks.forEach((el) => {
+          retn[el] = result[el];
+        });
+      } else {
+        retn = result;
+      }
       return retn;
     },
     // 移除记住oneof选项
@@ -382,9 +387,13 @@ export default {
       props.forEach((el) => {
         let prop = el;
         let config = properties[el];
-        if (required && required.includes(prop)) {
+        console.log(required);
+        if (Array.isArray(required) && required.includes(prop)) {
           config.required = true;
         }
+        // } else if (typeof required === "boolean") {
+        //   config.required = true;
+        // }
 
         let defaultValue = get(
           this.initModel || {},
