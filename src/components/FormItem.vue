@@ -22,12 +22,8 @@ export default {
   },
   watch: {
     value(n) {
-      // console.log(`watch currentValue `, this.currentValue);
       this.currentValue = n;
     }
-    // config(n) {
-    //   console.log(`watch config `, n);
-    // }
   },
   computed: {
     prefix() {
@@ -90,7 +86,6 @@ export default {
       });
     },
     renderObject(h, config, prop, model, slot) {
-      console.log(` config.properties `, config.properties);
       // 渲染对象，根据字段的position进行排序，position越小排前面
       let modelKeysSorted = Object.keys(model).sort((a, b) => {
         let pa = extraOptions(config.properties[a].description);
@@ -154,7 +149,6 @@ export default {
                 //     )
                 //   };
                 // }
-                // console.log(`config`, config);
                 return h("vue-form-item", {
                   props: {
                     prop: `${prop}.${el}`,
@@ -175,7 +169,6 @@ export default {
                         model[el] = value;
                         this.currentValue = model;
                         this.$emit("input", this.currentValue);
-                        // console.log(`update:config`, this.config, config);
                         this.config.selectedIndex = value;
                         this.config.type = "object";
                         // this.$emit("update:config", config);
@@ -255,14 +248,14 @@ export default {
         {
           class: "item-button",
           style: {
-            textAlign: "right",
-            flex: "1"
+            textAlign: "right"
           }
         },
         [index === 0 ? add : remove]
       );
     },
     renderArray(h, config, prop, model) {
+      // debugger;
       const { items } = config;
       let { type } = items;
       // let that = this;
@@ -322,7 +315,8 @@ export default {
                 );
               });
       }
-
+      //  判断是否是一级属性
+      // let level = prop.indexOf(".") === -1;
       return h(
         "div",
         {
@@ -342,6 +336,7 @@ export default {
               ], // class判断
               style: {
                 width: styleCfg.titleWidth
+                // display: level ? "none" : "block"
               }
             },
             extraOptions(config.description).title || config.title || prop
@@ -418,7 +413,6 @@ export default {
         if (idx > -1) {
           k = prop.substring(idx + 1) + "-option";
         }
-        // console.log(`----oneof-----`, config, extra);
         config.properties[k] = {
           title: extra.title,
           type: "select",
@@ -430,7 +424,6 @@ export default {
         currentValue = config.oneOf[selectedIndex].defaultModel;
         currentValue[k] = selectedIndex;
       }
-      // console.log(config);
       let children = [];
 
       if (type === "radio" || type === "checkbox") {
@@ -600,7 +593,6 @@ export default {
           data = res.data;
           window.sessionStorage.setItem(extra.url, JSON.stringify(data));
         }
-        // console.log(data);
         if (data) {
           this.config.enum = data.map((el) => el[extra.return]);
           this.config.enumNames = data.map((el) => el[extra.show]);
@@ -622,15 +614,8 @@ export default {
   beforeUpdate() {
     this.init();
   },
-  mounted() {
-    // console.log("mounted");
-  },
   render(h) {
-    // console.log("render", this.config, this.currentValue);
-    // debugger;
-    console.log(" base render ", this.config);
     if (this.Form.visiableStatus) {
-      // console.log(this.config, this.prop, this.currentValue);
       return this.renderFun(h, this.config, this.prop, this.currentValue);
     }
     return null;

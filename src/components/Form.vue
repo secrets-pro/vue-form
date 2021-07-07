@@ -27,7 +27,7 @@
         <div class="h5">
           高级配置
         </div>
-        <template v-for="prop in settings">
+        <template v-for="prop in settingcp">
           <form-item-plugin
             :key="prop"
             v-model="currentModel[prop]"
@@ -68,7 +68,7 @@ import { set, get, difference, debounce } from "lodash";
 import FormItemPlugin from "./FormItem.vue";
 import setting from "../config";
 const formatDate = setting.formatDate;
-// const extraOptions = setting.extraOptions;
+const extraOptions = setting.extraOptions;
 
 export default {
   components: { "form-item-plugin": FormItemPlugin },
@@ -119,6 +119,16 @@ export default {
     this.$emit("on-mounte");
   },
   computed: {
+    settingcp() {
+      // console.log(this.config);
+      let s = this.settings;
+      return s.sort((a, b) => {
+        let pa = extraOptions(this.config.properties[a].description);
+        let pb = extraOptions(this.config.properties[b].description);
+        console.log(pa, pb);
+        return pa.index - pb.index;
+      });
+    },
     rowSize() {
       return !this.schema.layout
         ? 1
@@ -182,6 +192,7 @@ export default {
     changeSetting(setting) {
       this.settings = setting;
     },
+
     getSetting() {
       return {
         settings: this.settings,
@@ -387,7 +398,6 @@ export default {
       props.forEach((el) => {
         let prop = el;
         let config = properties[el];
-        console.log(required);
         if (Array.isArray(required) && required.includes(prop)) {
           config.required = true;
         }
