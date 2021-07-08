@@ -102,11 +102,11 @@ export default {
         {
           class: ["item-object"],
           style: {
-            display: "flex"
+            // display: "flex"
           }
         },
         [
-          prop.indexOf(".") > -1
+          !(extraOptions(config.description).title || config.title)
             ? null
             : h(
                 "div",
@@ -127,9 +127,9 @@ export default {
             {
               class: ["flex-object"],
               style: {
-                flex: 1,
-                flexWrap: "wrap",
-                display: "flex" //prop.indexOf(".") > -1 ? "flex" : "initial"
+                // flex: 1,
+                // flexWrap: "wrap",
+                // display: "flex" //prop.indexOf(".") > -1 ? "flex" : "initial"
               }
             },
             [
@@ -152,9 +152,14 @@ export default {
                       model[el] = value;
                       // oneof选项变化
                       if (el.includes("-option")) {
-                        model = config.oneOf[value].defaultModel;
-                        model[el] = value;
-                        this.currentValue = model;
+                        if (value > -1) {
+                          model = config.oneOf[value].defaultModel;
+                          model[el] = value;
+                          this.currentValue = model;
+                        } else {
+                          this.currentValue = {};
+                        }
+
                         this.$emit("input", this.currentValue);
                         this.config.selectedIndex = value;
                         this.config.type = "object";
@@ -305,7 +310,7 @@ export default {
         {
           class: ["form-item-array"],
           style: {
-            display: "flex"
+            // display: "flex"
           }
         },
         [
@@ -328,7 +333,8 @@ export default {
             "div",
             {
               style: {
-                flex: 1
+                flex: 1,
+                marginLeft: styleCfg.titleWidth
               },
               class: "form-item-array-content"
             },
@@ -386,6 +392,8 @@ export default {
         });
       }
       if (config.oneOf) {
+        console.log(`selectedIndex`, selectedIndex);
+        let ext = extraOptions(config.description);
         // debugger;
         let selectedIndex = config.selectedIndex; // currentValue[prop + "-option"] ||
         config = {
@@ -398,6 +406,9 @@ export default {
         if (idx > -1) {
           k = prop.substring(idx + 1) + "-option";
         }
+        if (!config.properties) {
+          config.properties = {};
+        }
         config.properties[k] = {
           title: extra.title,
           description: "",
@@ -408,7 +419,13 @@ export default {
             extra.items ? extra.items[index] : `选项${index}`
           )
         };
-        currentValue = config.oneOf[selectedIndex].defaultModel;
+        if (selectedIndex > -1) {
+          currentValue = config.oneOf[selectedIndex].defaultModel;
+        }
+        if (ext.default === -1) {
+          config.properties[k].enum.unshift(-1);
+          config.properties[k].enumNames.unshift("不使用");
+        }
         currentValue[k] = selectedIndex;
       }
       let children = [];
@@ -651,6 +668,7 @@ export default {
 }
 .flex-object {
   display: flex;
+  flex-wrap: wrap;
 }
 .vue-form-item.maxWidth33 {
   max-width: 33.33%;
@@ -658,14 +676,20 @@ export default {
 .item-object.maxWidth33 {
   width: 100%;
 }
-.vue-form-item.normal-vue-item:not(.vue-form-oneofselection) {
-  flex: 1;
-}
+// .vue-form-item.normal-vue-item:not(.vue-form-oneofselection) {
+//   flex: 1;
+// }
 .vue-form-oneofselection {
-  width: 66.66%;
+  width: 100% !important;
   & > .ivu-form-item-content > .ivu-select {
     width: 100%;
   }
+  & ~ .normal-vue-item {
+    width: 100%;
+  }
+}
+.flex-array > .item-object > .flex-object > .normal-vue-item {
+  max-width: 100%;
 }
 // .flex-object {
 //   // background-color: red;
@@ -727,13 +751,27 @@ export default {
 //     }
 //   }
 // }
-/deep/.vue-form
+// /deep/.vue-form
+//   > .card
+//   > .form-item-array
+//   > .form-item-array-content
+//   > .flex-array
+//   > .item-object
+//   > .flex-object
+//   > .vue-form-item:first-child {
+//   width: calc(50% - 40px);
+// }
+.vue-form
+  > .card
   > .form-item-array
   > .form-item-array-content
   > .flex-array
   > .item-object
   > .flex-object
-  > .vue-form-item:first-child {
-  width: calc(50% - 40px);
+  > .vue-form-item {
+  width: 100%;
+}
+.flex-object-item-object {
+  width: 100%;
 }
 </style>

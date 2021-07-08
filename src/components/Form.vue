@@ -482,12 +482,13 @@ export default {
         } else if (config.type === "object" && config.oneOf) {
           // 通过比较属性key，确定选中的是哪一个。
           let configOneOfModelArray = [];
+          let selectedIndex = extraOptions(config.description).default || 0;
           config.oneOf.forEach((oneOfItem) => {
             const oneOfItemMoel = this.setModel(oneOfItem, {});
             oneOfItem.defaultModel = oneOfItemMoel;
             configOneOfModelArray.push(oneOfItemMoel);
           });
-          let selectedIndex = 0;
+
           if (defaultValue) {
             configOneOfModelArray.forEach((modelItem, index) => {
               const modelItemKeys = Object.keys(modelItem);
@@ -499,13 +500,19 @@ export default {
                 selectedIndex = index;
               }
             });
-            config.oneOf[selectedIndex].defaultModel = defaultValue;
+            if (selectedIndex > -1) {
+              config.oneOf[selectedIndex].defaultModel = defaultValue;
+            }
           }
           config.selectedIndex = selectedIndex;
           // model[`${prop}-option`] = selectedIndex;
-          let defa = config.oneOf[selectedIndex].defaultModel;
-          defa[`${prop}-option`] = selectedIndex;
-          model[prop] = defa;
+          if (selectedIndex > -1) {
+            let defa = config.oneOf[selectedIndex].defaultModel;
+            defa[`${prop}-option`] = selectedIndex;
+            model[prop] = defa;
+          } else {
+            model[prop] = {};
+          }
         } else if (
           (config.type === "object" && !config.properties && !config.oneOf) ||
           config.additionalProperties
