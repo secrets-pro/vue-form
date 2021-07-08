@@ -86,6 +86,7 @@ export default {
       });
     },
     renderObject(h, config, prop, model, slot) {
+      console.log(`renderObject`);
       // 渲染对象，根据字段的position进行排序，position越小排前面
       let modelKeysSorted = Object.keys(model).sort((a, b) => {
         let pa = extraOptions(config.properties[a].description);
@@ -140,6 +141,12 @@ export default {
                     value: model[el],
                     config: configResult
                   },
+                  class: [
+                    `flex-object-item-${configResult.type}`,
+                    modelKeysSorted.length > 3
+                      ? "maxWidth33"
+                      : "normal-vue-item"
+                  ],
                   on: {
                     input: (value) => {
                       model[el] = value;
@@ -245,7 +252,7 @@ export default {
                 return h(
                   "div",
                   {
-                    class: "flex-div"
+                    class: "flex-div flex-array"
                   },
                   [
                     this.renderFun(
@@ -322,7 +329,8 @@ export default {
             {
               style: {
                 flex: 1
-              }
+              },
+              class: "form-item-array-content"
             },
             [
               ...children
@@ -355,6 +363,7 @@ export default {
       };
       // ui 配置
       let uiOptions = config["ui:options"] || extra["ui:options"];
+      let uiClass = config["ui:classes"] || extra["ui:classes"] || [];
       if (uiOptions) {
         style = Object.assign(style, uiOptions);
       }
@@ -393,9 +402,7 @@ export default {
           title: extra.title,
           description: "",
           type: "select",
-          "ui:options": {
-            width: "100%"
-          },
+          "ui:classes": ["vue-form-oneofselection"],
           enum: config.oneOf.map((el, index) => index),
           enumNames: config.oneOf.map((el, index) =>
             extra.items ? extra.items[index] : `选项${index}`
@@ -512,7 +519,7 @@ export default {
       return h(
         `${this.prefix}-form-item`,
         {
-          class: ["vue-form-item"],
+          class: ["vue-form-item", ...uiClass],
           props: {
             prop: prop,
             labelWidth: this.prefix === "el" ? width + "px" : width,
@@ -605,26 +612,36 @@ export default {
 };
 </script>
 <style lang="less" scoped>
+//  block style
+// .vue-form > .card > .form-item-array > .form-item-array-content > .flex-div {
+//   background: #f9f9fc;
+//   padding: 4px;
+//   & > .item-object {
+//     padding: 4px;
+//     background: #fff;
+//   }
+// }
 .flex-div {
   display: flex;
   & > div:not(.item-button) {
     flex: 1;
     min-width: 0;
   }
-  & > .item-button {
-    width: 80px;
-    height: 36px;
-  }
-  &.simple-div {
-    & > div {
-      max-width: 50%;
-    }
-  }
-  .flex-object {
-    & > div:first-child {
-      width: auto;
-    }
-  }
+
+  // &.simple-div {
+  //   & > div {
+  //     max-width: 50%;
+  //   }
+  // }
+  // .flex-object {
+  //   & > div:first-child {
+  //     width: auto;
+  //   }
+  // }
+}
+.item-button {
+  width: 80px;
+  height: 36px;
 }
 
 .vue-form-item {
@@ -633,63 +650,90 @@ export default {
   }
 }
 .flex-object {
-  // background-color: red;
   display: flex;
-  & > div.vue-form-item {
-    width: calc(50% - 40px);
-    // flex: 1;
-    // width: 33.33%;
-    // flex: 1;
-  }
-  & > div.form-item-array {
-    width: 100%;
-  }
-  & > .item-button {
-    width: 80px;
-    height: 36px;
-    // flex: 1;
-  }
-  .flex-object {
-    & > div:first-child {
-      width: auto;
-    }
-  }
 }
-.item-object {
-  width: calc(100% - 80px) !important;
-  & > .flex-object {
-    & > div:first-child {
-      width: calc(100% - 80px);
-    }
-  }
+.vue-form-item.maxWidth33 {
+  max-width: 33.33%;
 }
-.form-item-array {
-  .flex-div {
-    .item-object {
-      width: calc(100% - 80px) !important;
-      & > .flex-object {
-        & > div:first-child {
-          width: 100%;
-        }
-      }
-    }
-  }
-  & + .item-button {
+.item-object.maxWidth33 {
+  width: 100%;
+}
+.vue-form-item.normal-vue-item:not(.vue-form-oneofselection) {
+  flex: 1;
+}
+.vue-form-oneofselection {
+  width: 66.66%;
+  & > .ivu-form-item-content > .ivu-select {
     width: 100%;
   }
 }
-.form-item-array {
-  .form-item-array {
-    .flex-div {
-      .item-object {
-        width: calc(100% - 80px) !important;
-        & > .flex-object {
-          & > div:first-child {
-            width: auto;
-          }
-        }
-      }
-    }
-  }
+// .flex-object {
+//   // background-color: red;
+//   display: flex;
+//   & > div.vue-form-item {
+//     width: calc(50% - 40px);
+//     // flex: 1;
+//     // width: 33.33%;
+//     // flex: 1;
+//   }
+//   & > div.form-item-array {
+//     width: 100%;
+//   }
+//   & > .item-button {
+//     width: 80px;
+//     height: 36px;
+//     // flex: 1;
+//   }
+//   .flex-object {
+//     & > div:first-child {
+//       width: auto;
+//     }
+//   }
+// }
+// .item-object {
+//   width: calc(100% - 80px) !important;
+//   & > .flex-object {
+//     & > div:first-child {
+//       width: calc(100% - 80px);
+//     }
+//   }
+// }
+// .form-item-array {
+//   .flex-div {
+//     .item-object {
+//       width: calc(100% - 80px) !important;
+//       & > .flex-object {
+//         & > div:first-child {
+//           width: 100%;
+//         }
+//       }
+//     }
+//   }
+//   & + .item-button {
+//     width: 100%;
+//   }
+// }
+// .form-item-array {
+//   .form-item-array {
+//     .flex-div {
+//       .item-object {
+//         width: calc(100% - 80px) !important;
+//         & > .flex-object {
+//           & > div:first-child {
+//             width: auto;
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
+/deep/.vue-form
+  > .form-item-array
+  > .form-item-array-content
+  > .flex-array
+  > .item-object
+  > .flex-object
+  > .vue-form-item:first-child {
+  width: calc(50% - 40px);
 }
 </style>
