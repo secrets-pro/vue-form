@@ -86,7 +86,7 @@ export default {
       });
     },
     renderObject(h, config, prop, model, slot) {
-      console.log(`renderObject`);
+      // console.log(`renderObject`);
       // 渲染对象，根据字段的position进行排序，position越小排前面
       let modelKeysSorted = Object.keys(model).sort((a, b) => {
         let pa = extraOptions(config.properties[a].description);
@@ -153,19 +153,23 @@ export default {
                       // oneof选项变化
                       if (el.includes("-option")) {
                         if (value > -1) {
-                          model = config.oneOf[value].defaultModel;
+                          model = JSON.parse(
+                            JSON.stringify(config.oneOf[value].defaultModel)
+                          );
                           model[el] = value;
                           this.currentValue = model;
                         } else {
                           this.currentValue = {};
                         }
 
+                        console.log(this.currentValue, `${prop}.${el}`);
                         this.$emit("input", this.currentValue);
                         this.config.selectedIndex = value;
                         this.config.type = "object";
                       }
                     },
                     arrayInput: (key, value) => {
+                      console.log(key, value);
                       this.$emit("arrayInput", key, value);
                     }
                   }
@@ -195,6 +199,7 @@ export default {
                 console.warn(`最大数量限制为${maxItems}`);
                 return;
               }
+              console.log(model, item);
               let zore = model[0] || item;
               if (typeof zore === "object") {
                 //  let keys = Object.keys(zore);
@@ -352,6 +357,9 @@ export default {
       );
     },
     renderFun(h, config, prop, currentValue, _arrayIndex, slot) {
+      // if ((prop + "").indexOf("outputRefs") > -1) {
+      //   debugger;
+      // }
       if (!config) {
         console.log(`没有参数`, config, prop);
         return;
@@ -392,7 +400,7 @@ export default {
         });
       }
       if (config.oneOf) {
-        console.log(`selectedIndex`, selectedIndex);
+        // console.log(`selectedIndex`, selectedIndex);
         let ext = extraOptions(config.description);
         // debugger;
         let selectedIndex = config.selectedIndex; // currentValue[prop + "-option"] ||
@@ -514,6 +522,11 @@ export default {
                 editor.layout();
               },
               input: (value) => {
+                console.log(
+                  ` =======emit input=======`,
+                  _arrayIndex,
+                  props.value
+                );
                 if (_arrayIndex !== undefined) {
                   currentValue[_arrayIndex] = value;
                   this.$emit("arrayInput", prop, currentValue[_arrayIndex]);
@@ -533,12 +546,15 @@ export default {
       if (this.readonly) {
         rules = undefined;
       }
+      if ((prop + "").indexOf("-option") > -1) {
+        prop = undefined;
+      }
       return h(
         `${this.prefix}-form-item`,
         {
           class: ["vue-form-item", ...uiClass],
           props: {
-            prop: prop,
+            prop,
             labelWidth: this.prefix === "el" ? width + "px" : width,
             rules
             // label: extra.title || config.title || prop
@@ -629,32 +645,12 @@ export default {
 };
 </script>
 <style lang="less" scoped>
-//  block style
-// .vue-form > .card > .form-item-array > .form-item-array-content > .flex-div {
-//   background: #f9f9fc;
-//   padding: 4px;
-//   & > .item-object {
-//     padding: 4px;
-//     background: #fff;
-//   }
-// }
 .flex-div {
   display: flex;
   & > div:not(.item-button) {
     flex: 1;
     min-width: 0;
   }
-
-  // &.simple-div {
-  //   & > div {
-  //     max-width: 50%;
-  //   }
-  // }
-  // .flex-object {
-  //   & > div:first-child {
-  //     width: auto;
-  //   }
-  // }
 }
 .item-button {
   width: 80px;
@@ -676,9 +672,7 @@ export default {
 .item-object.maxWidth33 {
   width: 100%;
 }
-// .vue-form-item.normal-vue-item:not(.vue-form-oneofselection) {
-//   flex: 1;
-// }
+
 .vue-form-oneofselection {
   width: 100% !important;
   & > .ivu-form-item-content > .ivu-select {
@@ -691,76 +685,6 @@ export default {
 .flex-array > .item-object > .flex-object > .normal-vue-item {
   max-width: 100%;
 }
-// .flex-object {
-//   // background-color: red;
-//   display: flex;
-//   & > div.vue-form-item {
-//     width: calc(50% - 40px);
-//     // flex: 1;
-//     // width: 33.33%;
-//     // flex: 1;
-//   }
-//   & > div.form-item-array {
-//     width: 100%;
-//   }
-//   & > .item-button {
-//     width: 80px;
-//     height: 36px;
-//     // flex: 1;
-//   }
-//   .flex-object {
-//     & > div:first-child {
-//       width: auto;
-//     }
-//   }
-// }
-// .item-object {
-//   width: calc(100% - 80px) !important;
-//   & > .flex-object {
-//     & > div:first-child {
-//       width: calc(100% - 80px);
-//     }
-//   }
-// }
-// .form-item-array {
-//   .flex-div {
-//     .item-object {
-//       width: calc(100% - 80px) !important;
-//       & > .flex-object {
-//         & > div:first-child {
-//           width: 100%;
-//         }
-//       }
-//     }
-//   }
-//   & + .item-button {
-//     width: 100%;
-//   }
-// }
-// .form-item-array {
-//   .form-item-array {
-//     .flex-div {
-//       .item-object {
-//         width: calc(100% - 80px) !important;
-//         & > .flex-object {
-//           & > div:first-child {
-//             width: auto;
-//           }
-//         }
-//       }
-//     }
-//   }
-// }
-// /deep/.vue-form
-//   > .card
-//   > .form-item-array
-//   > .form-item-array-content
-//   > .flex-array
-//   > .item-object
-//   > .flex-object
-//   > .vue-form-item:first-child {
-//   width: calc(50% - 40px);
-// }
 .vue-form
   > .card
   > .form-item-array
@@ -769,7 +693,22 @@ export default {
   > .item-object
   > .flex-object
   > .vue-form-item {
-  width: 100%;
+  flex: 1;
+}
+.vue-form
+  > .card
+  > .form-item-array
+  > .form-item-array-content
+  > .flex-array
+  > .item-object
+  > .flex-object
+  > .flex-object-item-array
+  > .form-item-array-content
+  > .flex-array
+  > .item-object
+  > .flex-object
+  > .normal-vue-item {
+  max-width: calc(50% - 40px);
 }
 .flex-object-item-object {
   width: 100%;

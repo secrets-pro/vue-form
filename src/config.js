@@ -2,14 +2,18 @@
  * @Author: bowen.xu
  * @Date: 2021-05-07 09:54:37
  * @Last Modified by: bowen.xu
- * @Last Modified time: 2021-07-07 15:25:54
+ * @Last Modified time: 2021-07-09 09:55:27
  */
 
 function extraOptions(description) {
+  if (!description) {
+    return {};
+  }
   let rtn = {};
   try {
     rtn = JSON.parse(description);
   } catch (error) {
+    console.error(error, description);
     // 不是json
     // rtn.title = description;
     rtn.description = description;
