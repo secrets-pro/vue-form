@@ -1,6 +1,5 @@
 <template>
   <div v-if="Object.keys(currentModel).length" class="vue-form" v-show="show">
-    {{ currentModel }}
     <component
       :is="`${this.prefix}-form`"
       size="medium"
@@ -68,6 +67,7 @@ const letters = "abcdefghijklmn".split("");
 import { set, get, difference, debounce } from "lodash";
 import FormItemPlugin from "./FormItem.vue";
 import setting from "../config";
+
 const formatDate = setting.formatDate;
 const extraOptions = setting.extraOptions;
 
@@ -253,15 +253,16 @@ export default {
     // FIXME  优化
     input(key, value) {
       if (key.indexOf(".") > -1) {
-        let keys = key.split(".");
-        let lastKey = keys[keys.length - 1];
-        keys.splice(keys.length - 1, 1);
-        let obj = this.currentModel;
-        for (let index in keys) {
-          let curKey = keys[index];
-          obj = obj[curKey];
-        }
-        this.$set(obj, lastKey, value);
+        // let keys = key.split(".");
+        // let lastKey = keys[keys.length - 1];
+        // keys.splice(keys.length - 1, 1);
+        // let obj = this.currentModel;
+        // for (let index in keys) {
+        //   let curKey = keys[index];
+        //   obj = obj[curKey];
+        // }
+        // this.$set(obj, lastKey, value);
+        set(this.currentModel, key, value);
       } else {
         this.$set(this.currentModel, key, value);
       }
