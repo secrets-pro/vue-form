@@ -263,27 +263,46 @@ export default {
                 return h(
                   "div",
                   {
-                    class: "flex-div flex-array"
+                    class: ["flex-array-wrapper"]
                   },
                   [
-                    this.renderFun(
+                    h(
+                      "div",
+                      {
+                        class: "flex-div flex-array"
+                      },
+                      [
+                        this.renderFun(
+                          h,
+                          items,
+                          `${prop}.${index}`,
+                          model[index],
+                          index,
+                          // this.renderArrayButton(
+                          //   h,
+                          //   config,
+                          //   model,
+                          //   extraOptions(config.description).title ||
+                          //     config.title ||
+                          //     prop,
+                          //   index,
+                          //   model.length
+                          // )
+                        )
+                      ]
+                    ),
+                    this.renderArrayButton(
                       h,
-                      items,
-                      `${prop}.${index}`,
-                      model[index],
+                      config,
+                      model,
+                      extraOptions(config.description).title ||
+                        config.title ||
+                        prop,
                       index,
-                      this.renderArrayButton(
-                        h,
-                        config,
-                        model,
-                        extraOptions(config.description).title ||
-                          config.title ||
-                          prop,
-                        index,
-                        model.length
-                      )
+                      model.length
                     )
                   ]
+
                 );
               })
             : model.map((el, index) => {
@@ -662,12 +681,16 @@ export default {
 }
 
 .form-item-array-content {
+  .flex-array-wrapper {
+    display: flex;
+  }
   .flex-array {
     border: 1px solid #efefef;
     border-radius: 5px;
     padding: 10px 5px;
     margin-bottom: 10px;
-    box-shadow: 0 4px 8px 0 rgba(36, 46, 66, 0.06);;
+    box-shadow: 0 4px 8px 0 rgba(36, 46, 66, 0.06);
+    margin-right: 10px;
   }
 }
 
