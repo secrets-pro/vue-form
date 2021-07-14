@@ -134,15 +134,15 @@ export default {
             },
             [
               ...modelKeysSorted.map((el) => {
-                let configResult = config.properties[el];
+                let configWrapper = JSON.parse(JSON.stringify(config))
                 return h("vue-form-item", {
                   props: {
                     prop: `${prop}.${el}`,
                     value: model[el],
-                    config: configResult
+                    config: configWrapper.properties[el]
                   },
                   class: [
-                    `flex-object-item-${configResult.type}`,
+                    `flex-object-item-${configWrapper.properties[el].type}`,
                     modelKeysSorted.length > 3
                       ? "maxWidth33"
                       : "normal-vue-item"
@@ -150,27 +150,28 @@ export default {
                   on: {
                     input: (value) => {
                       model[el] = value;
-                      // oneof选项变化
-                      if (el.includes("-option")) {
-                        if (value > -1) {
-                          model = JSON.parse(
-                            JSON.stringify(config.oneOf[value].defaultModel)
-                          );
-                          model[el] = value;
-                          this.currentValue = model;
-                        } else {
-                          this.currentValue = {};
-                        }
-
-                        console.log(this.currentValue, `${prop}.${el}`);
-                        this.$emit("input", this.currentValue);
-                        this.config.selectedIndex = value;
-                        this.config.type = "object";
-                      }
                     },
                     arrayInput: (key, value) => {
-                      console.log(key, value);
                       this.$emit("arrayInput", key, value);
+                    },
+                    oneOfSelectChange: (key, value) => {
+                      // oneof选项变化
+                      if (configWrapper.oneOf) {
+                        if (value > -1) {
+                            model = JSON.parse(
+                              JSON.stringify(configWrapper.oneOf[value].defaultModel)
+                            );
+                            model[el] = value;
+                            this.currentValue = model
+                        } else {
+                          model = {}
+                        }
+                        configWrapper.selectedIndex = value;
+                        configWrapper.type = "object";
+
+                        const keys = key.split(".")
+                        this.$emit("arrayInput", keys.slice(0, keys.length - 1).join("."), model, true);
+                      }
                     }
                   }
                 });
@@ -262,27 +263,46 @@ export default {
                 return h(
                   "div",
                   {
-                    class: "flex-div flex-array"
+                    class: ["flex-array-wrapper"]
                   },
                   [
-                    this.renderFun(
+                    h(
+                      "div",
+                      {
+                        class: "flex-div flex-array"
+                      },
+                      [
+                        this.renderFun(
+                          h,
+                          items,
+                          `${prop}.${index}`,
+                          model[index],
+                          index,
+                          // this.renderArrayButton(
+                          //   h,
+                          //   config,
+                          //   model,
+                          //   extraOptions(config.description).title ||
+                          //     config.title ||
+                          //     prop,
+                          //   index,
+                          //   model.length
+                          // )
+                        )
+                      ]
+                    ),
+                    this.renderArrayButton(
                       h,
-                      items,
-                      `${prop}.${index}`,
-                      model[index],
-                      undefined,
-                      this.renderArrayButton(
-                        h,
-                        config,
-                        model,
-                        extraOptions(config.description).title ||
-                          config.title ||
-                          prop,
-                        index,
-                        model.length
-                      )
+                      config,
+                      model,
+                      extraOptions(config.description).title ||
+                        config.title ||
+                        prop,
+                      index,
+                      model.length
                     )
                   ]
+
                 );
               })
             : model.map((el, index) => {
@@ -402,12 +422,18 @@ export default {
       if (config.oneOf) {
         // console.log(`selectedIndex`, selectedIndex);
         let ext = extraOptions(config.description);
-        // debugger;
-        let selectedIndex = config.selectedIndex; // currentValue[prop + "-option"] ||
+        let optionProp = ''
+        if (prop.includes(".")) {
+          const props = prop.split(".")
+          optionProp = props[props.length - 1]
+        }
+        let selectedIndex = currentValue[optionProp + "-option"] || currentValue[optionProp + "-option"] === 0 ? currentValue[optionProp + "-option"] : config.selectedIndex
+        // let selectedIndex = config.selectedIndex; // currentValue[prop + "-option"] ||
         config = {
           //  config 临时记录 现有选择的oneOf字段
           oneOf: config.oneOf,
-          ...config.oneOf[selectedIndex]
+          ...config.oneOf[selectedIndex],
+          selectedIndex: selectedIndex
         };
         let k = prop + "-option";
         let idx = prop.lastIndexOf(".");
@@ -522,16 +548,16 @@ export default {
                 editor.layout();
               },
               input: (value) => {
-                console.log(
-                  ` =======emit input=======`,
-                  _arrayIndex,
-                  props.value
-                );
                 if (_arrayIndex !== undefined) {
                   currentValue[_arrayIndex] = value;
                   this.$emit("arrayInput", prop, currentValue[_arrayIndex]);
                 } else {
-                  this.$emit("input", value);
+                  if (prop.includes("-option")) {
+                    // oneof
+                    this.$emit("oneOfSelectChange", prop, value);
+                  } else {
+                    this.$emit("input", value);
+                  }
                 }
               }
             }
@@ -545,9 +571,6 @@ export default {
       let width = _arrayIndex > -1 ? 0 : styleCfg.labelWidth;
       if (this.readonly) {
         rules = undefined;
-      }
-      if ((prop + "").indexOf("-option") > -1) {
-        prop = undefined;
       }
       return h(
         `${this.prefix}-form-item`,
@@ -655,6 +678,20 @@ export default {
 .item-button {
   width: 80px;
   height: 36px;
+}
+
+.form-item-array-content {
+  .flex-array-wrapper {
+    display: flex;
+  }
+  .flex-array {
+    border: 1px solid #efefef;
+    border-radius: 5px;
+    padding: 10px 5px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 8px 0 rgba(36, 46, 66, 0.06);
+    margin-right: 10px;
+  }
 }
 
 .vue-form-item {
