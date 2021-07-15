@@ -266,6 +266,10 @@ export default {
       let { type } = items;
       // let that = this;
       let children = [];
+      let level =
+        prop.indexOf(".") === -1 &&
+        items.properties &&
+        Object.keys(items.properties).length > 2;
       if (model) {
         children =
           type === "object"
@@ -290,19 +294,10 @@ export default {
                           `${prop}.${index}`,
                           model[index],
                           index
-                          // this.renderArrayButton(
-                          //   h,
-                          //   config,
-                          //   model,
-                          //   extraOptions(config.description).title ||
-                          //     config.title ||
-                          //     prop,
-                          //   index,
-                          //   model.length
-                          // )
                         )
                       ]
                     ),
+
                     this.renderArrayButton(
                       h,
                       config,
@@ -340,11 +335,12 @@ export default {
               });
       }
       //  判断是否是一级属性
-      let level =
-        prop.indexOf(".") === -1 && Object.keys(items.properties).length > 2;
+
       // if (level) {
       //   console.log(`children.length ${children.length}`, items);
       // }
+      let title =
+        extraOptions(config.description).title || config.title || prop;
       return h(
         "div",
         {
@@ -366,11 +362,26 @@ export default {
                   : "el-form-item__label"
               ], // class判断
               style: {
-                width: styleCfg.titleWidth
-                // display: level ? "none" : "block"
+                width: level ? "auto" : styleCfg.titleWidth,
+                display: level ? "flex" : "block",
+                alignItems: level ? "center" : "initial"
               }
             },
-            extraOptions(config.description).title || config.title || prop
+            [
+              h("div", title)
+              // level
+              //   ? this.renderArrayButton(
+              //       h,
+              //       config,
+              //       model,
+              //       extraOptions(config.description).title ||
+              //         config.title ||
+              //         prop,
+              //       0,
+              //       model.length
+              //     )
+              //   : null
+            ]
           ),
           h(
             "div",
@@ -381,15 +392,7 @@ export default {
               },
               class: "form-item-array-content"
             },
-            [
-              ...children
-              // this.renderArrayButton(
-              //   h,
-              //   config,
-              //   model,
-              //   extraOptions(config.description).title || config.title || prop
-              // )
-            ]
+            [...children]
           )
         ]
       );
@@ -698,8 +701,11 @@ export default {
   }
 }
 .item-button {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  & > button {
+    width: 18px !important;
+    height: 18px !important;
+  }
 }
 
 .form-item-array-content {
@@ -735,10 +741,15 @@ export default {
 }
 .item-object.maxWidth33 {
   width: 100%;
+  & > .flex-object {
+    border: none !important;
+  }
 }
 
 .vue-form-oneofselection {
   width: 100% !important;
+  max-width: 100% !important ;
+
   & > .ivu-form-item-content > .ivu-select {
     width: 100%;
   }

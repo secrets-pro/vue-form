@@ -660,8 +660,8 @@ export default {
     }
   }
   .ivu-btn > .ivu-icon {
-    line-height: 1.5;
-    vertical-align: middle;
+    line-height: 1;
+    vertical-align: unset;
   }
 }
 </style>
