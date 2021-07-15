@@ -125,7 +125,7 @@ export default {
           h(
             "div",
             {
-              class: ["flex-object"],
+              class: { "flex-object": modelKeysSorted.length > 1 },
               style: {
                 // flex: 1,
                 // flexWrap: "wrap",
@@ -134,7 +134,7 @@ export default {
             },
             [
               ...modelKeysSorted.map((el) => {
-                let configWrapper = JSON.parse(JSON.stringify(config))
+                let configWrapper = JSON.parse(JSON.stringify(config));
                 return h("vue-form-item", {
                   props: {
                     prop: `${prop}.${el}`,
@@ -158,19 +158,26 @@ export default {
                       // oneof选项变化
                       if (configWrapper.oneOf) {
                         if (value > -1) {
-                            model = JSON.parse(
-                              JSON.stringify(configWrapper.oneOf[value].defaultModel)
-                            );
-                            model[el] = value;
-                            this.currentValue = model
+                          model = JSON.parse(
+                            JSON.stringify(
+                              configWrapper.oneOf[value].defaultModel
+                            )
+                          );
+                          model[el] = value;
+                          this.currentValue = model;
                         } else {
-                          model = {}
+                          model = {};
                         }
                         configWrapper.selectedIndex = value;
                         configWrapper.type = "object";
 
-                        const keys = key.split(".")
-                        this.$emit("arrayInput", keys.slice(0, keys.length - 1).join("."), model, true);
+                        const keys = key.split(".");
+                        this.$emit(
+                          "arrayInput",
+                          keys.slice(0, keys.length - 1).join("."),
+                          model,
+                          true
+                        );
                       }
                     }
                   }
@@ -190,8 +197,10 @@ export default {
         `${this.prefix}-button`,
         {
           props: {
-            type: "primary"
-            // size: "small"
+            type: "primary",
+            shape: "circle",
+            icon: "md-add",
+            size: "small"
           },
           on: {
             click: () => {
@@ -214,15 +223,18 @@ export default {
               }
             }
           }
-        },
-        `新增` // ${title}
+        }
+        // `新增` // ${title}
       );
       let remove = h(
         `${this.prefix}-button`,
         {
           props: {
-            type: this.prefix == "i" ? "error" : "danger" // error类型  判断
-            // size: "small"
+            type: this.prefix == "i" ? "error" : "danger", // error类型  判断
+            size: "small",
+            //  type: "primary",
+            shape: "circle",
+            icon: "md-remove"
           },
           on: {
             click: () => {
@@ -234,8 +246,8 @@ export default {
               model.pop();
             }
           }
-        },
-        `删除` //${title}
+        }
+        // `删除` //${title}
       );
       // return index === 0 ? add : remove;
       return h(
@@ -277,7 +289,7 @@ export default {
                           items,
                           `${prop}.${index}`,
                           model[index],
-                          index,
+                          index
                           // this.renderArrayButton(
                           //   h,
                           //   config,
@@ -302,7 +314,6 @@ export default {
                       model.length
                     )
                   ]
-
                 );
               })
             : model.map((el, index) => {
@@ -329,11 +340,18 @@ export default {
               });
       }
       //  判断是否是一级属性
-      // let level = prop.indexOf(".") === -1;
+      let level =
+        prop.indexOf(".") === -1 && Object.keys(items.properties).length > 2;
+      // if (level) {
+      //   console.log(`children.length ${children.length}`, items);
+      // }
       return h(
         "div",
         {
-          class: ["form-item-array"],
+          class: {
+            "form-item-array": true,
+            level1: level
+          },
           style: {
             // display: "flex"
           }
@@ -422,12 +440,16 @@ export default {
       if (config.oneOf) {
         // console.log(`selectedIndex`, selectedIndex);
         let ext = extraOptions(config.description);
-        let optionProp = ''
+        let optionProp = "";
         if (prop.includes(".")) {
-          const props = prop.split(".")
-          optionProp = props[props.length - 1]
+          const props = prop.split(".");
+          optionProp = props[props.length - 1];
         }
-        let selectedIndex = currentValue[optionProp + "-option"] || currentValue[optionProp + "-option"] === 0 ? currentValue[optionProp + "-option"] : config.selectedIndex
+        let selectedIndex =
+          currentValue[optionProp + "-option"] ||
+          currentValue[optionProp + "-option"] === 0
+            ? currentValue[optionProp + "-option"]
+            : config.selectedIndex;
         // let selectedIndex = config.selectedIndex; // currentValue[prop + "-option"] ||
         config = {
           //  config 临时记录 现有选择的oneOf字段
@@ -676,7 +698,7 @@ export default {
   }
 }
 .item-button {
-  width: 80px;
+  width: 36px;
   height: 36px;
 }
 
@@ -686,14 +708,19 @@ export default {
   }
   .flex-array {
     border: 1px solid #efefef;
-    border-radius: 5px;
-    padding: 10px 5px;
-    margin-bottom: 10px;
-    box-shadow: 0 4px 8px 0 rgba(36, 46, 66, 0.06);
-    margin-right: 10px;
+    border-radius: 4px;
+    padding: 8px 4px;
+    margin-bottom: 8px;
+    // box-shadow: 0 4px 8px 0 rgba(36, 46, 66, 0.06);
+    margin-right: 8px;
+    & > .item-object > .flex-object > .item-object > .flex-object {
+      border: 1px solid #efefef;
+      border-radius: 4px;
+      padding: 8px 4px;
+      margin-bottom: 8px;
+    }
   }
 }
-
 .vue-form-item {
   input[readonly="readonly"] {
     border: none;
@@ -745,9 +772,21 @@ export default {
   > .item-object
   > .flex-object
   > .normal-vue-item {
-  max-width: calc(50% - 40px);
+  max-width: calc(50% - 18px);
 }
 .flex-object-item-object {
   width: 100%;
+}
+.form-item-array.level1 {
+  & > .ivu-form-item-label {
+    width: 100%;
+    float: none;
+    display: block;
+    text-align: left;
+    font-weight: 500;
+  }
+  & > .form-item-array-content {
+    margin: 0 !important;
+  }
 }
 </style>

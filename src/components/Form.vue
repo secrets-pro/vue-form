@@ -3,7 +3,7 @@
     <component
       :is="`${this.prefix}-form`"
       size="medium"
-      class="vue-form"
+      :class="`vue-form ${this.trait ? 'trait' : ''}`"
       :model="currentModel"
       :ref="formId"
       :label-width="
@@ -87,6 +87,7 @@ export default {
         return () => {};
       }
     },
+    trait: Boolean,
     model: {
       type: Object,
       default() {
@@ -659,8 +660,8 @@ export default {
     }
   }
   .ivu-btn > .ivu-icon {
-    line-height: 1;
-    vertical-align: unset;
+    line-height: 1.5;
+    vertical-align: middle;
   }
 }
 </style>
