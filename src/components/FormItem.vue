@@ -607,6 +607,7 @@ export default {
             rules
             // label: extra.title || config.title || prop
           },
+          key: prop,
           style: type === "editor" ? {} : style
         },
         arr
