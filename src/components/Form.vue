@@ -1,5 +1,6 @@
 <template>
   <div v-if="Object.keys(currentModel).length" class="vue-form" v-show="show">
+    {{ currentModel }}
     <component
       :is="`${this.prefix}-form`"
       size="medium"
@@ -629,7 +630,7 @@ export default {
       // let model = {}; // 准备model
       let rules = {}; //  准备rules
       let model = this.setModel(this.currentScheme, rules);
-      console.log(model);
+      // console.log(model);
       this.currentModel = model;
     }
   }

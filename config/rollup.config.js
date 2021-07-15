@@ -1,7 +1,7 @@
 import vueplugin from "rollup-plugin-vue";
 import resolve from "rollup-plugin-node-resolve";
 import babel from "rollup-plugin-babel";
-import uglify from "rollup-plugin-uglify-es";
+// import uglify from "rollup-plugin-uglify-es";
 
 let baseconfig = (format) => {
   return {
@@ -9,7 +9,8 @@ let baseconfig = (format) => {
     output: {
       name: "vue-form",
       globals: {
-        vue: "Vue"
+        vue: "Vue",
+        lodash: "lodash"
       },
       extend: true,
       format,
@@ -28,4 +29,5 @@ let baseconfig = (format) => {
     ]
   };
 };
-export default [baseconfig("esm"), baseconfig("cjs"), baseconfig("iife")];
+// baseconfig("esm"),
+export default [baseconfig("cjs"), baseconfig("iife")];
