@@ -446,7 +446,7 @@ export default {
       if (config.oneOf) {
         // console.log(`selectedIndex`, selectedIndex);
         let ext = extraOptions(config.description);
-        let optionProp = "";
+        let optionProp = prop;
         if (prop.includes(".")) {
           const props = prop.split(".");
           optionProp = props[props.length - 1];
