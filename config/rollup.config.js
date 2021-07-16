@@ -29,5 +29,5 @@ let baseconfig = (format) => {
     ]
   };
 };
-// baseconfig("esm"),
-export default [baseconfig("cjs"), baseconfig("iife")];
+// baseconfig("esm"), , baseconfig("iife") , baseconfig("cjs")
+export default [baseconfig("esm")];
