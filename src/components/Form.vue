@@ -20,7 +20,8 @@
             v-model="currentModel[prop.name]"
             :config="prop"
             :prop="prop.name"
-            @arrayInput="input"
+            @arrayInput="arrayInput"
+            @deepInput="deepInput"
           ></form-item-plugin>
         </template>
       </div>
@@ -34,7 +35,8 @@
             v-model="currentModel[prop]"
             :config="lastKeysProperties[prop]"
             :prop="prop"
-            @arrayInput="input"
+            @arrayInput="arrayInput"
+            @deepInput="deepInput"
           ></form-item-plugin>
         </template>
         <div v-if="!settings.length" style="padding:12px;">
@@ -253,21 +255,23 @@ export default {
       }
     },
     // FIXME  优化
-    input(key, value) {
+    arrayInput(key, value) {
       if (key.indexOf(".") > -1) {
-        // let keys = key.split(".");
-        // let lastKey = keys[keys.length - 1];
-        // keys.splice(keys.length - 1, 1);
-        // let obj = this.currentModel;
-        // for (let index in keys) {
-        //   let curKey = keys[index];
-        //   obj = obj[curKey];
-        // }
-        // this.$set(obj, lastKey, value);
-        set(this.currentModel, key, value);
+        let keys = key.split(".");
+        let lastKey = keys[keys.length - 1];
+        keys.splice(keys.length - 1, 1);
+        let obj = this.currentModel;
+        for (let index in keys) {
+          let curKey = keys[index];
+          obj = obj[curKey];
+        }
+        this.$set(obj, lastKey, value);
       } else {
         this.$set(this.currentModel, key, value);
       }
+    },
+    deepInput(key, value) {
+      set(this.currentModel, key, value);
     },
     getData() {
       let obj = JSON.parse(JSON.stringify(this.currentModel));
