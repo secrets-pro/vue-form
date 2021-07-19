@@ -150,6 +150,7 @@ export default {
                   on: {
                     input: (value) => {
                       model[el] = value;
+                      this.$emit("deepInput", `${prop}.${el}`, value);
                     },
                     arrayInput: (key, value) => {
                       this.$emit("arrayInput", key, value);
@@ -173,12 +174,14 @@ export default {
 
                         const keys = key.split(".");
                         this.$emit(
-                          "arrayInput",
+                          "deepInput",
                           keys.slice(0, keys.length - 1).join("."),
-                          model,
-                          true
+                          model
                         );
                       }
+                    },
+                    deepInput: (key, value) => {
+                      this.$emit("deepInput", key, value)
                     }
                   }
                 });
@@ -443,7 +446,7 @@ export default {
       if (config.oneOf) {
         // console.log(`selectedIndex`, selectedIndex);
         let ext = extraOptions(config.description);
-        let optionProp = "";
+        let optionProp = prop;
         if (prop.includes(".")) {
           const props = prop.split(".");
           optionProp = props[props.length - 1];
@@ -479,7 +482,10 @@ export default {
           )
         };
         if (selectedIndex > -1) {
-          currentValue = config.oneOf[selectedIndex].defaultModel;
+          const resultModel = config.oneOf[selectedIndex].defaultModel;
+          Object.assign(resultModel, currentValue)
+          currentValue = resultModel;
+
         }
         if (ext.default === -1) {
           config.properties[k].enum.unshift(-1);
