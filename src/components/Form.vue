@@ -526,7 +526,7 @@ export default {
           config.additionalProperties
         ) {
           let properties = {};
-          let w = "calc(50% - 40px)";
+          let w = "calc(50% - 18px)";
           if (config.additionalProperties) {
             if (config.additionalProperties.type === "object") {
               properties = {
@@ -536,7 +536,8 @@ export default {
                   description: '{"title":"key"}',
                   "ui:options": {
                     width: w
-                  }
+                  },
+                  "ui:classes": ["vue-object-key"]
                 },
                 ...config.additionalProperties.properties
               };
@@ -547,14 +548,16 @@ export default {
                   title: "键",
                   "ui:options": {
                     width: w
-                  }
+                  },
+                  "ui:classes": ["vue-object-key"]
                 },
                 value: {
                   type: "string",
                   title: "值",
                   "ui:options": {
                     width: w
-                  }
+                  },
+                  "ui:classes": ["vue-object-value"]
                 }
               };
             }

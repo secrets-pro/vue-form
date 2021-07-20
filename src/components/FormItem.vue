@@ -135,14 +135,15 @@ export default {
             [
               ...modelKeysSorted.map((el) => {
                 let configWrapper = JSON.parse(JSON.stringify(config));
+                let __el__ = configWrapper.properties[el];
                 return h("vue-form-item", {
                   props: {
                     prop: `${prop}.${el}`,
                     value: model[el],
-                    config: configWrapper.properties[el]
+                    config: __el__
                   },
                   class: [
-                    `flex-object-item-${configWrapper.properties[el].type}`,
+                    `flex-object-item-${__el__.enum ? "select" : __el__.type}`,
                     modelKeysSorted.length > 3
                       ? "maxWidth33"
                       : "normal-vue-item"
@@ -181,7 +182,7 @@ export default {
                       }
                     },
                     deepInput: (key, value) => {
-                      this.$emit("deepInput", key, value)
+                      this.$emit("deepInput", key, value);
                     }
                   }
                 });
@@ -483,9 +484,8 @@ export default {
         };
         if (selectedIndex > -1) {
           const resultModel = config.oneOf[selectedIndex].defaultModel;
-          Object.assign(resultModel, currentValue)
+          Object.assign(resultModel, currentValue);
           currentValue = resultModel;
-
         }
         if (ext.default === -1) {
           config.properties[k].enum.unshift(-1);
@@ -726,11 +726,14 @@ export default {
     margin-bottom: 8px;
     // box-shadow: 0 4px 8px 0 rgba(36, 46, 66, 0.06);
     margin-right: 8px;
+    flex: 1;
     & > .item-object > .flex-object > .item-object > .flex-object {
       border: 1px solid #efefef;
       border-radius: 4px;
       padding: 8px 4px;
       margin-bottom: 8px;
+      // width: calc(100% - 40px);
+      width: calc(100% - 160px); // 120 _ 40
     }
   }
 }
@@ -806,5 +809,31 @@ export default {
   & > .form-item-array-content {
     margin: 0 !important;
   }
+}
+.flex-object-item-string + .form-item-array {
+  width: 100%;
+}
+.vue-form
+  > .card
+  > .form-item-array
+  > .form-item-array-content
+  > .flex-array-wrapper
+  > .flex-div.flex-array
+  > .item-object
+  > .flex-object
+  > .ivu-form-item:first-child.flex-object-item-string {
+  width: calc(100% - 40px);
+}
+
+.vue-form > .card > .vue-form-item {
+  width: calc(100% - 40px);
+}
+/deep/.flex-object-item-select > .ivu-form-item-content {
+  width: calc(100% - 160px);
+}
+.item-object.flex-object-item-object.maxWidth33
+  + .vue-form-item.flex-object-item-integer.maxWidth33 {
+  max-width: 100%;
+  width: 66.66%;
 }
 </style>
