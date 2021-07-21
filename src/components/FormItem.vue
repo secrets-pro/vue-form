@@ -125,7 +125,7 @@ export default {
           h(
             "div",
             {
-              class: { "flex-object": modelKeysSorted.length > 1 },
+              class: { "flex-object": modelKeysSorted.length > 1, "has-title-object-content": extraOptions(config.description).title || config.title },
               style: {
                 // flex: 1,
                 // flexWrap: "wrap",
@@ -728,12 +728,18 @@ export default {
     margin-right: 8px;
     flex: 1;
     & > .item-object > .flex-object > .item-object > .flex-object {
-      border: 1px solid #efefef;
+      // border: 1px solid #efefef;
       border-radius: 4px;
       padding: 8px 4px;
       margin-bottom: 8px;
       // width: calc(100% - 40px);
+      // width: calc(100% - 160px); // 120 _ 40
+      width: 100%; // 120 _ 40
+    }
+
+    & > .item-object > .flex-object > .item-object > .has-title-object-content {
       width: calc(100% - 160px); // 120 _ 40
+      border: 1px solid #efefef;
     }
   }
 }
