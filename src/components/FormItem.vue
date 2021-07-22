@@ -350,7 +350,8 @@ export default {
         {
           class: {
             "form-item-array": true,
-            level1: level
+            level1: level,
+            "widthcomplete": type === "object" //数组对象，宽度需要100%
           },
           style: {
             // display: "flex"
@@ -776,6 +777,9 @@ export default {
 .flex-array > .item-object > .flex-object > .normal-vue-item {
   max-width: 100%;
 }
+.flex-array > .item-object > .flex-object > .widthcomplete {
+  width: 100% !important;
+}
 .vue-form
   > .card
   > .form-item-array
@@ -834,9 +838,9 @@ export default {
 .vue-form > .card > .vue-form-item {
   width: calc(100% - 40px);
 }
-/deep/.flex-object-item-select > .ivu-form-item-content {
-  width: calc(100% - 160px);
-}
+// /deep/.flex-object-item-select > .ivu-form-item-content {
+//   width: calc(100% - 160px);
+// }
 .item-object.flex-object-item-object.maxWidth33
   + .vue-form-item.flex-object-item-integer.maxWidth33 {
   max-width: 100%;
