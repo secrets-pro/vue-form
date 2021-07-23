@@ -754,7 +754,7 @@ export default {
   flex-wrap: wrap;
 }
 .vue-form-item.maxWidth33 {
-  max-width: 33.33%;
+  width: 33.33%;
 }
 .item-object.maxWidth33 {
   width: 100%;
