@@ -2,7 +2,7 @@
  * @Author: bowen.xu
  * @Date: 2021-05-07 09:54:37
  * @Last Modified by: bowen.xu
- * @Last Modified time: 2021-07-09 09:55:27
+ * @Last Modified time: 2021-07-29 14:57:58
  */
 
 function extraOptions(description) {
@@ -20,6 +20,15 @@ function extraOptions(description) {
   }
   return rtn;
 }
+function formatUrl(url, params) {
+  if (params) {
+    for (let k in params) {
+      url = url.replace(new RegExp("\\{" + k + "\\}", "g"), params[k]);
+    }
+  }
+  return url;
+}
+
 export default {
   language: "json",
   format: "yyyy-MM-dd",
@@ -28,6 +37,7 @@ export default {
     iView: false
   },
   extraOptions,
+  formatUrl,
   formatDate(date) {
     let m = date.getMonth() + 1;
     let y = date.getFullYear();

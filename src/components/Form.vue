@@ -12,7 +12,7 @@
           this.defaultWidth
       "
     >
-      <div class="h5" v-if="split">基础配置</div>
+      <vue-form-title title="基础设置" description="部署配置中必要的参数内容" />
       <div class="card">
         <template v-for="prop in propertiesSorted">
           <form-item-plugin
@@ -26,9 +26,10 @@
         </template>
       </div>
       <div class="card" v-if="Object.keys(lastKeysProperties).length">
-        <div class="h5">
-          高级配置
-        </div>
+        <vue-form-title
+          title="高级配置"
+          description="除必要参数之外额外设置的内容"
+        />
         <template v-for="prop in settingcp">
           <form-item-plugin
             :key="prop"
@@ -49,19 +50,6 @@
         </div>
       </div>
     </component>
-    <!-- <Modal v-model="modal">
-      <div>
-        <CheckboxGroup v-model="settings">
-          <Checkbox
-            v-for="i in lastKeysProperties"
-            :label="i.name"
-            :key="i.name"
-          >
-            <span>{{ i.name }}</span>
-          </Checkbox>
-        </CheckboxGroup>
-      </div>
-    </Modal> -->
   </div>
 </template>
 <script>
@@ -73,9 +61,51 @@ import setting from "../config";
 
 const formatDate = setting.formatDate;
 const extraOptions = setting.extraOptions;
-
+let Title = {
+  props: {
+    title: String,
+    description: String
+  },
+  computed: {
+    prefix() {
+      return !setting.options.iView ? "el" : "i";
+    }
+  },
+  render() {
+    // let exp = extraOptions(description);
+    let Tag = this.prefix + "-tooltip";
+    let ButtonTag = this.prefix + "-button";
+    let icon = this.prefix === "el" ? "el-icon-info" : "ios-information-circle";
+    return (
+      <div>
+        <span class="vue-form-title">{this.title}</span>
+        {this.description ? (
+          <Tag
+            class="item"
+            effect="dark"
+            placement="top"
+            max-width="200"
+            content={this.description}
+          >
+            <ButtonTag
+              icon={icon} //  icon类型
+              style={{
+                padding: 0,
+                border: 0,
+                width: "auto",
+                height: "auto",
+                color: "#409eff"
+                // marginTop:"-2px"
+              }}
+            ></ButtonTag>
+          </Tag>
+        ) : null}
+      </div>
+    );
+  }
+};
 export default {
-  components: { "form-item-plugin": FormItemPlugin },
+  components: { "form-item-plugin": FormItemPlugin, "vue-form-title": Title },
   provide() {
     return {
       Form: this
@@ -670,6 +700,13 @@ export default {
   .ivu-btn > .ivu-icon {
     line-height: 1;
     vertical-align: unset;
+  }
+  .vue-form-title {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 400;
+
+    color: #333;
   }
 }
 </style>

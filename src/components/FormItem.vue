@@ -2,15 +2,9 @@
 /* eslint-disable no-unused-vars */
 import setting from "../config";
 import styleCfg from "../styleCfg";
-const { extraOptions, generateRule } = setting;
-function formatUrl(url, params) {
-  if (params) {
-    for (let k in params) {
-      url = url.replace(new RegExp("\\{" + k + "\\}", "g"), params[k]);
-    }
-  }
-  return url;
-}
+import { renderSelectOptions, renderRadioCheckbox } from "./render";
+const { extraOptions, generateRule, formatUrl } = setting;
+
 export default {
   name: "vue-form-item",
   inject: ["Form"],
@@ -40,51 +34,6 @@ export default {
     };
   },
   methods: {
-    renderSelectOptions(h, options = [], groups) {
-      if (groups) {
-        return options.map((el) => {
-          return h(
-            `${this.prefix}-option-group`,
-            {
-              props: {
-                label: el.label
-              }
-            },
-            el.options.map((op) => {
-              // 检查 options
-              return h(`${this.prefix}-option`, {
-                props: {
-                  label: op.label,
-                  value: op.value
-                }
-              });
-            })
-          );
-        });
-      }
-      return options.map((el) => {
-        return h(`${this.prefix}-option`, {
-          props: {
-            label: el.label,
-            value: el.value
-          }
-        });
-      });
-    },
-    renderRadioCheckbox(h, type, options = []) {
-      // option [{ label: "类型1", value: "type1"}] ==> option[1.2] enum[1,2] enumNames["xx","yyy"]
-      return options.map((el) => {
-        return h(
-          `${this.prefix}-${type}`,
-          {
-            props: {
-              label: el.value
-            }
-          },
-          el.label
-        );
-      });
-    },
     renderObject(h, config, prop, model, slot) {
       // console.log(`renderObject`);
       // 渲染对象，根据字段的position进行排序，position越小排前面
@@ -125,7 +74,11 @@ export default {
           h(
             "div",
             {
-              class: { "flex-object": modelKeysSorted.length > 1, "has-title-object-content": extraOptions(config.description).title || config.title },
+              class: {
+                "flex-object": modelKeysSorted.length > 1,
+                "has-title-object-content":
+                  extraOptions(config.description).title || config.title
+              },
               style: {
                 // flex: 1,
                 // flexWrap: "wrap",
@@ -144,7 +97,7 @@ export default {
                   },
                   class: [
                     `flex-object-item-${__el__.enum ? "select" : __el__.type}`,
-                    modelKeysSorted.length > 3
+                    modelKeysSorted.length >= 3
                       ? "maxWidth33"
                       : "normal-vue-item"
                   ],
@@ -351,7 +304,7 @@ export default {
           class: {
             "form-item-array": true,
             level1: level,
-            "widthcomplete": type === "object" //数组对象，宽度需要100%
+            widthcomplete: type === "object" //数组对象，宽度需要100%
           },
           style: {
             // display: "flex"
@@ -498,7 +451,12 @@ export default {
 
       if (type === "radio" || type === "checkbox") {
         type = `${type}-group`;
-        children = this.renderRadioCheckbox(h, config.type, config.options);
+        children = renderRadioCheckbox(
+          h,
+          config.type,
+          config.options,
+          this.prefix
+        );
       } else if (type === "date") {
         type = "date-picker";
         props.placeholder = "请选择日期";
@@ -531,7 +489,12 @@ export default {
           });
         }
 
-        children = this.renderSelectOptions(h, config.options, config.groups);
+        children = renderSelectOptions(
+          h,
+          config.options,
+          config.groups,
+          this.prefix
+        );
         type = "select";
         // style.width = "100%";
         props.multiple = config.multiple;
@@ -701,149 +664,5 @@ export default {
 };
 </script>
 <style lang="less" scoped>
-.flex-div {
-  display: flex;
-  & > div:not(.item-button) {
-    flex: 1;
-    min-width: 0;
-  }
-}
-.item-button {
-  width: 32px;
-  & > button {
-    width: 18px !important;
-    height: 18px !important;
-  }
-}
-
-.form-item-array-content {
-  .flex-array-wrapper {
-    display: flex;
-  }
-  .flex-array {
-    border: 1px solid #efefef;
-    border-radius: 4px;
-    padding: 8px 4px;
-    margin-bottom: 8px;
-    // box-shadow: 0 4px 8px 0 rgba(36, 46, 66, 0.06);
-    margin-right: 8px;
-    flex: 1;
-    & > .item-object > .flex-object > .item-object > .flex-object {
-      // border: 1px solid #efefef;
-      border-radius: 4px;
-      padding: 8px 4px;
-      margin-bottom: 8px;
-      // width: calc(100% - 40px);
-      // width: calc(100% - 160px); // 120 _ 40
-      width: 100%; // 120 _ 40
-    }
-
-    & > .item-object > .flex-object > .item-object > .has-title-object-content {
-      width: calc(100% - 160px); // 120 _ 40
-      border: 1px solid #efefef;
-    }
-  }
-}
-.vue-form-item {
-  input[readonly="readonly"] {
-    border: none;
-  }
-}
-.flex-object {
-  display: flex;
-  flex-wrap: wrap;
-}
-.vue-form-item.maxWidth33 {
-  width: 33.33%;
-}
-.item-object.maxWidth33 {
-  width: 100%;
-  & > .flex-object {
-    border: none !important;
-  }
-}
-
-.vue-form-oneofselection {
-  width: 100% !important;
-  max-width: 100% !important ;
-
-  & > .ivu-form-item-content > .ivu-select {
-    width: 100%;
-  }
-  & ~ .normal-vue-item {
-    width: 100%;
-  }
-}
-.flex-array > .item-object > .flex-object > .normal-vue-item {
-  max-width: 100%;
-}
-.flex-array > .item-object > .flex-object > .widthcomplete {
-  width: 100% !important;
-}
-.vue-form
-  > .card
-  > .form-item-array
-  > .form-item-array-content
-  > .flex-array
-  > .item-object
-  > .flex-object
-  > .vue-form-item {
-  flex: 1;
-}
-.vue-form
-  > .card
-  > .form-item-array
-  > .form-item-array-content
-  > .flex-array
-  > .item-object
-  > .flex-object
-  > .flex-object-item-array
-  > .form-item-array-content
-  > .flex-array
-  > .item-object
-  > .flex-object
-  > .normal-vue-item {
-  max-width: calc(50% - 18px);
-}
-.flex-object-item-object {
-  width: 100%;
-}
-.form-item-array.level1 {
-  & > .ivu-form-item-label {
-    width: 100%;
-    float: none;
-    display: block;
-    text-align: left;
-    font-weight: 500;
-  }
-  & > .form-item-array-content {
-    margin: 0 !important;
-  }
-}
-.flex-object-item-string + .form-item-array {
-  width: 100%;
-}
-.vue-form
-  > .card
-  > .form-item-array
-  > .form-item-array-content
-  > .flex-array-wrapper
-  > .flex-div.flex-array
-  > .item-object
-  > .flex-object
-  > .ivu-form-item:first-child.flex-object-item-string {
-  width: calc(100% - 40px);
-}
-
-.vue-form > .card > .vue-form-item {
-  width: calc(100% - 40px);
-}
-// /deep/.flex-object-item-select > .ivu-form-item-content {
-//   width: calc(100% - 160px);
-// }
-.item-object.flex-object-item-object.maxWidth33
-  + .vue-form-item.flex-object-item-integer.maxWidth33 {
-  max-width: 100%;
-  width: 66.66%;
-}
+@import url("./FormItem.less");
 </style>
