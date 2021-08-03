@@ -33,6 +33,9 @@ export default {
       requests: {}
     };
   },
+  updated() {
+    // console.log(`-----updated------`, this.value);
+  },
   methods: {
     renderObject(h, config, prop, model, slot) {
       // console.log(`renderObject`);
@@ -95,6 +98,7 @@ export default {
                     value: model[el],
                     config: __el__
                   },
+                  key: `${prop}.${el}`,
                   class: [
                     `flex-object-item-${__el__.enum ? "select" : __el__.type}`,
                     modelKeysSorted.length >= 3
@@ -104,9 +108,11 @@ export default {
                   on: {
                     input: (value) => {
                       model[el] = value;
+                      // console.log(`--deepInput------`, model);
                       this.$emit("deepInput", `${prop}.${el}`, value);
                     },
                     arrayInput: (key, value) => {
+                      // console.log(`--on-arrayinput------`, key, value);
                       this.$emit("arrayInput", key, value);
                     },
                     oneOfSelectChange: (key, value) => {
@@ -166,7 +172,7 @@ export default {
                 console.warn(`最大数量限制为${maxItems}`);
                 return;
               }
-              console.log(model, item);
+              // console.log(model, item);
               let zore = model[0] || item;
               if (typeof zore === "object") {
                 //  let keys = Object.keys(zore);
@@ -236,7 +242,8 @@ export default {
                 return h(
                   "div",
                   {
-                    class: ["flex-array-wrapper"]
+                    class: ["flex-array-wrapper"],
+                    key: `divarr-${prop}.${index}`
                   },
                   [
                     h(
@@ -273,7 +280,8 @@ export default {
                 return h(
                   "div",
                   {
-                    class: ["flex-div", "simple-div"]
+                    class: ["flex-div", "simple-div"],
+                    key: `div0bj-${prop}.${index}`
                   },
                   [
                     this.renderFun(h, items, `${prop}.${index}`, model, index),
@@ -545,6 +553,7 @@ export default {
               input: (value) => {
                 if (_arrayIndex !== undefined) {
                   currentValue[_arrayIndex] = value;
+                  // console.log(`-----arrayInput----`, currentValue);
                   this.$emit("arrayInput", prop, currentValue[_arrayIndex]);
                 } else {
                   if (prop.includes("-option")) {
@@ -653,9 +662,11 @@ export default {
     this.init();
   },
   beforeUpdate() {
+    // console.log(`-----beforeUpdate------`, this.value);
     this.init();
   },
   render(h) {
+    // console.log(`-----render------`, this.value);
     if (this.Form.visiableStatus) {
       return this.renderFun(h, this.config, this.prop, this.currentValue);
     }

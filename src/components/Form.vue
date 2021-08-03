@@ -1,6 +1,6 @@
 <template>
   <div v-if="Object.keys(currentModel).length" class="vue-form" v-show="show">
-    <!-- {{ currentModel }} -->
+    {{ currentModel }}
     <component
       :is="`${this.prefix}-form`"
       size="medium"
@@ -189,8 +189,8 @@ export default {
     },
     model: {
       deep: true,
-      handler(n) {
-        this.initModel = n;
+      handler(n, o) {
+        this.initModel = JSON.parse(JSON.stringify(n));
         this.handleWatch();
       }
     },
@@ -222,7 +222,7 @@ export default {
       lastKeysProperties: [],
       settings: [],
       required: [],
-      initModel: this.model
+      initModel: JSON.parse(JSON.stringify(this.model))
     };
   },
   methods: {
@@ -291,6 +291,7 @@ export default {
     },
     // FIXME  优化
     arrayInput(key, value) {
+      console.log(`-form-arrayInput---xxx`, key, value);
       if (key.indexOf(".") > -1) {
         let keys = key.split(".");
         let lastKey = keys[keys.length - 1];
@@ -307,6 +308,7 @@ export default {
     },
     deepInput(key, value) {
       set(this.currentModel, key, value);
+      // JSON.parse(JSON.stringify(this.currentModel));
     },
     getData() {
       let obj = JSON.parse(JSON.stringify(this.currentModel));
@@ -432,6 +434,7 @@ export default {
       return _value;
     },
     setModel(currentScheme, rules, parentProp) {
+      console.log(`-------setModel--------`);
       let { properties, required } = currentScheme;
       if (!properties) {
         return {};
@@ -670,6 +673,7 @@ export default {
       // let props = Object.keys(this.currentScheme.properties);
       // let model = {}; // 准备model
       let rules = {}; //  准备rules
+      console.log(`------validateScheme------`);
       let model = this.setModel(this.currentScheme, rules);
       // console.log(model);
       this.currentModel = model;
