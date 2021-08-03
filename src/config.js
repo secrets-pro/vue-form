@@ -2,7 +2,7 @@
  * @Author: bowen.xu
  * @Date: 2021-05-07 09:54:37
  * @Last Modified by: bowen.xu
- * @Last Modified time: 2021-07-29 14:57:58
+ * @Last Modified time: 2021-07-30 16:24:35
  */
 
 function extraOptions(description) {
@@ -62,7 +62,7 @@ export default {
       boolean: "boolean"
     };
     // if (config.type !== "array") {
-    let required_ = config.minLength || config.maxLength || config.enum;
+    let required_ = config.minLength || config.maxLength; //|| config.enum;
     //  || config.pattern;
     let text = config.enum || config.options ? "请选择" : "请输入";
     // FXIME 如果是数组嵌套object的时候 prop--> a.0.b==>rule

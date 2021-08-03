@@ -12,7 +12,11 @@
           this.defaultWidth
       "
     >
-      <vue-form-title title="基础设置" description="部署配置中必要的参数内容" />
+      <vue-form-title
+        v-if="split"
+        title="基础设置"
+        description="部署配置中必要的参数内容"
+      />
       <div class="card">
         <template v-for="prop in propertiesSorted">
           <form-item-plugin
@@ -27,6 +31,7 @@
       </div>
       <div class="card" v-if="Object.keys(lastKeysProperties).length">
         <vue-form-title
+          v-if="split"
           title="高级配置"
           description="除必要参数之外额外设置的内容"
         />
@@ -433,7 +438,6 @@ export default {
       }
       let model = {};
       let props = Object.keys(properties);
-
       props.forEach((el) => {
         let prop = el;
         let config = properties[el];
