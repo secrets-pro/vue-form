@@ -489,9 +489,10 @@ export default {
         }
       } else if (type === "select" || config.enum) {
         if (config.enum) {
+          let enumNames = config.enumNames || extra.items;
           config.options = config.enum.map((el, index) => {
             return {
-              label: config.enumNames ? config.enumNames[index] : el,
+              label: enumNames ? enumNames[index] : el,
               value: el
             };
           });
