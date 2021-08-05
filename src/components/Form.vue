@@ -184,6 +184,7 @@ export default {
   },
   watch: {
     schema(n) {
+      this.settings = [];
       this.currentScheme = n;
       this.handleWatch();
     },
