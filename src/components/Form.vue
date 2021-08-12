@@ -398,7 +398,7 @@ export default {
     reset() {
       this.$refs[this.formId].resetFields();
     },
-    setArrayModal(currentScheme, rules, parentProp) {
+    setArrayModal(currentScheme, rules, parentProp, defaultValue) {
       const { items } = currentScheme;
       let _value = [];
 
@@ -419,10 +419,20 @@ export default {
           _value.push(0);
         }
       } else if (items.type === "object") {
-        let obj = this.setModel(items, {}, parentProp);
-        set(currentScheme, "item", obj);
-        if (this.initinal) {
-          _value.push(obj);
+        if (defaultValue && Array.isArray(defaultValue)) {
+          defaultValue.forEach((defaultValueItem, index) => {
+            let obj = this.setModel(items, {}, `${parentProp}.${index}`);
+            set(currentScheme, "item", obj);
+            if (this.initinal) {
+              _value.push(obj);
+            }
+          })
+        } else {
+          let obj = this.setModel(items, {}, parentProp);
+          set(currentScheme, "item", obj);
+          if (this.initinal) {
+            _value.push(obj);
+          }
         }
       }
       if (currentScheme.minItems > 1) {
@@ -435,7 +445,6 @@ export default {
       return _value;
     },
     setModel(currentScheme, rules, parentProp) {
-      console.log(`-------setModel--------`);
       let { properties, required } = currentScheme;
       if (!properties) {
         return {};
@@ -445,9 +454,6 @@ export default {
       props.forEach((el) => {
         let prop = el;
         let config = properties[el];
-        // if (extraOptions(config.description).multiple) {
-        //   debugger;
-        // }
         if (Array.isArray(required) && required.includes(prop)) {
           config.required = true;
         }
@@ -483,7 +489,7 @@ export default {
         } else if (config.type === "array") {
           // 数组类型
           // 设置默认的格式 config.items
-          let _value = this.setArrayModal(config, rules, prop);
+          let _value = this.setArrayModal(config, rules, prop, defaultValue);
 
           set(model, prop, defaultValue || _value || "");
           if (prop.indexOf(".") > -1) {
@@ -674,7 +680,6 @@ export default {
       // let props = Object.keys(this.currentScheme.properties);
       // let model = {}; // 准备model
       let rules = {}; //  准备rules
-      console.log(`------validateScheme------`);
       let model = this.setModel(this.currentScheme, rules);
       // console.log(model);
       this.currentModel = model;

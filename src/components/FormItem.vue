@@ -173,7 +173,10 @@ export default {
                 return;
               }
               // console.log(model, item);
-              let zore = model[0] || item;
+              const modelWrapper = model[0] || item
+              let zore = typeof modelWrapper === "object" ? JSON.parse(JSON.stringify(modelWrapper)) : modelWrapper;
+              // 清空数据，解决添加会带上一项数据的问题
+              zore = this.clearValues(zore)
               if (typeof zore === "object") {
                 //  let keys = Object.keys(zore);
                 // let obj = {};
@@ -223,6 +226,28 @@ export default {
         },
         [index === 0 ? add : remove]
       );
+    },
+    clearValues(orginal) {
+      if (typeof orginal === 'object') {
+        Object.keys(orginal).forEach(el => {
+          if (typeof orginal[el] === 'boolean') {
+            orginal[el] = false
+          } else if (typeof orginal[el] === 'number') {
+            orginal[el] = 0
+          } else if (typeof orginal[el] === 'object') {
+            orginal[el] = this.clearValues(orginal[el])
+          } else if (typeof orginal[el] === 'string') {
+            orginal[el] = ''
+          }
+        })
+      } else if (typeof orginal === 'boolean') {
+        orginal = false
+      } else if (typeof orginal === 'number') {
+        orginal = 0
+      } else if (typeof orginal === 'string') {
+        orginal = ''
+      }
+      return orginal
     },
     renderArray(h, config, prop, model) {
       const { items } = config;
