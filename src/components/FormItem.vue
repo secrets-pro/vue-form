@@ -12,7 +12,8 @@ export default {
   props: {
     value: [String, Number, Boolean, Array, Date, Object],
     config: Object,
-    prop: String
+    prop: String,
+    required: Boolean
   },
   watch: {
     value(n) {
@@ -359,7 +360,11 @@ export default {
               }
             },
             [
-              h("div", title)
+              h("div",  
+                this.required ? [
+                  h("span", { style: { color: "red", marginRight: "5px" } }, "*"),
+                  h("span", title)
+                ] : [h("span", title)])
               // level
               //   ? this.renderArrayButton(
               //       h,
@@ -609,7 +614,7 @@ export default {
           props: {
             prop,
             labelWidth: this.prefix === "el" ? width + "px" : width,
-            rules
+            rules: this.required ? this.renderRules(config) : rules
             // label: extra.title || config.title || prop
           },
           key: prop,
@@ -617,6 +622,28 @@ export default {
         },
         arr
       );
+    },
+    renderRules(config) {
+      const { type, multiple } = config;
+
+      let ruleType = {
+        checkbox: "array",
+        array: "array",
+        number: "number",
+        integer: "number",
+        date: "date",
+        switch: "boolean",
+        boolean: "boolean"
+      };
+      let rule = [
+        {
+          required: true,
+          type: type === "select" && multiple ? "array" : ruleType[type] ? ruleType[type] : "string",
+          trigger: type === "select" ? "change" : "blur",
+          message: type === "select" ? "请选择" : "请输入"
+        }
+      ];
+      return rule;
     },
     // 修改成render
     renderLabel(title, description) {

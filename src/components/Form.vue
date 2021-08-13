@@ -43,6 +43,7 @@
             :prop="prop"
             @arrayInput="arrayInput"
             @deepInput="deepInput"
+            required
           ></form-item-plugin>
         </template>
         <div v-if="!settings.length" style="padding:12px;">
