@@ -405,7 +405,7 @@ export default {
 
       if (items.type === "string") {
         set(currentScheme, "item", "");
-        if (this.initinal) {
+        if (this.initinal && !(currentScheme.description && JSON.parse(currentScheme.description).url)) {
           _value.push("");
         }
       }
