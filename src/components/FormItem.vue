@@ -259,6 +259,9 @@ export default {
         prop.indexOf(".") === -1 &&
         items.properties &&
         Object.keys(items.properties).length > 2;
+      if (type === 'string') {
+        items.required = config.required
+      }
       if (model) {
         children =
           type === "object"
@@ -361,7 +364,7 @@ export default {
             },
             [
               h("div",  
-                this.required ? [
+                this.required || (type === "string" && config.required) ? [
                   h("span", { style: { color: "red", marginRight: "5px" } }, "*"),
                   h("span", title)
                 ] : [h("span", title)])
@@ -565,7 +568,7 @@ export default {
         return this.renderObject(h, config, prop, currentValue, slot);
       }
       let labelArr =
-        extra.title || config.title || (_arrayIndex > -1 ? "" : prop);
+        extra.title || config.title || (_arrayIndex > -1 ? "" : prop);      
       let arr = [
         h(
           `${type === "editor" ? "my" : this.prefix}-${type}`,
