@@ -13,7 +13,7 @@
       "
     >
       <vue-form-title
-        v-if="split"
+        v-if="split && propertiesSorted.length"
         title="基础设置"
         description="部署配置中必要的参数内容"
       />
@@ -594,7 +594,8 @@ export default {
                   "ui:options": {
                     width: w
                   },
-                  "ui:classes": ["vue-object-key"]
+                  "ui:classes": ["vue-object-key"],
+                  required: config.required
                 },
                 value: {
                   type: "string",
@@ -602,7 +603,8 @@ export default {
                   "ui:options": {
                     width: w
                   },
-                  "ui:classes": ["vue-object-value"]
+                  "ui:classes": ["vue-object-value"],
+                  required: config.required
                 }
               };
             }
