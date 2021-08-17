@@ -233,7 +233,7 @@ export default {
         Object.keys(orginal).forEach(el => {
           if (typeof orginal[el] === 'boolean') {
             orginal[el] = false
-          } else if (typeof orginal[el] === 'number') {
+          } else if (typeof orginal[el] === 'number' && el.indexOf("-option") === -1) {
             orginal[el] = 0
           } else if (typeof orginal[el] === 'object') {
             orginal[el] = this.clearValues(orginal[el])
@@ -243,7 +243,7 @@ export default {
         })
       } else if (typeof orginal === 'boolean') {
         orginal = false
-      } else if (typeof orginal === 'number') {
+      } else if (typeof orginal === 'number' && orginal.indexOf("-option") === -1) {
         orginal = 0
       } else if (typeof orginal === 'string') {
         orginal = ''
