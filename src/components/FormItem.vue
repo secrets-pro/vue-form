@@ -174,10 +174,13 @@ export default {
                 return;
               }
               // console.log(model, item);
-              const modelWrapper = model[0] || item
-              let zore = typeof modelWrapper === "object" ? JSON.parse(JSON.stringify(modelWrapper)) : modelWrapper;
+              const modelWrapper = model[0] || item;
+              let zore =
+                typeof modelWrapper === "object"
+                  ? JSON.parse(JSON.stringify(modelWrapper))
+                  : modelWrapper;
               // 清空数据，解决添加会带上一项数据的问题
-              zore = this.clearValues(zore)
+              zore = this.clearValues(zore);
               if (typeof zore === "object") {
                 //  let keys = Object.keys(zore);
                 // let obj = {};
@@ -229,26 +232,32 @@ export default {
       );
     },
     clearValues(orginal) {
-      if (typeof orginal === 'object') {
-        Object.keys(orginal).forEach(el => {
-          if (typeof orginal[el] === 'boolean') {
-            orginal[el] = false
-          } else if (typeof orginal[el] === 'number' && el.indexOf("-option") === -1) {
-            orginal[el] = 0
-          } else if (typeof orginal[el] === 'object') {
-            orginal[el] = this.clearValues(orginal[el])
-          } else if (typeof orginal[el] === 'string') {
-            orginal[el] = ''
+      if (typeof orginal === "object") {
+        Object.keys(orginal).forEach((el) => {
+          if (typeof orginal[el] === "boolean") {
+            orginal[el] = false;
+          } else if (
+            typeof orginal[el] === "number" &&
+            el.indexOf("-option") === -1
+          ) {
+            orginal[el] = 0;
+          } else if (typeof orginal[el] === "object") {
+            orginal[el] = this.clearValues(orginal[el]);
+          } else if (typeof orginal[el] === "string") {
+            orginal[el] = "";
           }
-        })
-      } else if (typeof orginal === 'boolean') {
-        orginal = false
-      } else if (typeof orginal === 'number' && orginal.indexOf("-option") === -1) {
-        orginal = 0
-      } else if (typeof orginal === 'string') {
-        orginal = ''
+        });
+      } else if (typeof orginal === "boolean") {
+        orginal = false;
+      } else if (
+        typeof orginal === "number" &&
+        orginal.indexOf("-option") === -1
+      ) {
+        orginal = 0;
+      } else if (typeof orginal === "string") {
+        orginal = "";
       }
-      return orginal
+      return orginal;
     },
     renderArray(h, config, prop, model) {
       const { items } = config;
@@ -259,8 +268,8 @@ export default {
         prop.indexOf(".") === -1 &&
         items.properties &&
         Object.keys(items.properties).length > 2;
-      if (type === 'string') {
-        items.required = config.required
+      if (type === "string") {
+        items.required = config.required;
       }
       if (model) {
         children =
@@ -363,11 +372,19 @@ export default {
               }
             },
             [
-              h("div",  
-                this.required || (type === "string" && config.required) ? [
-                  h("span", { style: { color: "red", marginRight: "5px" } }, "*"),
-                  h("span", title)
-                ] : [h("span", title)])
+              h(
+                "div",
+                this.required || (type === "string" && config.required)
+                  ? [
+                      h(
+                        "span",
+                        { style: { color: "red", marginRight: "5px" } },
+                        "*"
+                      ),
+                      h("span", title)
+                    ]
+                  : [h("span", title)]
+              )
               // level
               //   ? this.renderArrayButton(
               //       h,
@@ -568,7 +585,7 @@ export default {
         return this.renderObject(h, config, prop, currentValue, slot);
       }
       let labelArr =
-        extra.title || config.title || (_arrayIndex > -1 ? "" : prop);      
+        extra.title || config.title || (_arrayIndex > -1 ? "" : prop);
       let arr = [
         h(
           `${type === "editor" ? "my" : this.prefix}-${type}`,
@@ -641,7 +658,12 @@ export default {
       let rule = [
         {
           required: true,
-          type: type === "select" && multiple ? "array" : ruleType[type] ? ruleType[type] : "string",
+          type:
+            type === "select" && multiple
+              ? "array"
+              : ruleType[type]
+              ? ruleType[type]
+              : "string",
           trigger: type === "select" ? "change" : "blur",
           message: type === "select" ? "请选择" : "请输入"
         }
@@ -699,12 +721,13 @@ export default {
             window.sessionStorage.setItem(extra.url, JSON.stringify(data));
           }
         }
-        if (data) {
-          this.config.enum = data.map((el) => el[extra.return]);
-          this.config.enumNames = data.map((el) => el[extra.show]);
-          this.config.type = "select";
-          this.config.multiple = extra.multiple === "true";
-        }
+        // if (data) {
+
+        this.config.enum = data ? data.map((el) => el[extra.return]) : [];
+        this.config.enumNames = data ? data.map((el) => el[extra.show]) : [];
+        this.config.type = "select";
+        this.config.multiple = extra.multiple === "true";
+        // }e
 
         // this.Form.addRequest(prop, {
         //   url: extra.url,
