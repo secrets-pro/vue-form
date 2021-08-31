@@ -2,12 +2,17 @@
  * @Author: bowen.xu
  * @Date: 2021-05-07 09:54:37
  * @Last Modified by: bowen.xu
- * @Last Modified time: 2021-07-30 16:24:35
+ * @Last Modified time: 2021-08-31 15:23:07
  */
+
+import { isObject } from "lodash";
 
 function extraOptions(description) {
   if (!description) {
     return {};
+  }
+  if (isObject(description)) {
+    return description;
   }
   let rtn = {};
   try {
