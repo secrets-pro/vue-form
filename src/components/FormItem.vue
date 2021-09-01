@@ -711,22 +711,42 @@ export default {
         if (data) {
           data = JSON.parse(data);
         } else {
-          let res = await this.Form.request(
-            formatUrl(extra.url, {
-              ...this.$route.params
-            })
-          );
-          data = res.data;
-          if (data) {
-            window.sessionStorage.setItem(extra.url, JSON.stringify(data));
+          try {
+            let res = await this.Form.request(
+              formatUrl(extra.url, {
+                ...this.$route.params
+              })
+            );
+            data = res.data;
+            if (data) {
+              window.sessionStorage.setItem(extra.url, JSON.stringify(data));
+            }
+          } catch (error) {
+            console.error(error);
           }
         }
         // if (data) {
-
-        this.config.enum = data ? data.map((el) => el[extra.return]) : [];
-        this.config.enumNames = data ? data.map((el) => el[extra.show]) : [];
+        let __enum__ = data ? data.map((el) => el[extra.return]) : [];
+        let __enumNames__ = data ? data.map((el) => el[extra.show]) : [];
+        let muti = extra.multiple === "true";
+        let __current_value__ = this.currentValue;
+        if (muti) {
+          __current_value__.forEach((el) => {
+            if (!__enum__.includes(el)) {
+              __enum__.push(el);
+              __enumNames__.push(el);
+            }
+          });
+        } else {
+          if (!__enum__.includes(__current_value__)) {
+            __enum__.push(__current_value__);
+            __enumNames__.push(__current_value__);
+          }
+        }
+        this.config.enum = __enum__;
+        this.config.enumNames = __enumNames__;
         this.config.type = "select";
-        this.config.multiple = extra.multiple === "true";
+        this.config.multiple = muti;
         // }e
 
         // this.Form.addRequest(prop, {
