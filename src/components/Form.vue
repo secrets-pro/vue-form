@@ -21,6 +21,7 @@
         <template v-for="prop in propertiesSorted">
           <form-item-plugin
             :key="prop.name"
+            :labelWidth="labelWidth"
             v-model="currentModel[prop.name]"
             :config="prop"
             :prop="prop.name"
@@ -38,6 +39,7 @@
         <template v-for="prop in settingcp">
           <form-item-plugin
             :key="prop"
+            :labelWidth="labelWidth"
             v-model="currentModel[prop]"
             :config="lastKeysProperties[prop]"
             :prop="prop"
@@ -147,6 +149,10 @@ export default {
       type: Boolean,
       default: true
     },
+    labelWidth: {
+      type: Number,
+      default: 120
+    },
     readonly: Boolean
   },
   beforeCreate() {
@@ -160,6 +166,9 @@ export default {
     this.$emit("on-mounte");
   },
   computed: {
+    defaultWidth() {
+      return this.prefix === "el" ? `${this.labelWidth}px` : this.labelWidth;
+    },
     settingcp() {
       let config = this.schema.properties;
       let s = this.settings;
@@ -211,7 +220,7 @@ export default {
   data() {
     return {
       modal: false,
-      defaultWidth: this.prefix === "el" ? "100px" : 100,
+
       currentScheme: this.schema,
       currentModel: {},
       formId: this.randomId(),
@@ -405,7 +414,13 @@ export default {
 
       if (items.type === "string") {
         set(currentScheme, "item", "");
-        if (this.initinal && !(currentScheme.description && JSON.parse(currentScheme.description).url)) {
+        if (
+          this.initinal &&
+          !(
+            currentScheme.description &&
+            JSON.parse(currentScheme.description).url
+          )
+        ) {
           _value.push("");
         }
       }
@@ -427,7 +442,7 @@ export default {
             if (this.initinal) {
               _value.push(obj);
             }
-          })
+          });
         } else {
           let obj = this.setModel(items, {}, parentProp);
           set(currentScheme, "item", obj);

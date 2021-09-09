@@ -1,7 +1,7 @@
 <script>
 /* eslint-disable no-unused-vars */
 import setting from "../config";
-import styleCfg from "../styleCfg";
+// import styleCfg from "../styleCfg";
 import { renderSelectOptions, renderRadioCheckbox } from "./render";
 const { extraOptions, generateRule, formatUrl } = setting;
 
@@ -13,6 +13,7 @@ export default {
     value: [String, Number, Boolean, Array, Date, Object],
     config: Object,
     prop: String,
+    labelWidth: [Number, String],
     required: Boolean
   },
   watch: {
@@ -50,6 +51,7 @@ export default {
 
         return pa.index - pb.index;
       });
+      console.log(`---this.labelWidth---`, this.labelWidth);
       return h(
         "div",
         {
@@ -70,7 +72,7 @@ export default {
                       : "el-form-item__label"
                   ],
                   style: {
-                    width: styleCfg.titleWidth
+                    width: this.labelWidth + "px"
                   }
                 },
                 extraOptions(config.description).title || config.title
@@ -97,6 +99,7 @@ export default {
                   props: {
                     prop: `${prop}.${el}`,
                     value: model[el],
+                    labelWidth: this.labelWidth,
                     config: __el__
                   },
                   key: `${prop}.${el}`,
@@ -260,7 +263,7 @@ export default {
       return orginal;
     },
     renderArray(h, config, prop, model) {
-      const { items } = config;
+      const { items, labelWidth } = config;
       let { type } = items;
       // let that = this;
       let children = [];
@@ -344,6 +347,7 @@ export default {
       // }
       let title =
         extraOptions(config.description).title || config.title || prop;
+      let w = config.labelWidth + "px";
       return h(
         "div",
         {
@@ -366,7 +370,7 @@ export default {
                   : "el-form-item__label"
               ], // class判断
               style: {
-                width: level ? "auto" : styleCfg.titleWidth,
+                width: level ? "auto" : w,
                 display: level ? "flex" : "block",
                 alignItems: level ? "center" : "initial"
               }
@@ -404,7 +408,7 @@ export default {
             {
               style: {
                 flex: 1,
-                marginLeft: styleCfg.titleWidth
+                marginLeft: w
               },
               class: "form-item-array-content"
             },
@@ -580,6 +584,7 @@ export default {
         style.minWidth = "400px";
       }
       if (type === "array") {
+        config.labelWidth = this.labelWidth;
         return this.renderArray(h, config, prop, currentValue);
       } else if (type === "object") {
         return this.renderObject(h, config, prop, currentValue, slot);
@@ -623,7 +628,7 @@ export default {
       if (labelArr) {
         arr.push(this.renderLabel(labelArr, extra.description));
       }
-      let width = _arrayIndex > -1 ? 0 : styleCfg.labelWidth;
+      let width = _arrayIndex > -1 ? 0 : this.labelWidth;
       if (this.readonly) {
         rules = undefined;
       }
@@ -717,8 +722,9 @@ export default {
                 ...this.$route.params
               })
             );
-            data = res.data;
-            if (data) {
+
+            if (res && res.data) {
+              data = res.data;
               window.sessionStorage.setItem(extra.url, JSON.stringify(data));
             }
           } catch (error) {
@@ -759,6 +765,7 @@ export default {
   },
   async created() {
     this.init();
+    console.log(`------created----`, this.labelWidth, this.config);
   },
   beforeUpdate() {
     // console.log(`-----beforeUpdate------`, this.value);
