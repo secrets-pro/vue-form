@@ -51,7 +51,10 @@ export default {
 
         return pa.index - pb.index;
       });
-      console.log(`---this.labelWidth---`, this.labelWidth);
+      // console.log(`---this.labelWidth---`, this.labelWidth);
+      let title = extraOptions(config.description).title || config.title;
+      let desc =
+        extraOptions(config.description).description || config.description;
       return h(
         "div",
         {
@@ -61,7 +64,7 @@ export default {
           }
         },
         [
-          !(extraOptions(config.description).title || config.title)
+          !title
             ? null
             : h(
                 "div",
@@ -75,7 +78,7 @@ export default {
                     width: this.labelWidth + "px"
                   }
                 },
-                extraOptions(config.description).title || config.title
+                [this.renderLabel(title, desc)]
               ),
           h(
             "div",
@@ -626,7 +629,7 @@ export default {
         )
       ];
       if (labelArr) {
-        arr.push(this.renderLabel(labelArr, extra.description));
+        arr.push(this.renderLabel(labelArr, extra.description, "label"));
       }
       let width = _arrayIndex > -1 ? 0 : this.labelWidth;
       if (this.readonly) {
@@ -676,14 +679,14 @@ export default {
       return rule;
     },
     // 修改成render
-    renderLabel(title, description) {
+    renderLabel(title, description, slot) {
       // let exp = extraOptions(description);
       let Tag = this.prefix + "-tooltip";
       let ButtonTag = this.prefix + "-button";
       let icon =
         this.prefix === "el" ? "el-icon-info" : "ios-information-circle";
-      return (
-        <span slot="label">
+      let res = (
+        <span>
           <span>{title}</span>
           {description ? (
             <Tag
@@ -708,6 +711,10 @@ export default {
           ) : null}
         </span>
       );
+      if (!slot) {
+        return <span>{res}</span>;
+      }
+      return <span slot={slot}>{res}</span>;
     },
     async init() {
       let extra = extraOptions(this.config.description);
