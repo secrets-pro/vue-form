@@ -424,6 +424,7 @@ export default {
       // if ((prop + "").indexOf("outputRefs") > -1) {
       //   debugger;
       // }
+      // console.log(`config ${config}`, prop);
       if (!config) {
         console.log(`没有参数`, config, prop);
         return;
@@ -566,6 +567,11 @@ export default {
         props.multiple = config.multiple;
       } else if (type === "string") {
         type = "input";
+        if (config.name.toLowerCase() === "password") {
+          props.type = "password";
+        }
+        props.placeholder = "请输入" + extra.title;
+        // console.log(`prop`, props);
       } else if (type === "boolean") {
         type = "switch";
       } else if (type === "editor") {
@@ -592,6 +598,7 @@ export default {
       } else if (type === "object") {
         return this.renderObject(h, config, prop, currentValue, slot);
       }
+
       let labelArr =
         extra.title || config.title || (_arrayIndex > -1 ? "" : prop);
       let arr = [
@@ -772,7 +779,7 @@ export default {
   },
   async created() {
     this.init();
-    console.log(`------created----`, this.labelWidth, this.config);
+    // console.log(`------created----`, this.labelWidth, this.config);
   },
   beforeUpdate() {
     // console.log(`-----beforeUpdate------`, this.value);
