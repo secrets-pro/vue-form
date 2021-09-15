@@ -567,10 +567,12 @@ export default {
         props.multiple = config.multiple;
       } else if (type === "string") {
         type = "input";
-        if (config.name.toLowerCase() === "password") {
+        if (config.name && config.name.toLowerCase() === "password") {
           props.type = "password";
         }
-        props.placeholder = "请输入" + extra.title;
+        if (extra.title) {
+          props.placeholder = "请输入" + extra.title;
+        }
         // console.log(`prop`, props);
       } else if (type === "boolean") {
         type = "switch";
