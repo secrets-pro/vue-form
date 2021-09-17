@@ -724,7 +724,7 @@ export default {
       }
       return <span slot={slot}>{res}</span>;
     },
-    async init() {
+    async init(flag) {
       let extra = extraOptions(this.config.description);
       if (extra.url) {
         let url = formatUrl(extra.url, {
@@ -745,7 +745,6 @@ export default {
             console.error(error);
           }
         }
-        // if (data) {
         let __enum__ = data ? data.map((el) => el[extra.return]) : [];
         let __enumNames__ = data ? data.map((el) => el[extra.show]) : [];
         let muti = extra.multiple === "true";
@@ -768,33 +767,19 @@ export default {
         this.config.type = "select";
         this.config.multiple = muti;
         // }e
-        this.$forceUpdate();
-        console.log("`inti----`", JSON.stringify(this.config));
-        // this.Form.addRequest(prop, {
-        //   url: extra.url,
-        //   key: extra.key,
-        //   show: extra.show
-        // });
+        if (flag) {
+          this.$forceUpdate();
+        }
       }
     }
   },
   async created() {
-    this.init();
-    if (this.config.title === "secretName") {
-      console.log(`------created----`, JSON.stringify(this.config));
-    }
+    this.init(1);
   },
   beforeUpdate() {
-    if (this.config.title === "secretName") {
-      console.log(`------beforeUpdate----`, JSON.stringify(this.config));
-    }
     this.init();
   },
   render(h) {
-    if (this.config.title === "secretName") {
-      console.log(`------render----`, JSON.stringify(this.config));
-    }
-    // console.log(`-----render------`, this.value);
     if (this.Form.visiableStatus) {
       return this.renderFun(h, this.config, this.prop, this.currentValue);
     }
