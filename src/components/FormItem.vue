@@ -727,20 +727,19 @@ export default {
     async init() {
       let extra = extraOptions(this.config.description);
       if (extra.url) {
-        let data = window.sessionStorage.getItem(extra.url);
+        let url = formatUrl(extra.url, {
+          ...this.$route.params
+        });
+        let data = window.sessionStorage.getItem(url);
         if (data) {
           data = JSON.parse(data);
         } else {
           try {
-            let res = await this.Form.request(
-              formatUrl(extra.url, {
-                ...this.$route.params
-              })
-            );
+            let res = await this.Form.request(url);
 
             if (res && res.data) {
               data = res.data;
-              window.sessionStorage.setItem(extra.url, JSON.stringify(data));
+              window.sessionStorage.setItem(url, JSON.stringify(data));
             }
           } catch (error) {
             console.error(error);
