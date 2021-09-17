@@ -555,7 +555,6 @@ export default {
             };
           });
         }
-
         children = renderSelectOptions(
           h,
           config.options,
@@ -754,13 +753,13 @@ export default {
         let __current_value__ = this.currentValue;
         if (muti) {
           __current_value__.forEach((el) => {
-            if (!__enum__.includes(el)) {
+            if (el && !__enum__.includes(el)) {
               __enum__.push(el);
               __enumNames__.push(el);
             }
           });
         } else {
-          if (!__enum__.includes(__current_value__)) {
+          if (__current_value__ && !__enum__.includes(__current_value__)) {
             __enum__.push(__current_value__);
             __enumNames__.push(__current_value__);
           }
@@ -770,7 +769,8 @@ export default {
         this.config.type = "select";
         this.config.multiple = muti;
         // }e
-
+        this.$forceUpdate();
+        console.log("`inti----`", JSON.stringify(this.config));
         // this.Form.addRequest(prop, {
         //   url: extra.url,
         //   key: extra.key,
@@ -781,13 +781,20 @@ export default {
   },
   async created() {
     this.init();
-    // console.log(`------created----`, this.labelWidth, this.config);
+    if (this.config.title === "secretName") {
+      console.log(`------created----`, JSON.stringify(this.config));
+    }
   },
   beforeUpdate() {
-    // console.log(`-----beforeUpdate------`, this.value);
+    if (this.config.title === "secretName") {
+      console.log(`------beforeUpdate----`, JSON.stringify(this.config));
+    }
     this.init();
   },
   render(h) {
+    if (this.config.title === "secretName") {
+      console.log(`------render----`, JSON.stringify(this.config));
+    }
     // console.log(`-----render------`, this.value);
     if (this.Form.visiableStatus) {
       return this.renderFun(h, this.config, this.prop, this.currentValue);
