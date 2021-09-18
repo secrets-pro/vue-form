@@ -1,12 +1,13 @@
 # vue-form
 
-A JSON Scheme parse for Form with Element-UI
+A JSON Scheme parse for Form with Element-UI,iview
 
 - support `switch`,`input`,`input-number`,`select`,`radio`,`checkbox`,`date` components.
 - support `minimun`,`maximun`,`minLength`,`maxlenght`,`pattern` form rules.
 - support array & object nest
 - support simple object without properties
 - support anyOf
+- support request url for select-options
 
 ## How to use
 
@@ -18,7 +19,10 @@ npm i @secrets/vue-form
 import elementUI from "element-ui";
 import vueForm from "@secrets/vue-form";
 Vue.use(elementUI);
-Vue.use(vueForm);
+Vue.use(vueForm, {
+  elementUI: true // or
+  // iView: true
+});
 ```
 
 ## demo
@@ -174,3 +178,38 @@ yarn link //加入到本地全局模块
 ```bash
 yarn link  @secrets/vue-form
 ```
+
+## 扩展
+
+### description
+
+description 可以写入一个 json-string，如：
+
+```js
+description: '{"title":"姓名","description":"描述信息","index":1}';
+```
+
+| key         | 描述                                   | 补充说明              |
+| ----------- | -------------------------------------- | --------------------- |
+| title       | 真实数据显示的名称                     | -                     |
+| description | 描述信息，添加后会有一个 tooltip 提示  | -                     |
+| index       | 字段排序，优先取 required 中配置的顺序 | -                     |
+| url         | 接口请求地址                           | 需要传入 request 属性 |
+| show        | url 数据中展示的字段                   |                       |
+| return      | url 数据中作为值的字段                 |                       |
+
+### request
+
+需要手动传入一个 request 方法，比如`axios.post`, 内部逻辑会使用这个 request 根据 url 发起请求;响应结果的格式是固定的
+
+```js
+{
+  data:[],
+  total:10
+}
+```
+
+### 自定义样式
+
+1. 添加 style 通过设置 `ui:options`，数据是一个 Object,可以在 config 中设置，也可以在上述 description 扩展中写
+2. 添加 class 通过设置 `ui:options`，数据是一个 Array，可以在 config 中设置，也可以在上述 description 扩展中写

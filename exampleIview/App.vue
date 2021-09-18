@@ -1,7 +1,6 @@
 <template>
   <div class="test">
-    {{ model }}
-    <i-button @click="setModal" type="primary">setModal</i-button>
+    <!-- <i-button @click="setModal" type="primary">setModal</i-button> -->
     <div style="display:flex;">
       <div style="width:40%;">
         <!-- <el-input type="textarea" :rows="100" v-model="schemaString" /> -->
@@ -10,11 +9,12 @@
       <vue-form
         @on-confirm="confirm"
         :split="false"
-        readonly
+        :readonly="false"
         ref="form"
         :schema="schema"
+        :request="this.$http"
         :model="model"
-        style="min-height:400px;max-width:50%;"
+        style="flex:1;padding:12px;"
       ></vue-form>
     </div>
 
@@ -57,6 +57,9 @@ export default {
       // console.log(model);
     },
     async getData() {
+      this.$http("http://api.com/image/list", {}).then((res) => {
+        console.log(res);
+      });
       let data = await this.$refs.form.validate();
       console.log(data);
       if (data) {

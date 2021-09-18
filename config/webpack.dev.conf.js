@@ -9,5 +9,11 @@ module.exports = merge(base, {
     port: 8081,
     hot: true,
     open: true //默认打开浏览器
+    // proxy: {
+    //   "/api": {
+    //     target: "http://api.com",
+    //     pathRewrite: { "^/api": "" }
+    //   }
+    // }
   }
 });

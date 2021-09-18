@@ -728,7 +728,7 @@ export default {
       let extra = extraOptions(this.config.description);
       if (extra.url) {
         let url = formatUrl(extra.url, {
-          ...this.$route.params
+          ...(this.$route ? this.$route.params : {})
         });
         let data = window.sessionStorage.getItem(url);
         if (data) {

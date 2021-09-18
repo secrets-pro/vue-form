@@ -5,7 +5,7 @@ import App from "./App.vue";
 // import elementUI from "view-design";
 import VueForm from "../src";
 import "./iview";
-
+import "../mock";
 // Vue.use(elementUI);
 Vue.use(VueForm, { iView: true });
 new Vue({

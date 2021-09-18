@@ -81,7 +81,7 @@ export default {
       type: "array"
     },
     envFromFieldRef: {
-      description: "引用容器属性作为环境变量",
+      description: `{"title":"api","description":"引用容器属性作为环境变量"}`,
       items: {
         properties: {
           fieldPath: {
@@ -212,7 +212,7 @@ export default {
           description: '{"title":"探针类型"}',
           oneOf: [
             {
-              description: "命令",
+              description: `{"title":"命令"}`,
               properties: {
                 command: {
                   description: '{"title":"命令"}',
@@ -283,7 +283,7 @@ export default {
     },
     quotaModel: {
       description:
-        '{"title":"配额","description":"用于指定容器需要的最小、最大cpu内存配置，通过配额管理配置模板","url":"/argo/v4/tenants/{tenantName}/projects/{projectName}/quota-model/list?cluster={cluster}","type":"select","key":"id","show":"name","return":"jsonStr"}',
+        '{"title":"配额","description":"用于指定容器需要的最小、最大cpu内存配置，通过配额管理配置模板","url":"http://api.com/image/list","type":"select","key":"id","show":"label","return":"value"}',
       title: "quotaModel",
       type: "string"
     },
@@ -302,7 +302,7 @@ export default {
           description: '{"title":"探针类型"}',
           oneOf: [
             {
-              description: "命令",
+              description: '{"title":"命令"}',
               properties: {
                 command: {
                   description: '{"title":"命令"}',
@@ -424,163 +424,11 @@ export default {
       },
       title: "volumeMountsConfigmap",
       type: "array"
-    },
-    volumeMountsPvc: {
-      description: '{"title":"挂载磁盘"}',
-      items: {
-        properties: {
-          mountPath: {
-            description: '{"title":"挂载路径"}',
-            title: "mountPath",
-            type: "string"
-          },
-          name: {
-            description:
-              '{"description":"磁盘名称(空代表挂载宿主机上的目录或文件)","title":"名称"}',
-            title: "name",
-            type: "string"
-          },
-          readOnly: {
-            default: false,
-            description: '{"title":"只读"}',
-            title: "readOnly",
-            type: "boolean"
-          },
-          subPath: {
-            description: '{"title":"子路径"}',
-            title: "subPath",
-            type: "string"
-          },
-          volumeName: {
-            description: '{"title":"挂载名称"}',
-            title: "volumeName",
-            type: "string"
-          }
-        },
-        required: ["volumeName", "readOnly", "mountPath"],
-        type: "object"
-      },
-      title: "volumeMountsPvc",
-      type: "array"
-    },
-    volumeMountsSecret: {
-      description: '{"title":"挂载加密文件"}',
-      items: {
-        properties: {
-          mountPath: {
-            description: '{"title":"挂载路径"}',
-            title: "mountPath",
-            type: "string"
-          },
-          name: {
-            description: '{"title":"加密文件名称"}',
-            title: "name",
-            type: "string"
-          },
-          readOnly: {
-            default: false,
-            description: '{"title":"只读"}',
-            title: "readOnly",
-            type: "boolean"
-          },
-          subPath: {
-            description: '{"title":"子路径"}',
-            title: "subPath",
-            type: "string"
-          },
-          volumeName: {
-            description: '{"title":"挂载名称"}',
-            title: "volumeName",
-            type: "string"
-          }
-        },
-        required: ["name", "volumeName", "readOnly", "mountPath"],
-        type: "object"
-      },
-      title: "volumeMountsSecret",
-      type: "array"
-    },
-    code: {
-      type: "editor"
     }
+    // code: {
+    //   type: "editor"
+    // }
   },
   required: ["replicas", "image", "http", "quotaModel", "domain"],
   type: "object"
 };
-
-// export default {
-//   properties: {
-//     replicasType: {
-//       description: "副本数类型",
-//       oneOf: [
-//         {
-//           properties: {
-//             replicas: {
-//               default: 1,
-//               description: "固定副本数",
-//               exclusiveMinimum: true,
-//               maximum: 2147483647,
-//               minimum: 0,
-//               type: "integer"
-//             }
-//           },
-//           required: ["replicas"]
-//         },
-//         {
-//           properties: {
-//             cpu: { description: "+usage=最小cpu占用", type: "integer" },
-//             cpuUnit: {
-//               default: "%",
-//               description: "+usage=cpu单位",
-//               type: "string"
-//             },
-//             customExpressions: {
-//               description: "+usage=自定义伸缩表达式",
-//               items: {
-//                 properties: {
-//                   criticalValue: {
-//                     description: "+usage=临界值",
-//                     type: "integer"
-//                   },
-//                   expression: {
-//                     description: "+usage=自定义伸缩表达式",
-//                     type: "string"
-//                   }
-//                 },
-//                 required: ["criticalValue", "expression"],
-//                 type: "object"
-//               },
-//               type: "array"
-//             },
-//             maxReplicas: {
-//               default: 1,
-//               description: "+usage=最大副本数",
-//               exclusiveMinimum: true,
-//               minimum: 0,
-//               type: "integer"
-//             },
-//             memory: { description: "+usage=最小内存占用", type: "integer" },
-//             memoryUnit: {
-//               default: "Mi",
-//               description: "+usage=内存单位",
-//               type: "string"
-//             },
-//             minReplicas: {
-//               default: 1,
-//               description: "+usage=最小副本数",
-//               exclusiveMinimum: true,
-//               minimum: 0,
-//               type: "integer"
-//             },
-//             qps: { description: "+usage=QPS数", type: "integer" }
-//           },
-//           required: ["minReplicas", "maxReplicas", "cpuUnit", "memoryUnit"]
-//         }
-//       ],
-//       title: "replicasType",
-//       type: "object"
-//     }
-//   },
-//   required: ["replicasType"],
-//   type: "object"
-// };

@@ -1,7 +1,7 @@
 import vueplugin from "rollup-plugin-vue";
 import resolve from "rollup-plugin-node-resolve";
 import babel from "rollup-plugin-babel";
-// import uglify from "rollup-plugin-uglify-es";
+import { terser } from "rollup-plugin-terser";
 
 let baseconfig = (format) => {
   return {
@@ -14,7 +14,7 @@ let baseconfig = (format) => {
       },
       extend: true,
       format,
-      sourceMap: true,
+      sourceMap: false,
       file:
         format === "iife" ? "dist/vue-form.js" : `dist/vue-form.${format}.js`
     },
@@ -24,8 +24,8 @@ let baseconfig = (format) => {
       babel({
         exclude: "node_modules/**" // 只编译我们的源代码
       }),
-      vueplugin({ css: true })
-      // uglify()
+      vueplugin({ css: true }),
+      terser()
     ]
   };
 };
