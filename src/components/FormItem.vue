@@ -573,7 +573,7 @@ export default {
           props.placeholder = "请输入" + extra.title;
         }
         // console.log(`prop`, props);
-      } else if (type === "boolean") {
+      } else if (type === "boolean" || type === "bool") {
         type = "switch";
       } else if (type === "editor") {
         //  theme="vs-dark"
@@ -668,20 +668,22 @@ export default {
         number: "number",
         integer: "number",
         date: "date",
+        bool: "boolean",
         switch: "boolean",
         boolean: "boolean"
       };
+      let isSelect = type === "select" || ruleType[type] === "boolean";
       let rule = [
         {
           required: true,
           type:
-            type === "select" && multiple
+            isSelect && multiple
               ? "array"
               : ruleType[type]
               ? ruleType[type]
               : "string",
-          trigger: type === "select" ? "change" : "blur",
-          message: type === "select" ? "请选择" : "请输入"
+          trigger: isSelect ? "change" : "blur",
+          message: isSelect ? "请选择" : "请输入"
         }
       ];
       return rule;

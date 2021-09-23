@@ -2,7 +2,7 @@
  * @Author: bowen.xu
  * @Date: 2021-05-07 09:54:37
  * @Last Modified by: bowen.xu
- * @Last Modified time: 2021-08-31 15:23:07
+ * @Last Modified time: 2021-09-23 16:54:51
  */
 
 import { isObject } from "lodash";
@@ -64,6 +64,7 @@ export default {
       integer: "number",
       date: "date",
       switch: "boolean",
+      bool: "boolean",
       boolean: "boolean"
     };
     // if (config.type !== "array") {
