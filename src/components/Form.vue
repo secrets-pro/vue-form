@@ -1,6 +1,6 @@
 <template>
   <div v-if="Object.keys(currentModel).length" class="vue-form" v-show="show">
-    {{ currentModel }}
+    <!-- {{ currentModel }} -->
     <component
       :is="`${this.prefix}-form`"
       size="medium"
