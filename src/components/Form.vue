@@ -1,6 +1,6 @@
 <template>
   <div v-if="Object.keys(currentModel).length" class="vue-form" v-show="show">
-    <!-- {{ currentModel }} -->
+    {{ currentModel }}
     <component
       :is="`${this.prefix}-form`"
       size="medium"
@@ -482,6 +482,7 @@ export default {
           parentProp ? parentProp + "." + el : el,
           config.defaultValue || config.default
         );
+
         let d = get(
           this.initModel || {},
           parentProp ? parentProp + "." + el : el
@@ -511,7 +512,7 @@ export default {
           if (prop.indexOf(".") > -1) {
             model[prop] = defaultValue || _value || "";
           }
-        } else if (config.type === "boolean") {
+        } else if (config.type === "boolean" || config.type === "bool") {
           if (config.children) {
             let values = this.setModel(
               { properties: config.children },
