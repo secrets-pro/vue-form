@@ -575,6 +575,9 @@ export default {
         // console.log(`prop`, props);
       } else if (type === "boolean" || type === "bool") {
         type = "switch";
+        if (this.readonly) {
+          props.disabled = true;
+        }
       } else if (type === "editor") {
         //  theme="vs-dark"
         // v-model="code"
