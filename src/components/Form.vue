@@ -173,10 +173,8 @@ export default {
       let config = this.schema.properties;
       let s = this.settings;
       return s.sort((a, b) => {
-        // console.log(a, b);
         let pa = extraOptions(config[a].description);
         let pb = extraOptions(config[b].description);
-        // console.log(pa, pb);
         return pa.index - pb.index;
       });
     },
@@ -302,7 +300,7 @@ export default {
     },
     // FIXME  优化
     arrayInput(key, value) {
-      console.log(`-form-arrayInput---xxx`, key, value);
+      // console.log(`-form-arrayInput---xxx`, key, value);
       if (key.indexOf(".") > -1) {
         let keys = key.split(".");
         let lastKey = keys[keys.length - 1];
@@ -460,16 +458,18 @@ export default {
       }
       return _value;
     },
-    setModel(currentScheme, rules, parentProp) {
+    setModel(currentScheme, rules, parentProp, _defaultValue) {
       let { properties, required } = currentScheme;
       if (!properties) {
         return {};
       }
       let model = {};
       let props = Object.keys(properties);
+
       props.forEach((el) => {
         let prop = el;
         let config = properties[el];
+
         if (Array.isArray(required) && required.includes(prop)) {
           config.required = true;
         }
@@ -482,6 +482,13 @@ export default {
           parentProp ? parentProp + "." + el : el,
           config.defaultValue || config.default
         );
+        if (defaultValue === undefined) {
+          defaultValue = get(
+            _defaultValue,
+            el,
+            config.defaultValue || config.default
+          );
+        }
 
         let d = get(
           this.initModel || {},
@@ -547,7 +554,7 @@ export default {
           }
         }
         if (config.type === "object" && config.properties) {
-          model[prop] = this.setModel(config, rules, prop);
+          model[prop] = this.setModel(config, rules, prop, defaultValue);
         } else if (config.type === "object" && config.oneOf) {
           // 通过比较属性key，确定选中的是哪一个。
           let configOneOfModelArray = [];
