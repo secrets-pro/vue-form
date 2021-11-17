@@ -399,13 +399,14 @@ export default {
         .map((el) => letters[el])
         .join("");
     },
-    validate() {
-      return new Promise((resolve, reject) => {
+    validate(string) {
+      let resp = new Promise((resolve, reject) => {
         this.$refs[this.formId].validate((el) => {
           let res = el && this.validatelastestNeedOneProps();
           resolve(res);
         });
       });
+      return resp;
     },
     async confirm() {
       await this.validate();
@@ -726,9 +727,10 @@ export default {
       let ret = false;
       if (Array.isArray(value)) {
         ret = value.some((el) => !el);
-      }
-      if (typeof value === "object") {
+      } else if (typeof value === "object") {
         ret = Object.values(value).some((el) => !el);
+      } else if (typeof value === "number") {
+        return value <= 0;
       } else {
         ret = !value;
       }
@@ -757,7 +759,6 @@ export default {
           return false;
         }
       }
-      console.log(`this.emptyProps`, this.emptyProps);
       return true;
     },
     validateScheme() {
