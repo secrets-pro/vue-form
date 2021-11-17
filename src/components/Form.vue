@@ -63,7 +63,7 @@
 <script>
 /* eslint-disable no-unused-vars */
 const letters = "abcdefghijklmn".split("");
-import { set, get, difference, debounce } from "lodash";
+import { set, get, difference, debounce, omit } from "lodash";
 import FormItemPlugin from "./FormItem.vue";
 import setting from "../config";
 
@@ -231,7 +231,8 @@ export default {
       lastKeysProperties: [],
       settings: [],
       required: [],
-      initModel: JSON.parse(JSON.stringify(this.model))
+      initModel: JSON.parse(JSON.stringify(this.model)),
+      lastestNeedOneProps: []
     };
   },
   methods: {
@@ -300,7 +301,6 @@ export default {
     },
     // FIXME  优化
     arrayInput(key, value) {
-      // console.log(`-form-arrayInput---xxx`, key, value);
       if (key.indexOf(".") > -1) {
         let keys = key.split(".");
         let lastKey = keys[keys.length - 1];
@@ -372,6 +372,12 @@ export default {
       } else {
         retn = result;
       }
+      // 最后处理一下 emptyProps
+      if (this.emptyProps.length) {
+        for (let key of this.emptyProps) {
+          retn = omit(retn, [key]);
+        }
+      }
       return retn;
     },
     // 移除记住oneof选项
@@ -396,7 +402,8 @@ export default {
     validate() {
       return new Promise((resolve, reject) => {
         this.$refs[this.formId].validate((el) => {
-          resolve(el);
+          let res = el && this.validatelastestNeedOneProps();
+          resolve(res);
         });
       });
     },
@@ -459,19 +466,31 @@ export default {
       return _value;
     },
     setModel(currentScheme, rules, parentProp, _defaultValue) {
-      let { properties, required } = currentScheme;
+      let { properties, required, description } = currentScheme;
       if (!properties) {
         return {};
       }
       let model = {};
       let props = Object.keys(properties);
-
+      let { lastestNeedOne, title } = extraOptions(description);
+      let lastestNeedOneProps = [];
+      let propTitles = [];
+      // lastestNeedOne 当前平级的属性至少满足一个 ，如果属性是object类型 则其所有属性都要有值
       props.forEach((el) => {
         let prop = el;
         let config = properties[el];
+        if (lastestNeedOne) {
+          let propTile = extraOptions(config.description).title;
+          propTitles.push(propTile);
+          lastestNeedOneProps.push(parentProp ? parentProp + "." + prop : prop);
+        }
 
         if (Array.isArray(required) && required.includes(prop)) {
           config.required = true;
+        }
+        // 去掉其必填标志
+        if (lastestNeedOne) {
+          config.required = false;
         }
         // } else if (typeof required === "boolean") {
         //   config.required = true;
@@ -696,7 +715,50 @@ export default {
         // }
         // }
       });
+      if (lastestNeedOne) {
+        this.lastestNeedOneProps.push({
+          [propTitles.join("、")]: lastestNeedOneProps
+        });
+      }
       return model;
+    },
+    isEmpty(value) {
+      let ret = false;
+      if (Array.isArray(value)) {
+        ret = value.some((el) => !el);
+      }
+      if (typeof value === "object") {
+        ret = Object.values(value).some((el) => !el);
+      } else {
+        ret = !value;
+      }
+      return ret;
+    },
+    validatelastestNeedOneProps() {
+      this.emptyProps = [];
+      for (let group of this.lastestNeedOneProps) {
+        let defKey = Object.keys(group)[0];
+        let entity = group[defKey];
+        let values = entity.map((el) => {
+          return !this.isEmpty(get(this.currentModel, el));
+        });
+        this.emptyProps.push(
+          ...values
+            .map((el, index) => (!el ? entity[index] : null))
+            .filter((el) => el)
+        );
+        //  只要不同时为false
+        let v = values.some((el) => !!el);
+        if (!v) {
+          this.$emit(
+            "on-validate-error",
+            defKey + " 至少需要完善一个子配置内容"
+          );
+          return false;
+        }
+      }
+      console.log(`this.emptyProps`, this.emptyProps);
+      return true;
     },
     validateScheme() {
       if (!this.currentScheme) {
@@ -707,7 +769,6 @@ export default {
       // let model = {}; // 准备model
       let rules = {}; //  准备rules
       let model = this.setModel(this.currentScheme, rules);
-      // console.log(model);
       this.currentModel = model;
     }
   }

@@ -2,7 +2,7 @@
  * @Author: bowen.xu
  * @Date: 2021-05-07 09:54:37
  * @Last Modified by: bowen.xu
- * @Last Modified time: 2021-09-23 16:54:51
+ * @Last Modified time: 2021-11-17 15:31:47
  */
 
 import { isObject } from "lodash";
@@ -76,16 +76,17 @@ export default {
     if (config.multiple) {
       type = "array";
     }
+    let extOpt = extraOptions(config.description);
+    if (extOpt.lastestNeedOne) {
+      console.log(`extOpt.lastestNeedOne`, config);
+    }
     let baseRule = [
       {
         required: required_ || required,
 
         type: type,
         message:
-          extraOptions(config.description).description ||
-          `${text}${extraOptions(config.description).title ||
-            config.title ||
-            prop}`
+          extOpt.description || `${text}${extOpt.title || config.title || prop}`
       }
     ];
 
