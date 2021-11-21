@@ -218,7 +218,7 @@ export default {
   data() {
     return {
       modal: false,
-
+      emptyProps: [],
       currentScheme: this.schema,
       currentModel: {},
       formId: this.randomId(),
@@ -496,16 +496,19 @@ export default {
         // } else if (typeof required === "boolean") {
         //   config.required = true;
         // }
-
         let defaultValue = get(
-          this.initModel || {},
-          parentProp ? parentProp + "." + el : el,
+          _defaultValue,
+          el,
           config.defaultValue || config.default
         );
+
+        // if (el === "matchRuleType") {
+        //   console.log(`---el---`, el, config);
+        // }
         if (defaultValue === undefined) {
           defaultValue = get(
-            _defaultValue,
-            el,
+            this.initModel || {},
+            parentProp ? parentProp + "." + el : el,
             config.defaultValue || config.default
           );
         }
