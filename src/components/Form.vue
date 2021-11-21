@@ -493,9 +493,7 @@ export default {
         if (lastestNeedOne) {
           config.required = false;
         }
-        // } else if (typeof required === "boolean") {
-        //   config.required = true;
-        // }
+
         let defaultValue = get(
           _defaultValue,
           el,
@@ -529,9 +527,9 @@ export default {
           }
         } else if (config.type === "integer" || config.type === "number") {
           // model[prop] = defaultValue || [];
-          set(model, prop, defaultValue || 0);
+          set(model, prop, defaultValue || "");
           if (prop.indexOf(".") > -1) {
-            model[prop] = defaultValue || 0;
+            model[prop] = defaultValue | "";
           }
         } else if (config.type === "array") {
           // 数组类型

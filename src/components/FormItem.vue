@@ -546,9 +546,9 @@ export default {
           type = "input-number";
         }
 
-        if (typeof props.value != "number") {
-          props.value = 0;
-        }
+        // if (typeof props.value != "number") {
+        //   props.value = 0;
+        // }
       } else if (type === "select" || config.enum) {
         if (config.enum) {
           let enumNames = config.enumNames || extra.items;
@@ -636,7 +636,7 @@ export default {
                   } else {
                     if (type === "input-number") {
                       if (value === null) {
-                        value = 0;
+                        value = "";
                       }
                     }
                     this.$emit("input", value);
