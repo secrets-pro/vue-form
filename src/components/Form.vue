@@ -493,22 +493,25 @@ export default {
         if (lastestNeedOne) {
           config.required = false;
         }
+        // if (el === "image") {
+        //   debugger;
+        // }
 
         let defaultValue = get(
-          _defaultValue,
-          el,
-          config.defaultValue || config.default
+          this.initModel || {},
+          parentProp ? parentProp + "." + el : el,
+          undefined
         );
 
         // if (el === "matchRuleType") {
         //   console.log(`---el---`, el, config);
         // }
         if (defaultValue === undefined) {
-          defaultValue = get(
-            this.initModel || {},
-            parentProp ? parentProp + "." + el : el,
-            config.defaultValue || config.default
-          );
+          defaultValue = get(_defaultValue, el, undefined);
+        }
+
+        if (defaultValue === undefined) {
+          defaultValue = config.defaultValue || config.default;
         }
 
         let d = get(
