@@ -494,9 +494,9 @@ export default {
         if (lastestNeedOne) {
           config.required = false;
         }
-        // if (el === "image") {
-        //   debugger;
-        // }
+        if (el === "newServiceWeight") {
+          debugger;
+        }
 
         let defaultValue = get(
           this.initModel || {},
@@ -531,9 +531,13 @@ export default {
           }
         } else if (config.type === "integer" || config.type === "number") {
           // model[prop] = defaultValue || [];
-          set(model, prop, defaultValue || "");
+          set(
+            model,
+            prop,
+            typeof defaultValue === "number" ? defaultValue : ""
+          );
           if (prop.indexOf(".") > -1) {
-            model[prop] = defaultValue | "";
+            model[prop] = typeof defaultValue === "number" ? defaultValue : "";
           }
         } else if (config.type === "array") {
           // 数组类型
