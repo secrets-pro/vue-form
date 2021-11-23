@@ -321,6 +321,7 @@ export default {
     },
     getData() {
       let obj = JSON.parse(JSON.stringify(this.currentModel));
+      // console.log("--this.currentModel--", this.currentModel);
       let result = {};
       Object.keys(obj).forEach((el) => {
         let value = obj[el];
@@ -734,7 +735,7 @@ export default {
       } else if (typeof value === "object") {
         ret = Object.values(value).some((el) => !el);
       } else if (typeof value === "number") {
-        return value <= 0;
+        ret = false;
       } else {
         ret = !value;
       }
@@ -748,11 +749,14 @@ export default {
         let values = entity.map((el) => {
           return !this.isEmpty(get(this.currentModel, el));
         });
+
         this.emptyProps.push(
           ...values
             .map((el, index) => (!el ? entity[index] : null))
             .filter((el) => el)
         );
+
+        // console.log("-----emptyProps----", values, this.emptyProps);
         //  只要不同时为false
         let v = values.some((el) => !!el);
         if (!v) {

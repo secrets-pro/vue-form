@@ -51,7 +51,7 @@ export default {
 
         return pa.index - pb.index;
       });
-      // console.log(`---this.labelWidth---`, this.labelWidth);
+      // console.log(`---1111this.labelWidth---`, config);
       let ext = extraOptions(config.description);
       let title = ext.title || config.title;
       let desc = ext.description || config.description;
@@ -624,6 +624,7 @@ export default {
                 editor.layout();
               },
               input: (value) => {
+                console.log("----value=---", value, type);
                 if (_arrayIndex !== undefined) {
                   currentValue[_arrayIndex] = value;
                   // console.log(`-----arrayInput----`, currentValue);
