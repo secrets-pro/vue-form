@@ -52,9 +52,9 @@ export default {
         return pa.index - pb.index;
       });
       // console.log(`---this.labelWidth---`, this.labelWidth);
-      let title = extraOptions(config.description).title || config.title;
-      let desc =
-        extraOptions(config.description).description || config.description;
+      let ext = extraOptions(config.description);
+      let title = ext.title || config.title;
+      let desc = ext.description || config.description;
       return h(
         "div",
         {
@@ -64,7 +64,7 @@ export default {
           }
         },
         [
-          !title
+          !title || ext.showTitle === "false"
             ? null
             : h(
                 "div",
@@ -85,8 +85,7 @@ export default {
             {
               class: {
                 "flex-object": modelKeysSorted.length > 1,
-                "has-title-object-content":
-                  extraOptions(config.description).title || config.title
+                "has-title-object-content": ext.title || config.title
               },
               style: {
                 // flex: 1,
