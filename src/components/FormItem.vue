@@ -35,12 +35,9 @@ export default {
       requests: {}
     };
   },
-  updated() {
-    // console.log(`-----updated------`, this.value);
-  },
+
   methods: {
     renderObject(h, config, prop, model, slot) {
-      // console.log(`renderObject`);
       // 渲染对象，根据字段的position进行排序，position越小排前面
       let modelKeysSorted = Object.keys(model).sort((a, b) => {
         let pa = extraOptions(config.properties[a].description);
@@ -51,7 +48,6 @@ export default {
 
         return pa.index - pb.index;
       });
-      // console.log(`---1111this.labelWidth---`, config);
       let ext = extraOptions(config.description);
       let title = ext.title || config.title;
       let desc = ext.description || config.description;
@@ -114,11 +110,9 @@ export default {
                   on: {
                     input: (value) => {
                       model[el] = value;
-                      // console.log(`--deepInput------`, model);
                       this.$emit("deepInput", `${prop}.${el}`, value);
                     },
                     arrayInput: (key, value) => {
-                      // console.log(`--on-arrayinput------`, key, value);
                       this.$emit("arrayInput", key, value);
                     },
                     oneOfSelectChange: (key, value) => {
@@ -178,7 +172,6 @@ export default {
                 console.warn(`最大数量限制为${maxItems}`);
                 return;
               }
-              // console.log(model, item);
               const modelWrapper = model[0] || item;
               let zore =
                 typeof modelWrapper === "object"
@@ -343,10 +336,6 @@ export default {
               });
       }
       //  判断是否是一级属性
-
-      // if (level) {
-      //   console.log(`children.length ${children.length}`, items);
-      // }
       let title =
         extraOptions(config.description).title || config.title || prop;
       let w = config.labelWidth + "px";
@@ -420,10 +409,6 @@ export default {
       );
     },
     renderFun(h, config, prop, currentValue, _arrayIndex, slot) {
-      // if ((prop + "").indexOf("outputRefs") > -1) {
-      //   debugger;
-      // }
-      // console.log(`config ${config}`, prop);
       if (!config) {
         console.log(`没有参数`, config, prop);
         return;
@@ -464,7 +449,6 @@ export default {
         });
       }
       if (config.oneOf) {
-        // console.log(`selectedIndex`, selectedIndex);
         let ext = extraOptions(config.description);
         let optionProp = prop;
         if (prop.includes(".")) {
@@ -575,7 +559,6 @@ export default {
         if (extra.title) {
           props.placeholder = "请输入" + extra.title;
         }
-        // console.log(`prop`, props);
       } else if (type === "boolean" || type === "bool") {
         type = "switch";
         if (this.readonly) {
@@ -624,10 +607,8 @@ export default {
                 editor.layout();
               },
               input: (value) => {
-                console.log("----value=---", value, type);
                 if (_arrayIndex !== undefined) {
                   currentValue[_arrayIndex] = value;
-                  // console.log(`-----arrayInput----`, currentValue);
                   this.$emit("arrayInput", prop, currentValue[_arrayIndex]);
                 } else {
                   if (prop.includes("-option")) {

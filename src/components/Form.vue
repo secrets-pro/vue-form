@@ -321,7 +321,6 @@ export default {
     },
     getData() {
       let obj = JSON.parse(JSON.stringify(this.currentModel));
-      // console.log("--this.currentModel--", this.currentModel);
       let result = {};
       Object.keys(obj).forEach((el) => {
         let value = obj[el];
@@ -494,9 +493,6 @@ export default {
         if (lastestNeedOne) {
           config.required = false;
         }
-        if (el === "newServiceWeight") {
-          debugger;
-        }
 
         let defaultValue = get(
           this.initModel || {},
@@ -504,9 +500,6 @@ export default {
           undefined
         );
 
-        // if (el === "matchRuleType") {
-        //   console.log(`---el---`, el, config);
-        // }
         if (defaultValue === undefined) {
           defaultValue = get(_defaultValue, el, undefined);
         }
@@ -760,7 +753,6 @@ export default {
             .filter((el) => el)
         );
 
-        // console.log("-----emptyProps----", values, this.emptyProps);
         //  只要不同时为false
         let v = values.some((el) => !!el);
         if (!v) {
