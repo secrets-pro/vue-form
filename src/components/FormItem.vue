@@ -50,7 +50,7 @@ export default {
       });
       let ext = extraOptions(config.description);
       let title = ext.title || config.title;
-      let desc = ext.description || config.description;
+      let desc = ext.description; //|| config.description;
       return h(
         "div",
         {
@@ -643,7 +643,7 @@ export default {
           props: {
             prop,
             labelWidth: this.prefix === "el" ? width + "px" : width,
-            rules: this.required ? this.renderRules(config) : rules
+            rules: rules
             // label: extra.title || config.title || prop
           },
           key: prop,
@@ -651,35 +651,6 @@ export default {
         },
         arr
       );
-    },
-    renderRules(config) {
-      const { type, multiple } = config;
-
-      let ruleType = {
-        checkbox: "array",
-        array: "array",
-        number: "number",
-        integer: "number",
-        date: "date",
-        bool: "boolean",
-        switch: "boolean",
-        boolean: "boolean"
-      };
-      let isSelect = type === "select" || ruleType[type] === "boolean";
-      let rule = [
-        {
-          required: true,
-          type:
-            isSelect && multiple
-              ? "array"
-              : ruleType[type]
-              ? ruleType[type]
-              : "string",
-          trigger: isSelect ? "change" : "blur",
-          message: isSelect ? "请选择" : "请输入"
-        }
-      ];
-      return rule;
     },
     // 修改成render
     renderLabel(title, description, slot) {

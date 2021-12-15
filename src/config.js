@@ -2,7 +2,7 @@
  * @Author: bowen.xu
  * @Date: 2021-05-07 09:54:37
  * @Last Modified by: bowen.xu
- * @Last Modified time: 2021-11-17 15:31:47
+ * @Last Modified time: 2021-12-15 17:29:16
  */
 
 import { isObject } from "lodash";
@@ -77,16 +77,13 @@ export default {
       type = "array";
     }
     let extOpt = extraOptions(config.description);
-    if (extOpt.lastestNeedOne) {
-      console.log(`extOpt.lastestNeedOne`, config);
-    }
+    let isSelect = config.type === "select" || type === "boolean";
     let baseRule = [
       {
         required: required_ || required,
-
+        trigger: isSelect ? "change" : "blur",
         type: type,
-        message:
-          extOpt.description || `${text}${extOpt.title || config.title || prop}`
+        message: `${text}${extOpt.title || config.title || prop}`
       }
     ];
 
