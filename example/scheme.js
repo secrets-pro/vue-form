@@ -209,7 +209,7 @@ export default {
       description: '{"title":"存活性探针","description":"存活性探针"}',
       properties: {
         probeConfig: {
-          description: '{"title":"探针类型"}',
+          description: '{"title":"探针类型","default":-1}',
           oneOf: [
             {
               description: `{"title":"命令"}`,
@@ -230,7 +230,7 @@ export default {
               required: ["type"]
             },
             {
-              description: "httpGet",
+              description:'{"title":"httpGet"}',
               properties: {
                 path: {
                   default: "/",
@@ -254,7 +254,7 @@ export default {
               required: ["path", "type", "port"]
             },
             {
-              description: "Socket",
+              description: '{"title":"Socket"}',
               properties: {
                 port: {
                   description: '{"title":"容器端口"}',
@@ -320,7 +320,7 @@ export default {
               required: ["type"]
             },
             {
-              description: "httpGet",
+              description: '{"title":"httpGet"}',
               properties: {
                 path: {
                   default: "/",
@@ -344,7 +344,7 @@ export default {
               required: ["path", "type", "port"]
             },
             {
-              description: "Socket",
+              description: '{"title":"Socket"}',
               properties: {
                 port: {
                   description: '{"title":"容器端口"}',

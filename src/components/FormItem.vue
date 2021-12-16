@@ -124,11 +124,12 @@ export default {
                               configWrapper.oneOf[value].defaultModel
                             )
                           );
-                          model[el] = value;
-                          this.currentValue = model;
                         } else {
                           model = {};
                         }
+                        model[el] = value;
+                        this.currentValue = model;
+
                         configWrapper.selectedIndex = value;
                         configWrapper.type = "object";
 
