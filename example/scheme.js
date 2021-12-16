@@ -212,6 +212,25 @@ export default {
           description: '{"title":"探针类型","default":-1}',
           oneOf: [
             {
+              description: '{"title":"Socket"}',
+              properties: {
+                port: {
+                  description: '{"title":"容器端口"}',
+                  exclusiveMaximum: true,
+                  exclusiveMinimum: true,
+                  maximum: 65536,
+                  minimum: 0,
+                  type: "integer"
+                },
+                type: {
+                  description: '{"title":"类型"}',
+                  enum: ["TCP"],
+                  type: "string"
+                }
+              },
+              required: ["type", "port"]
+            },
+            {
               description: `{"title":"命令"}`,
               properties: {
                 command: {
@@ -230,7 +249,7 @@ export default {
               required: ["type"]
             },
             {
-              description:'{"title":"httpGet"}',
+              description: '{"title":"httpGet"}',
               properties: {
                 path: {
                   default: "/",
@@ -252,25 +271,6 @@ export default {
                 }
               },
               required: ["path", "type", "port"]
-            },
-            {
-              description: '{"title":"Socket"}',
-              properties: {
-                port: {
-                  description: '{"title":"容器端口"}',
-                  exclusiveMaximum: true,
-                  exclusiveMinimum: true,
-                  maximum: 65536,
-                  minimum: 0,
-                  type: "integer"
-                },
-                type: {
-                  description: '{"title":"类型"}',
-                  enum: ["TCP"],
-                  type: "string"
-                }
-              },
-              required: ["type", "port"]
             }
           ],
           title: "probeConfig",
