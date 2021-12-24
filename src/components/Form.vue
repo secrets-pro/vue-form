@@ -343,7 +343,7 @@ export default {
           }
         } else if (config.type === "boolean") {
           if (config.children) {
-            let values = this.setModel({ properties: config.children }, config.children.rules || {}, el)
+            let values = this.setModel({ properties: config.children }, config.children.rules || {}, parentProp)
             // 将children的值平铺开放到model里
             Object.keys(values).map(el => {
               model[el] = values[el]
