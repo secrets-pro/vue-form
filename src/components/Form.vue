@@ -315,9 +315,16 @@ export default {
       props.forEach((el) => {
         let prop = el;
         let config = properties[el];
-        let defaultValue = this.model[el] || config.defaultValue || config.default;
-        if (this.model[el] === false || this.model[el] === 0) {
-          defaultValue = this.model[el]
+
+        // 解决嵌套取值问题
+        let defaultValue = get(
+          this.model,
+          parentProp ? parentProp + "." + el : el,
+          config.defaultValue || config.default
+        );
+        let d = get(this.model, parentProp ? parentProp + "." + el : el);
+        if (d === false || d === 0) {
+          defaultValue = d;
         }
 
         if (config.type === "checkbox") {
@@ -352,7 +359,8 @@ export default {
 
           if (config.children) {
             Object.keys(config.children).forEach((pProp) => {
-              let values = this.setModel({ properties: config.children[pProp] }, config.children[pProp].rules || {}, pProp)
+              // 由于config.children的值是和控制他的父级平级，所以parentProp不变
+              let values = this.setModel({ properties: config.children[pProp] }, config.children[pProp].rules || {}, parentProp)
               // 将children的值平铺开放到model里
               Object.keys(values).map(el => {
                 model[el] = values[el]
@@ -361,11 +369,8 @@ export default {
           }
         }
         if (config.type === "object" && config.properties) {
-          // model.prop =
           model[prop] = this.setModel(config, rules, prop);
         } else if (config.type === "object" && !config.properties) {
-          // debugger;
-          // currentScheme.type = "array";
           this.special.push(prop);
           let properties = {
             key: {
