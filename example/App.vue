@@ -1,23 +1,55 @@
 <template>
-  <div class="test">
-    <div style="display:flex;">
-      <div style="width:40%;">
-        <el-input type="textarea" :rows="100" v-model="schemaString" />
-      </div>
-      <vue-form
-        @on-confirm="confirm"
-        :initinal="true"
-        ref="form"
-        :schema="schema"
-        :model="model"
-        :split="false"
-        style="min-height:400px;max-width:50%;"
-      ></vue-form>
-    </div>
+<!-- element-ui -->
 
-    <el-button @click="getData">获取数据</el-button>
-    <el-input type="textarea" v-model="data1" :rows="10" />
+  <div class="test">
+    <div style="display:flex;height: 100%;justify-content: space-between;align-items: center;">
+      <div class="schema-input">
+        <el-input style="height: 100%;" type="textarea" v-model="schemaString"></el-input>
+      </div>
+      <div>
+        <el-button @click="getData" type="primary">获取数据</el-button>
+      </div>
+      <div class="right">
+        <vue-form
+          @on-confirm="confirm"
+          :initinal="true"
+          ref="form"
+          :schema="schema"
+          :model="model"
+          :split="false"
+        ></vue-form>
+        <div class="data-input">
+          <el-input style="height: 100%;" type="textarea" v-model="data1"></el-input>
+        </div>
+      </div>
+    </div>
   </div>
+
+  <!-- iview -->
+
+  <!-- <div class="test">
+    <div style="display:flex;height: 100%;justify-content: space-between;align-items: center;">
+      <div class="schema-input">
+        <i-input style="height: 100%;" type="textarea" v-model="schemaString"></i-input>
+      </div>
+      <div>
+        <i-button @click="getData" type="primary">获取数据</i-button>
+      </div>
+      <div class="right">
+        <vue-form
+          @on-confirm="confirm"
+          :initinal="true"
+          ref="form"
+          :schema="schema"
+          :model="model"
+          :split="false"
+        ></vue-form>
+        <div class="data-input">
+          <i-input style="height: 100%;" type="textarea" v-model="data1"></i-input>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </template>
 <script>
 import scheme from "./scheme";

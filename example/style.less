@@ -1,3 +1,49 @@
+body,
+div {
+  box-sizing: border-box;
+}
+
 .test {
-  padding: 48px;
+  padding: 20px;
+  height: 100vh;
+  box-sizing: border-box;
+
+  .schema-input {
+    width: 35%;
+    height: 100%;
+
+    /deep/textarea.ivu-input {
+      height: 100%;
+    }
+
+    /deep/.el-textarea__inner {
+      height: 100%;
+    }
+  }
+
+  .right {
+    width: 55%;
+    height: 100%;
+  }
+
+  .vue-form {
+    width: 100%;
+    height: 60%;
+    overflow: auto;
+    padding: 20px;
+    border: 1px solid #efefef;
+  }
+
+  .data-input {
+    width: 100%;
+    height: calc(40% - 20px);
+    margin-top: 20px;
+
+    /deep/textarea.ivu-input {
+      height: 100%;
+    }
+    /deep/.el-textarea__inner {
+      height: 100%;
+    }
+  }
 }
