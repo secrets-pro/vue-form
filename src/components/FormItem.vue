@@ -163,9 +163,11 @@ export default {
           props: {
             type: "primary",
             shape: "circle",
-            icon: "md-add",
-            size: "small"
+            icon: this.prefix === 'i' ? "md-add" : "el-icon-plus",
+            circle: true,
+            size: "small",
           },
+          class: "btn_icon_center",
           on: {
             click: () => {
               const { minItems, maxItems, item } = config;
@@ -201,10 +203,11 @@ export default {
           props: {
             type: this.prefix == "i" ? "error" : "danger", // error类型  判断
             size: "small",
-            //  type: "primary",
             shape: "circle",
-            icon: "md-remove"
+            icon: this.prefix === 'i' ? "md-remove" : "el-icon-minus",
+            circle: true,
           },
+          class: "btn_icon_center",
           on: {
             click: () => {
               const { minItems } = config;
@@ -224,7 +227,8 @@ export default {
         {
           class: "item-button",
           style: {
-            textAlign: "right"
+            display: "flex",
+            justifyContent: "flex-end"
           }
         },
         [index === 0 ? add : remove]
