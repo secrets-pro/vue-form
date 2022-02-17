@@ -40,6 +40,14 @@ export default {
     renderObject(h, config, prop, model, slot) {
       // 渲染对象，根据字段的position进行排序，position越小排前面
       let modelKeysSorted = Object.keys(model).sort((a, b) => {
+        if (!config.properties[a]) {
+          console.error(`属性${a}在schema中不存在对应配置`);
+          return -1;
+        }
+        if (!config.properties[b]) {
+          console.error(`属性${b}在schema中不存在对应配置`);
+          return -1;
+        }
         let pa = extraOptions(config.properties[a].description);
         let pb = extraOptions(config.properties[b].description);
         if (a.includes("-option")) {
@@ -163,9 +171,9 @@ export default {
           props: {
             type: "primary",
             shape: "circle",
-            icon: this.prefix === 'i' ? "md-add" : "el-icon-plus",
+            icon: this.prefix === "i" ? "md-add" : "el-icon-plus",
             circle: true,
-            size: "small",
+            size: "small"
           },
           class: "btn_icon_center",
           on: {
@@ -204,8 +212,8 @@ export default {
             type: this.prefix == "i" ? "error" : "danger", // error类型  判断
             size: "small",
             shape: "circle",
-            icon: this.prefix === 'i' ? "md-remove" : "el-icon-minus",
-            circle: true,
+            icon: this.prefix === "i" ? "md-remove" : "el-icon-minus",
+            circle: true
           },
           class: "btn_icon_center",
           on: {
