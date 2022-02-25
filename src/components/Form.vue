@@ -172,11 +172,21 @@ export default {
     settingcp() {
       let config = this.schema.properties;
       let s = this.settings;
-      return s.sort((a, b) => {
-        let pa = extraOptions(config[a].description);
-        let pb = extraOptions(config[b].description);
-        return pa.index - pb.index;
-      });
+      return s
+        .filter((el) => Object.prototype.hasOwnProperty.call(config, el))
+        .sort((a, b) => {
+          if (!config[a]) {
+            console.error(`属性${a}在schema中不存在对应配置`);
+            return -1;
+          }
+          if (!config[b]) {
+            console.error(`属性${b}在schema中不存在对应配置`);
+            return -1;
+          }
+          let pa = extraOptions(config[a].description);
+          let pb = extraOptions(config[b].description);
+          return pa.index - pb.index;
+        });
     },
     rowSize() {
       return !this.schema.layout

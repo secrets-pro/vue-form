@@ -39,23 +39,27 @@ export default {
   methods: {
     renderObject(h, config, prop, model, slot) {
       // 渲染对象，根据字段的position进行排序，position越小排前面
-      let modelKeysSorted = Object.keys(model).sort((a, b) => {
-        if (!config.properties[a]) {
-          console.error(`属性${a}在schema中不存在对应配置`);
-          return -1;
-        }
-        if (!config.properties[b]) {
-          console.error(`属性${b}在schema中不存在对应配置`);
-          return -1;
-        }
-        let pa = extraOptions(config.properties[a].description);
-        let pb = extraOptions(config.properties[b].description);
-        if (a.includes("-option")) {
-          return -1;
-        }
+      let modelKeysSorted = Object.keys(model)
+        .filter((el) =>
+          Object.prototype.hasOwnProperty.call(config.properties, el)
+        )
+        .sort((a, b) => {
+          if (!config.properties[a]) {
+            console.error(`属性${a}在schema中不存在对应配置`);
+            return -1;
+          }
+          if (!config.properties[b]) {
+            console.error(`属性${b}在schema中不存在对应配置`);
+            return -1;
+          }
+          let pa = extraOptions(config.properties[a].description);
+          let pb = extraOptions(config.properties[b].description);
+          if (a.includes("-option")) {
+            return -1;
+          }
 
-        return pa.index - pb.index;
-      });
+          return pa.index - pb.index;
+        });
       let ext = extraOptions(config.description);
       let title = ext.title || config.title;
       let desc = ext.description; //|| config.description;
@@ -427,7 +431,6 @@ export default {
         return;
       }
       let type = config.type;
-      // 解析description
 
       let extra = extraOptions(config.description);
       let rules = generateRule(config, prop);
