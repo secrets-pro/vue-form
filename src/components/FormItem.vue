@@ -437,6 +437,7 @@ export default {
       let style = {};
       let props = {
         readonly: this.readonly,
+        disabled: this.readonly,
         value:
           _arrayIndex !== undefined ? currentValue[_arrayIndex] : currentValue
       };
