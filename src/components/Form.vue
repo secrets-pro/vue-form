@@ -50,7 +50,9 @@
         </template>
         <div v-if="!settings.length" style="padding:12px;">
           <div style="text-align:center;">
-            没有可展示的配置项目，请点击设置按钮添加
+            <slot name="text">
+              没有可展示的配置项目，请点击设置按钮添加
+            </slot>
           </div>
         </div>
         <div style="text-align:center;">
