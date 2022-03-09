@@ -13,9 +13,11 @@
         ref="form"
         :schema="schema"
         :request="this.$http"
+        @on-copy="copy"
         :model="model"
         style="flex:1;padding:12px;"
       ></vue-form>
+      <Button type="primary">xxx</Button>
     </div>
 
     <i-button @click="getData">获取数据</i-button>
@@ -39,6 +41,9 @@ export default {
     }
   },
   methods: {
+    copy(vv) {
+      console.log(vv);
+    },
     setModal() {
       this.model = {
         replicasType: {
@@ -57,7 +62,7 @@ export default {
       // console.log(model);
     },
     async getData() {
-      this.$http("http://api.com/image/list", {}).then((res) => {
+      this.$http("http://api.com/image/list", {}).then(res => {
         console.log(res);
       });
       let data = await this.$refs.form.validate();

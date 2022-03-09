@@ -6,7 +6,7 @@ import VueForm from "../src";
 
 import elementUI from "element-ui";
 Vue.use(elementUI);
-Vue.use(VueForm,{ elementUI: true });
+Vue.use(VueForm, { elementUI: true, secretKeys: ["qwert"] });
 
 // import ViewUI from 'view-design';
 // import 'view-design/dist/styles/iview.css';
@@ -15,5 +15,5 @@ Vue.use(VueForm,{ elementUI: true });
 // Vue.use(VueForm,{ iView: true });
 
 new Vue({
-  render: (h) => h(App)
+  render: h => h(App)
 }).$mount("#app");

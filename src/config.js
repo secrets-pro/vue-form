@@ -2,7 +2,7 @@
  * @Author: bowen.xu
  * @Date: 2021-05-07 09:54:37
  * @Last Modified by: bowen.xu
- * @Last Modified time: 2022-02-17 17:04:03
+ * @Last Modified time: 2022-03-09 15:26:49
  */
 
 import { isObject } from "lodash";
@@ -33,14 +33,22 @@ function formatUrl(url, params) {
   }
   return url;
 }
-
+let secretKeys = ["password"];
 export default {
   language: "json",
   format: "yyyy-MM-dd",
   options: {
     elementUI: false,
-    iView: false
+    iView: false,
+    copy: false
   },
+  setSecretKeys(_) {
+    secretKeys = secretKeys.concat(_);
+  },
+  getSetSecretKeys() {
+    return secretKeys;
+  },
+
   extraOptions,
   formatUrl,
   formatDate(date) {

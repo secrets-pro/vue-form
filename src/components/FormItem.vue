@@ -3,8 +3,7 @@
 import setting from "../config";
 // import styleCfg from "../styleCfg";
 import { renderSelectOptions, renderRadioCheckbox } from "./render";
-const { extraOptions, generateRule, formatUrl } = setting;
-
+const { extraOptions, generateRule, formatUrl, getSetSecretKeys } = setting;
 export default {
   name: "vue-form-item",
   inject: ["Form"],
@@ -40,7 +39,7 @@ export default {
     renderObject(h, config, prop, model, slot) {
       // 渲染对象，根据字段的position进行排序，position越小排前面
       let modelKeysSorted = Object.keys(model)
-        .filter((el) =>
+        .filter(el =>
           Object.prototype.hasOwnProperty.call(config.properties, el)
         )
         .sort((a, b) => {
@@ -102,7 +101,7 @@ export default {
               }
             },
             [
-              ...modelKeysSorted.map((el) => {
+              ...modelKeysSorted.map(el => {
                 let configWrapper = JSON.parse(JSON.stringify(config));
                 let __el__ = configWrapper.properties[el];
                 return h("vue-form-item", {
@@ -120,7 +119,10 @@ export default {
                       : "normal-vue-item"
                   ],
                   on: {
-                    input: (value) => {
+                    "on-copy": value => {
+                      this.$emit("on-copy", value);
+                    },
+                    input: value => {
                       model[el] = value;
                       this.$emit("deepInput", `${prop}.${el}`, value);
                     },
@@ -248,7 +250,7 @@ export default {
     },
     clearValues(orginal) {
       if (typeof orginal === "object") {
-        Object.keys(orginal).forEach((el) => {
+        Object.keys(orginal).forEach(el => {
           if (typeof orginal[el] === "boolean") {
             orginal[el] = false;
           } else if (
@@ -458,10 +460,10 @@ export default {
         type = "select";
 
         config.groups = true;
-        config.options = config.anyOf.map((el) => {
+        config.options = config.anyOf.map(el => {
           return {
             label: el.description,
-            options: el.enum.map((ele) => ({ label: ele, value: ele }))
+            options: el.enum.map(ele => ({ label: ele, value: ele }))
           };
         });
       }
@@ -568,13 +570,39 @@ export default {
         type = "select";
         // style.width = "100%";
         props.multiple = config.multiple;
-      } else if (type === "string") {
-        type = "input";
-        if (config.name && config.name.toLowerCase() === "password") {
+      } else if (type === "string" || type === "textarea") {
+        console.log(type);
+
+        // 新增判断加密字段
+        if (getSetSecretKeys().includes(config.name)) {
+          // if (config.name && config.name.toLowerCase() === "password") {
           props.type = "password";
         }
         if (extra.title) {
           props.placeholder = "请输入" + extra.title;
+        }
+        if (type === "textarea") {
+          props.type = "textarea";
+          // props.autosize = { minRows: 2, maxRows: 6 };
+        }
+        type = "input";
+
+        if (props.type == "password" && setting.options.copy) {
+          children = [
+            h(
+              "span",
+              {
+                class: "copy-btn",
+                slot: "append",
+                on: {
+                  click: value => {
+                    this.$emit("on-copy", this.$data.currentValue);
+                  }
+                }
+              },
+              "copy"
+            )
+          ];
         }
       } else if (type === "boolean" || type === "bool") {
         type = "switch";
@@ -605,7 +633,7 @@ export default {
       } else if (type === "object") {
         return this.renderObject(h, config, prop, currentValue, slot);
       }
-
+      console.log("---children---", children);
       let labelArr =
         extra.title || config.title || (_arrayIndex > -1 ? "" : prop);
       let arr = [
@@ -615,15 +643,15 @@ export default {
             props,
             style: type !== "editor" ? {} : style,
             on: {
-              change: (value) => {
+              change: value => {
                 if (type === "editor") {
                   this.$emit("input", value);
                 }
               },
-              editorDidMount: (editor) => {
+              editorDidMount: editor => {
                 editor.layout();
               },
-              input: (value) => {
+              input: value => {
                 if (_arrayIndex !== undefined) {
                   currentValue[_arrayIndex] = value;
                   this.$emit("arrayInput", prop, currentValue[_arrayIndex]);
@@ -728,12 +756,12 @@ export default {
             console.error(error);
           }
         }
-        let __enum__ = data ? data.map((el) => el[extra.return]) : [];
-        let __enumNames__ = data ? data.map((el) => el[extra.show]) : [];
+        let __enum__ = data ? data.map(el => el[extra.return]) : [];
+        let __enumNames__ = data ? data.map(el => el[extra.show]) : [];
         let muti = extra.multiple === "true";
         let __current_value__ = this.currentValue;
         if (muti) {
-          __current_value__.forEach((el) => {
+          __current_value__.forEach(el => {
             if (el && !__enum__.includes(el)) {
               __enum__.push(el);
               __enumNames__.push(el);

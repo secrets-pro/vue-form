@@ -7,7 +7,8 @@ import VueForm from "../src";
 import "./iview";
 import "../mock";
 // Vue.use(elementUI);
-Vue.use(VueForm, { iView: true });
+Vue.use(VueForm, { iView: true, secretKeys: ["qwert"], copy: true });
+
 new Vue({
-  render: (h) => h(App)
+  render: h => h(App)
 }).$mount("#app");

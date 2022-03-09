@@ -27,6 +27,7 @@
             :prop="prop.name"
             @arrayInput="arrayInput"
             @deepInput="deepInput"
+            @on-copy="copyed"
           ></form-item-plugin>
         </template>
       </div>
@@ -45,6 +46,7 @@
             :prop="prop"
             @arrayInput="arrayInput"
             @deepInput="deepInput"
+            @on-copy="copyed"
             required
           ></form-item-plugin>
         </template>
@@ -175,7 +177,7 @@ export default {
       let config = this.schema.properties;
       let s = this.settings;
       return s
-        .filter((el) => Object.prototype.hasOwnProperty.call(config, el))
+        .filter(el => Object.prototype.hasOwnProperty.call(config, el))
         .sort((a, b) => {
           if (!config[a]) {
             console.error(`属性${a}在schema中不存在对应配置`);
@@ -248,6 +250,9 @@ export default {
     };
   },
   methods: {
+    copyed(value) {
+      this.$emit("on-copy", value);
+    },
     handleWatch() {
       this.validateScheme();
       this.setSortProperties();
@@ -276,12 +281,12 @@ export default {
       //   lastKeys.sort((a, b) => properties[a].position - properties[b].position)
       // );
 
-      let propertiesSorted = required.map((el) => ({
+      let propertiesSorted = required.map(el => ({
         name: el,
         ...properties[el]
       }));
       let lastKeysProperties = {};
-      lastKeys.forEach((el) => {
+      lastKeys.forEach(el => {
         let obj = {
           name: el,
           ...properties[el]
@@ -334,7 +339,7 @@ export default {
     getData() {
       let obj = JSON.parse(JSON.stringify(this.currentModel));
       let result = {};
-      Object.keys(obj).forEach((el) => {
+      Object.keys(obj).forEach(el => {
         let value = obj[el];
         if (value instanceof Date) {
           result[el] = formatDate(value, "yyyy-MM-dd");
@@ -351,12 +356,12 @@ export default {
         }
       });
       if (this.special.length) {
-        this.special.forEach((el) => {
+        this.special.forEach(el => {
           let __temp__ = get(obj, el);
           if (__temp__) {
             let v = JSON.parse(JSON.stringify(__temp__));
             let value = {};
-            v.forEach((els) => {
+            v.forEach(els => {
               let key = els.key;
               if (key) {
                 delete els.key;
@@ -378,7 +383,7 @@ export default {
       let retn = {};
       if (this.split) {
         let ks = [].concat(this.required).concat(this.settings);
-        ks.forEach((el) => {
+        ks.forEach(el => {
           retn[el] = result[el];
         });
       } else {
@@ -394,7 +399,7 @@ export default {
     },
     // 移除记住oneof选项
     removeOneOfOption(result) {
-      Object.keys(result).forEach((el) => {
+      Object.keys(result).forEach(el => {
         if (el.includes("-option")) {
           delete result[el];
         } else if (typeof result[el] === "object") {
@@ -408,12 +413,12 @@ export default {
       return y
         .substring(6)
         .split("")
-        .map((el) => letters[el])
+        .map(el => letters[el])
         .join("");
     },
     validate(string) {
       let resp = new Promise((resolve, reject) => {
-        this.$refs[this.formId].validate((el) => {
+        this.$refs[this.formId].validate(el => {
           let res = el && this.validatelastestNeedOneProps();
           resolve(res);
         });
@@ -489,7 +494,7 @@ export default {
       let lastestNeedOneProps = [];
       let propTitles = [];
       // lastestNeedOne 当前平级的属性至少满足一个 ，如果属性是object类型 则其所有属性都要有值
-      props.forEach((el) => {
+      props.forEach(el => {
         let prop = el;
         let config = properties[el];
         if (lastestNeedOne) {
@@ -561,7 +566,7 @@ export default {
               el
             );
             // 将children的值平铺开放到model里
-            Object.keys(values).map((el) => {
+            Object.keys(values).map(el => {
               model[el] = values[el];
             });
           }
@@ -574,14 +579,14 @@ export default {
           }
 
           if (config.children) {
-            Object.keys(config.children).forEach((pProp) => {
+            Object.keys(config.children).forEach(pProp => {
               let values = this.setModel(
                 { properties: config.children[pProp] },
                 config.children[pProp].rules || {},
                 pProp
               );
               // 将children的值平铺开放到model里
-              Object.keys(values).map((el) => {
+              Object.keys(values).map(el => {
                 model[el] = values[el];
               });
             });
@@ -593,7 +598,7 @@ export default {
           // 通过比较属性key，确定选中的是哪一个。
           let configOneOfModelArray = [];
           let selectedIndex = extraOptions(config.description).default || 0;
-          config.oneOf.forEach((oneOfItem) => {
+          config.oneOf.forEach(oneOfItem => {
             const oneOfItemMoel = this.setModel(oneOfItem, {});
             oneOfItem.defaultModel = oneOfItemMoel;
             configOneOfModelArray.push(oneOfItemMoel);
@@ -646,7 +651,7 @@ export default {
             } else if (config.additionalProperties.type === "string") {
               properties = {
                 key: {
-                  type: "string",
+                  type: "textarea",
                   title: "键",
                   "ui:options": {
                     width: w
@@ -655,7 +660,7 @@ export default {
                   required: config.required
                 },
                 value: {
-                  type: "string",
+                  type: "textarea",
                   title: "值",
                   "ui:options": {
                     width: w
@@ -668,14 +673,14 @@ export default {
           } else {
             properties = {
               key: {
-                type: "string",
+                type: "textarea",
                 title: "键",
                 "ui:options": {
                   width: w
                 }
               },
               value: {
-                type: "string",
+                type: "textarea",
                 title: "值",
                 "ui:options": {
                   width: w
@@ -697,7 +702,7 @@ export default {
           ) {
             // 这里 有问题
             let __ks__ = Object.keys(defaultValue);
-            let value = __ks__.map((k) => {
+            let value = __ks__.map(k => {
               let v = defaultValue[k];
               if (Object.prototype.toString.call(v) === "[object Object]") {
                 return {
@@ -740,9 +745,9 @@ export default {
     isEmpty(value) {
       let ret = false;
       if (Array.isArray(value)) {
-        ret = value.some((el) => !el);
+        ret = value.some(el => !el);
       } else if (typeof value === "object") {
-        ret = Object.values(value).some((el) => !el);
+        ret = Object.values(value).some(el => !el);
       } else if (typeof value === "number") {
         ret = false;
       } else {
@@ -755,18 +760,18 @@ export default {
       for (let group of this.lastestNeedOneProps) {
         let defKey = Object.keys(group)[0];
         let entity = group[defKey];
-        let values = entity.map((el) => {
+        let values = entity.map(el => {
           return !this.isEmpty(get(this.currentModel, el));
         });
 
         this.emptyProps.push(
           ...values
             .map((el, index) => (!el ? entity[index] : null))
-            .filter((el) => el)
+            .filter(el => el)
         );
 
         //  只要不同时为false
-        let v = values.some((el) => !!el);
+        let v = values.some(el => !!el);
         if (!v) {
           this.$emit(
             "on-validate-error",

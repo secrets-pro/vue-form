@@ -1,16 +1,23 @@
 <template>
-<!-- element-ui -->
+  <!-- element-ui -->
 
   <div class="test">
-    <div style="display:flex;height: 100%;justify-content: space-between;align-items: center;">
+    <div
+      style="display:flex;height: 100%;justify-content: space-between;align-items: center;"
+    >
       <div class="schema-input">
-        <el-input style="height: 100%;" type="textarea" v-model="schemaString"></el-input>
+        <el-input
+          style="height: 100%;"
+          type="textarea"
+          v-model="schemaString"
+        ></el-input>
       </div>
       <div>
         <el-button @click="getData" type="primary">获取数据</el-button>
       </div>
       <div class="right">
         <vue-form
+          readonly
           @on-confirm="confirm"
           :initinal="true"
           ref="form"
@@ -19,7 +26,11 @@
           :split="false"
         ></vue-form>
         <div class="data-input">
-          <el-input style="height: 100%;" type="textarea" v-model="data1"></el-input>
+          <el-input
+            style="height: 100%;"
+            type="textarea"
+            v-model="data1"
+          ></el-input>
         </div>
       </div>
     </div>
@@ -85,7 +96,7 @@ export default {
       console.log(model);
     },
     getData() {
-      this.$refs.form.validate().then((el) => {
+      this.$refs.form.validate().then(el => {
         let data = this.$refs.form.getData();
         this.data1 = JSON.stringify(data, null, "\t");
       });
