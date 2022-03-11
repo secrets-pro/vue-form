@@ -571,7 +571,7 @@ export default {
         // style.width = "100%";
         props.multiple = config.multiple;
       } else if (type === "string" || type === "textarea") {
-        console.log(type);
+        // console.log(type);
 
         // 新增判断加密字段
         if (getSetSecretKeys().includes(config.name)) {
@@ -633,7 +633,7 @@ export default {
       } else if (type === "object") {
         return this.renderObject(h, config, prop, currentValue, slot);
       }
-      console.log("---children---", children);
+      // console.log("---children---", children);
       let labelArr =
         extra.title || config.title || (_arrayIndex > -1 ? "" : prop);
       let arr = [
