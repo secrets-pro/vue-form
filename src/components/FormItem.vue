@@ -589,19 +589,15 @@ export default {
 
         if (props.type == "password" && setting.options.copy) {
           children = [
-            h(
-              "span",
-              {
-                class: "copy-btn",
-                slot: "append",
-                on: {
-                  click: value => {
-                    this.$emit("on-copy", this.$data.currentValue);
-                  }
+            h("span", {
+              class: "copy-btn",
+              slot: "append",
+              on: {
+                click: value => {
+                  this.$emit("on-copy", this.$data.currentValue);
                 }
-              },
-              "copy"
-            )
+              }
+            })
           ];
         }
       } else if (type === "boolean" || type === "bool") {
