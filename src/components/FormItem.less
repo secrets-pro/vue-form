@@ -6,10 +6,18 @@
   }
 }
 .item-button {
+  display: flex;
+  flex-direction: column;
   width: 32px;
+  align-items: center;
+
   & > button {
     width: 18px !important;
     height: 18px !important;
+    margin-left: 0 !important;
+  }
+  & > button:first-child {
+    margin-bottom: 12px;
   }
 }
 

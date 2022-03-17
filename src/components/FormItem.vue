@@ -229,7 +229,8 @@ export default {
                 console.warn(`最小数量限制为${minItems}`);
                 return;
               }
-              model.pop();
+              // model.pop();
+              model.splice(index, 1);
             }
           }
         }
@@ -239,13 +240,9 @@ export default {
       return h(
         "div",
         {
-          class: "item-button",
-          style: {
-            display: "flex",
-            justifyContent: "flex-end"
-          }
+          class: "item-button"
         },
-        [index === 0 ? add : remove]
+        index === 0 ? (length > 1 ? [add, remove] : [add]) : [remove]
       );
     },
     clearValues(orginal) {
