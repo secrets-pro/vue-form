@@ -419,6 +419,7 @@ export default {
       );
     },
     renderFun(h, config, prop, currentValue, _arrayIndex, slot) {
+      // console.log(prop, currentValue);
       if (!config) {
         console.log(`没有参数`, config, prop);
         return;
@@ -725,17 +726,28 @@ export default {
         let __enumNames__ = data ? data.map(el => el[extra.show]) : [];
         let muti = extra.multiple === "true";
         let __current_value__ = this.currentValue;
+        // 展示不存在的值
         if (muti) {
-          __current_value__.forEach(el => {
-            if (el && !__enum__.includes(el)) {
-              __enum__.push(el);
-              __enumNames__.push(el);
-            }
-          });
+          // __current_value__.forEach(el => {
+          //   if (el && !__enum__.includes(el)) {
+          //     __enum__.push(el);
+          //     __enumNames__.push(el);
+
+          //   }
+          // });
+          this.currentValue = __current_value__.filter(
+            el => el && __enum__.includes(el)
+          );
         } else {
+          // if (__current_value__ && !__enum__.includes(__current_value__)) {
+          //   __enum__.push(__current_value__);
+          //   __enumNames__.push(__current_value__);
+          // }
           if (__current_value__ && !__enum__.includes(__current_value__)) {
-            __enum__.push(__current_value__);
-            __enumNames__.push(__current_value__);
+            // console.log(__current_value__, __enum__);
+            __current_value__ = "";
+            this.currentValue = "";
+            this.$emit("input", "");
           }
         }
         this.config.enum = __enum__;
@@ -750,10 +762,10 @@ export default {
     }
   },
   async created() {
-    this.init(1);
+    await this.init(1);
   },
-  beforeUpdate() {
-    this.init();
+  async beforeUpdate() {
+    await this.init();
   },
   render(h) {
     if (this.Form.visiableStatus) {
