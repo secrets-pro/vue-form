@@ -1,9 +1,11 @@
 <script>
 /* eslint-disable no-unused-vars */
 import setting from "../config";
-// import styleCfg from "../styleCfg";
 import { renderSelectOptions, renderRadioCheckbox } from "./render";
 const { extraOptions, generateRule, formatUrl, getSetSecretKeys } = setting;
+function type(obj) {
+  return typeof obj;
+}
 export default {
   name: "vue-form-item",
   inject: ["Form"],
@@ -191,19 +193,15 @@ export default {
               }
               const modelWrapper = model[0] || item;
               let zore =
-                typeof modelWrapper === "object"
+                type(modelWrapper) === "object"
                   ? JSON.parse(JSON.stringify(modelWrapper))
                   : modelWrapper;
               // 清空数据，解决添加会带上一项数据的问题
               zore = this.clearValues(zore);
-              if (typeof zore === "object") {
-                //  let keys = Object.keys(zore);
-                // let obj = {};
-                // keys.forEach((els) => {
-                //   obj[els] = "";
-                // });
+              let _t = type(zore);
+              if (_t === "object") {
                 model.push(JSON.parse(JSON.stringify(zore)));
-              } else if (typeof zore === "string" || typeof zore === "number") {
+              } else if (_t === "string" || _t === "number") {
                 model.push("");
               }
             }
@@ -246,29 +244,25 @@ export default {
       );
     },
     clearValues(orginal) {
-      if (typeof orginal === "object") {
+      let to = type(orginal);
+      if (to === "object") {
         Object.keys(orginal).forEach(el => {
-          if (typeof orginal[el] === "boolean") {
+          let _t = type(orginal[el]);
+          if (_t === "boolean") {
             orginal[el] = false;
-          } else if (
-            typeof orginal[el] === "number" &&
-            el.indexOf("-option") === -1
-          ) {
+          } else if (_t === "number" && el.indexOf("-option") === -1) {
             orginal[el] = 0;
-          } else if (typeof orginal[el] === "object") {
+          } else if (_t === "object") {
             orginal[el] = this.clearValues(orginal[el]);
-          } else if (typeof orginal[el] === "string") {
+          } else if (_t === "string") {
             orginal[el] = "";
           }
         });
-      } else if (typeof orginal === "boolean") {
+      } else if (to === "boolean") {
         orginal = false;
-      } else if (
-        typeof orginal === "number" &&
-        orginal.indexOf("-option") === -1
-      ) {
+      } else if (to === "number" && orginal.indexOf("-option") === -1) {
         orginal = 0;
-      } else if (typeof orginal === "string") {
+      } else if (to === "string") {
         orginal = "";
       }
       return orginal;
@@ -544,10 +538,6 @@ export default {
         } else {
           type = "input-number";
         }
-
-        // if (typeof props.value != "number") {
-        //   props.value = 0;
-        // }
       } else if (type === "select" || config.enum) {
         if (config.enum) {
           let enumNames = config.enumNames || extra.items;
@@ -602,25 +592,7 @@ export default {
         if (this.readonly) {
           props.disabled = true;
         }
-      } else if (type === "editor") {
-        //  theme="vs-dark"
-        // v-model="code"
-        // language="javascript"
-        props.theme = "vs-dark";
-        props.language = config.language || setting.language;
-        props.options = {
-          cursorStyle: "line", // 光标样式
-          automaticLayout: true, // 自动布局
-          formatOnPaste: true,
-          formatOnType: true
-        };
-        // TODO  优先级
-        style.width = "100%";
-        style.height = "400px";
-        style.minHeight = "400px";
-        style.minWidth = "400px";
-      }
-      if (type === "array") {
+      } else if (type === "array") {
         config.labelWidth = this.labelWidth;
         return this.renderArray(h, config, prop, currentValue);
       } else if (type === "object") {
@@ -672,7 +644,7 @@ export default {
       }
       let width = _arrayIndex > -1 ? 0 : this.labelWidth;
       if (this.readonly) {
-        rules = undefined;
+        rules = void 0;
       }
       return h(
         `${this.prefix}-form-item`,

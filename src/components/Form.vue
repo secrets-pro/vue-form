@@ -336,8 +336,9 @@ export default {
       set(this.currentModel, key, value);
       // JSON.parse(JSON.stringify(this.currentModel));
     },
-    getData() {
-      let obj = JSON.parse(JSON.stringify(this.currentModel));
+    // 支持自定义数据转换
+    getData(replacer) {
+      let obj = JSON.parse(JSON.stringify(this.currentModel, replacer));
       let result = {};
       Object.keys(obj).forEach(el => {
         let value = obj[el];

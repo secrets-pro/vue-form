@@ -1,9 +1,9 @@
 import vueplugin from "rollup-plugin-vue";
 import resolve from "rollup-plugin-node-resolve";
 import babel from "rollup-plugin-babel";
-// import { terser } from "rollup-plugin-terser";
+import { terser } from "rollup-plugin-terser";
 
-let baseconfig = (format) => {
+let baseconfig = format => {
   return {
     input: "./src/index.js",
     output: {
@@ -24,8 +24,8 @@ let baseconfig = (format) => {
       babel({
         exclude: "node_modules/**" // 只编译我们的源代码
       }),
-      vueplugin({ css: true })
-      // terser()
+      vueplugin({ css: true }),
+      terser()
     ]
   };
 };
