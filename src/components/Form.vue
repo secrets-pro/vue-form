@@ -293,9 +293,13 @@ export default {
         };
         lastKeysProperties[el] = obj;
       });
+
       let settings = Object.keys(this.initModel || {});
       for (let i = required.length - 1; i > -1; i--) {
-        settings.splice(settings.indexOf(required[i]), 1);
+        let idx = settings.indexOf(required[i]);
+        if (idx > -1) {
+          settings.splice(idx, 1);
+        }
       }
       this.settings = settings;
       this.required = required;
