@@ -69,7 +69,7 @@
 const letters = "abcdefghijklmn".split("");
 import { set, get, difference, debounce, omit } from "lodash";
 import FormItemPlugin from "./FormItem.vue";
-import setting from "../config";
+import setting, { optKey } from "../config";
 
 const formatDate = setting.formatDate;
 const extraOptions = setting.extraOptions;
@@ -106,7 +106,7 @@ let Title = {
                 border: 0,
                 width: "auto",
                 height: "auto",
-                color: "#409eff"
+                color: "#04a7b2"
                 // marginTop:"-2px"
               }}
             ></ButtonTag>
@@ -163,11 +163,11 @@ export default {
     this.$emit("on-create");
   },
   created() {
-    this.handleWatch = debounce(this.handleWatch, 500);
+    this.handleWatch = debounce(this.handleWatch, 1000);
     this.handleWatch();
   },
   mounted() {
-    this.$emit("on-mounte");
+    this.$emit("on-mounted");
   },
   computed: {
     defaultWidth() {
@@ -208,12 +208,16 @@ export default {
     schema(n) {
       this.settings = [];
       this.currentScheme = n;
+      // console.log("schema change handleWatch");
+      this.$emit("on-scheme-change");
       this.handleWatch();
     },
     model: {
       deep: true,
       handler(n, o) {
         this.initModel = JSON.parse(JSON.stringify(n));
+        // console.log("model change handleWatch");
+        this.$emit("on-model-change");
         this.handleWatch();
       }
     },
@@ -254,8 +258,12 @@ export default {
       this.$emit("on-copy", value);
     },
     handleWatch() {
+      // let d1 = new Date().getTime();
       this.validateScheme();
       this.setSortProperties();
+      // let d2 = new Date().getTime();
+      // console.log("handleWatch 耗时:" + (d2 - d1));
+      this.$emit("on-change-end");
     },
     changeSetting(setting) {
       this.settings = setting;
@@ -405,7 +413,7 @@ export default {
     // 移除记住oneof选项
     removeOneOfOption(result) {
       Object.keys(result).forEach(el => {
-        if (el.includes("-option")) {
+        if (el.includes(optKey)) {
           delete result[el];
         } else if (typeof result[el] === "object") {
           this.removeOneOfOption(result[el]);
@@ -797,6 +805,7 @@ export default {
       let rules = {}; //  准备rules
       let model = this.setModel(this.currentScheme, rules);
       this.currentModel = model;
+      // console.log("this.currentModel", this.currentModel);
     }
   }
 };

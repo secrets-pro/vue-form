@@ -1,6 +1,6 @@
 <script>
 /* eslint-disable no-unused-vars */
-import setting from "../config";
+import setting, { optKey } from "../config";
 import { renderSelectOptions, renderRadioCheckbox } from "./render";
 const { extraOptions, generateRule, formatUrl, getSetSecretKeys } = setting;
 function type(obj) {
@@ -55,7 +55,7 @@ export default {
           }
           let pa = extraOptions(config.properties[a].description);
           let pb = extraOptions(config.properties[b].description);
-          if (a.includes("-option")) {
+          if (a.includes(optKey)) {
             return -1;
           }
 
@@ -250,7 +250,7 @@ export default {
           let _t = type(orginal[el]);
           if (_t === "boolean") {
             orginal[el] = false;
-          } else if (_t === "number" && el.indexOf("-option") === -1) {
+          } else if (_t === "number" && el.indexOf(optKey) === -1) {
             orginal[el] = 0;
           } else if (_t === "object") {
             orginal[el] = this.clearValues(orginal[el]);
@@ -260,7 +260,7 @@ export default {
         });
       } else if (to === "boolean") {
         orginal = false;
-      } else if (to === "number" && orginal.indexOf("-option") === -1) {
+      } else if (to === "number" && orginal.indexOf(optKey) === -1) {
         orginal = 0;
       } else if (to === "string") {
         orginal = "";
@@ -466,22 +466,21 @@ export default {
           const props = prop.split(".");
           optionProp = props[props.length - 1];
         }
+        let dymicOption = optionProp + optKey;
         let selectedIndex =
-          currentValue[optionProp + "-option"] ||
-          currentValue[optionProp + "-option"] === 0
-            ? currentValue[optionProp + "-option"]
+          currentValue[dymicOption] || currentValue[dymicOption] === 0
+            ? currentValue[dymicOption]
             : config.selectedIndex;
-        // let selectedIndex = config.selectedIndex; // currentValue[prop + "-option"] ||
         config = {
           //  config 临时记录 现有选择的oneOf字段
           oneOf: config.oneOf,
           ...config.oneOf[selectedIndex],
           selectedIndex: selectedIndex
         };
-        let k = prop + "-option";
+        let k = prop + optKey;
         let idx = prop.lastIndexOf(".");
         if (idx > -1) {
-          k = prop.substring(idx + 1) + "-option";
+          k = prop.substring(idx + 1) + optKey;
         }
         if (!config.properties) {
           config.properties = {};
@@ -496,6 +495,7 @@ export default {
             extra.items ? extra.items[index] : `选项${index}`
           )
         };
+        // debugger;
         if (selectedIndex > -1) {
           const resultModel = config.oneOf[selectedIndex].defaultModel;
           Object.assign(resultModel, currentValue);
@@ -622,7 +622,7 @@ export default {
                   currentValue[_arrayIndex] = value;
                   this.$emit("arrayInput", prop, currentValue[_arrayIndex]);
                 } else {
-                  if (prop.includes("-option")) {
+                  if (prop.includes(optKey)) {
                     // oneof
                     this.$emit("oneOfSelectChange", prop, value);
                   } else {
@@ -688,7 +688,7 @@ export default {
                   border: 0,
                   width: "auto",
                   height: "auto",
-                  color: "#409eff"
+                  color: "#04a7b2"
                   // marginTop:"-2px"
                 }}
               ></ButtonTag>
@@ -702,6 +702,7 @@ export default {
       return <span slot={slot}>{res}</span>;
     },
     async init(flag) {
+      // console.log("init flag", flag);
       let extra = extraOptions(this.config.description);
       if (extra.url) {
         let url = formatUrl(extra.url, {
@@ -762,9 +763,11 @@ export default {
     }
   },
   async created() {
+    // console.log("created");
     await this.init(1);
   },
   async beforeUpdate() {
+    // console.log("beforeUpdate");
     await this.init();
   },
   render(h) {

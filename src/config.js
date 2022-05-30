@@ -2,7 +2,7 @@
  * @Author: bowen.xu
  * @Date: 2021-05-07 09:54:37
  * @Last Modified by: bowen.xu
- * @Last Modified time: 2022-03-09 15:26:49
+ * @Last Modified time: 2022-05-30 14:51:42
  */
 
 import { isObject } from "lodash";
@@ -61,7 +61,7 @@ export default {
     // if (prop === "imagePullSecrets") {
     //   debugger;
     // }
-    if (prop.includes("-option")) {
+    if (prop.includes(optKey)) {
       return [];
     }
     let required = !!config.required;
@@ -119,3 +119,5 @@ export default {
     return baseRule;
   }
 };
+
+export const optKey = "-option";
