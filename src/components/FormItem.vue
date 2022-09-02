@@ -268,7 +268,7 @@ export default {
       return orginal;
     },
     renderArray(h, config, prop, model) {
-      const { items, labelWidth } = config;
+      const { items,item, labelWidth } = config;
       let { type } = items;
       // let that = this;
       let children = [];
@@ -302,7 +302,8 @@ export default {
                           h,
                           items,
                           `${prop}.${index}`,
-                          model[index],
+                          // 解决模版和数据的属性不对应的问题
+                          Object.assign(item||{},model[index]),
                           index
                         )
                       ]

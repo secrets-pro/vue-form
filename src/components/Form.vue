@@ -753,6 +753,7 @@ export default {
           [propTitles.join("、")]: lastestNeedOneProps
         });
       }
+      // console.log('model',model)
       return model;
     },
     isEmpty(value) {
@@ -804,6 +805,8 @@ export default {
       // let model = {}; // 准备model
       let rules = {}; //  准备rules
       let model = this.setModel(this.currentScheme, rules);
+      // console.log('this.currentScheme',this.currentScheme);
+      // console.log('model',model)
       this.currentModel = model;
       // console.log("this.currentModel", this.currentModel);
     }
