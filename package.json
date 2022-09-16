@@ -1,6 +1,6 @@
 {
   "name": "@secrets/vue-form",
-  "version": "2.0.13-alpha-9",
+  "version": "2.0.13-alpha-10",
   "description": "vue-form",
   "main": "dist/vue-form.cjs.js",
   "module": "dist/vue-form.esm.js",
