@@ -67,7 +67,7 @@
 <script>
 /* eslint-disable no-unused-vars */
 const letters = "abcdefghijklmn".split("");
-import { set, get, difference, debounce, omit } from "lodash";
+import { set, get, difference, debounce, omit,merge } from "lodash";
 import FormItemPlugin from "./FormItem.vue";
 import setting, { optKey } from "../config";
 
@@ -613,6 +613,9 @@ export default {
           let selectedIndex = extraOptions(config.description).default || 0;
           config.oneOf.forEach(oneOfItem => {
             const oneOfItemMoel = this.setModel(oneOfItem, {});
+            if(oneOfItemMoel.nodePorts){
+              debugger;
+            }
             oneOfItem.defaultModel = oneOfItemMoel;
             configOneOfModelArray.push(oneOfItemMoel);
           });
@@ -629,8 +632,9 @@ export default {
               }
             });
             if (selectedIndex > -1) {
-              config.oneOf[selectedIndex].defaultModel =  Object.assign({},config.oneOf[selectedIndex].defaultModel,defaultValue);
-            }
+              // config.oneOf[selectedIndex].defaultModel =  Object.assign({},config.oneOf[selectedIndex].defaultModel,defaultValue);
+           config.oneOf[selectedIndex].defaultModel  = merge({},config.oneOf[selectedIndex].defaultModel,defaultValue);
+           }
           }
           config.selectedIndex = selectedIndex;
           // model[`${prop}-option`] = selectedIndex;
@@ -805,7 +809,7 @@ export default {
       // let model = {}; // 准备model
       let rules = {}; //  准备rules
       let model = this.setModel(this.currentScheme, rules);
-      // console.log('model',model)
+      console.log('model',model,rules)
       this.currentModel = model;
       // console.log("this.currentModel", this.currentModel);
     }
