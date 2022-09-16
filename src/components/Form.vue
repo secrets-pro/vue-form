@@ -629,7 +629,7 @@ export default {
               }
             });
             if (selectedIndex > -1) {
-              config.oneOf[selectedIndex].defaultModel = defaultValue;
+              config.oneOf[selectedIndex].defaultModel =  Object.assign({},config.oneOf[selectedIndex].defaultModel,defaultValue);
             }
           }
           config.selectedIndex = selectedIndex;
@@ -805,7 +805,6 @@ export default {
       // let model = {}; // 准备model
       let rules = {}; //  准备rules
       let model = this.setModel(this.currentScheme, rules);
-      // console.log('this.currentScheme',this.currentScheme);
       // console.log('model',model)
       this.currentModel = model;
       // console.log("this.currentModel", this.currentModel);
