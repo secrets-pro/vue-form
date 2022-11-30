@@ -2,6 +2,7 @@
 /* eslint-disable no-unused-vars */
 import setting, { optKey } from "../config";
 import { renderSelectOptions, renderRadioCheckbox } from "./render";
+import { difference } from "lodash";
 const { extraOptions, generateRule, formatUrl, getSetSecretKeys } = setting;
 function type(obj) {
 	return typeof obj;
@@ -240,7 +241,8 @@ export default {
 				{
 					class: "item-button"
 				},
-				index === 0 ? (length > 1 ? [add, remove] : [add]) : [remove]
+				[add, remove]
+				// index === 0 ? (length > 1 ? [add, remove] : [add]) : [remove]
 			);
 		},
 		clearValues(orginal) {
@@ -284,7 +286,7 @@ export default {
 					type === "object"
 						? model.map((el, index) => {
 								// TODO model 类型
-                let tmdel = Object.assign({}, item || {}, model[index]);
+								let tmdel = Object.assign({}, item || {}, model[index]);
 								// model是当前构造出来的数组对象 el就是子项 如果el不是object类型
 								return h(
 									"div",
@@ -468,16 +470,30 @@ export default {
 					optionProp = props[props.length - 1];
 				}
 				let dymicOption = optionProp + optKey;
-				let selectedIndex =
+				let s =
 					currentValue[dymicOption] || currentValue[dymicOption] === 0
 						? currentValue[dymicOption]
 						: config.selectedIndex;
+				// 再算一次 以防没有塞到
+				let selectedIndex = s;
+				config.oneOf.forEach((modelItem, index) => {
+					const modelItemKeys = Object.keys(modelItem.properties);
+					const defaultValueKeys = Object.keys(currentValue);
+					if (
+						!difference(modelItemKeys, defaultValueKeys).length &&
+						!difference(defaultValueKeys, modelItemKeys).length
+					) {
+						selectedIndex = index;
+					}
+				});
+				// console.log("====sencodeselectedIndex", selectedIndex);
 				config = {
 					//  config 临时记录 现有选择的oneOf字段
 					oneOf: config.oneOf,
 					...config.oneOf[selectedIndex],
 					selectedIndex: selectedIndex
 				};
+				// console.log("item config", JSON.stringify(config, null, "\t"));
 				let k = prop + optKey;
 				let idx = prop.lastIndexOf(".");
 				if (idx > -1) {
