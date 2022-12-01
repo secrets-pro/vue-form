@@ -471,7 +471,14 @@ export default {
 					_value.push(0);
 				}
 			} else if (items.type === "object") {
-				if (defaultValue && Array.isArray(defaultValue)) {
+				if (parentProp === "volumeMountsNew") {
+					debugger;
+				}
+				if (
+					defaultValue &&
+					Array.isArray(defaultValue) &&
+					defaultValue.length
+				) {
 					defaultValue.forEach((defaultValueItem, index) => {
 						let obj = this.setModel(items, {}, `${parentProp}.${index}`);
 						set(currentScheme, "item", obj);
@@ -567,9 +574,14 @@ export default {
 					// 设置默认的格式 config.items
 					let _value = this.setArrayModal(config, rules, prop, defaultValue);
 
-					set(model, prop, defaultValue || _value || "");
+					set(
+						model,
+						prop,
+						defaultValue && defaultValue.length ? defaultValue : _value || ""
+					);
 					if (prop.indexOf(".") > -1) {
-						model[prop] = defaultValue || _value || "";
+						model[prop] =
+							defaultValue && defaultValue.length ? defaultValue : _value || "";
 					}
 				} else if (config.type === "boolean" || config.type === "bool") {
 					if (config.children) {
@@ -638,11 +650,15 @@ export default {
 							);
 						}
 					}
+					// if (config.title == "volumeType") {
+					// 	debugger;
+					// }
 					// model[`${prop}-option`] = selectedIndex;
 					if (selectedIndex > -1) {
 						let defa = config.oneOf[selectedIndex].defaultModel;
 						defa[`${prop}-option`] = selectedIndex;
 						model[prop] = defa;
+						// console.log("====modeldefa====", JSON.stringify(model, null, "\t"));
 					} else {
 						model[prop] = {};
 					}
@@ -808,10 +824,10 @@ export default {
 			// let props = Object.keys(this.currentScheme.properties);
 			// let model = {}; // 准备model
 			let rules = {}; //  准备rules
-			let cps = JSON.parse(JSON.stringify(this.currentScheme));
-			let model = this.setModel(cps, rules);
+			// let cps = JSON.parse(JSON.stringify(this.currentScheme));
+			let model = this.setModel(this.currentScheme, rules);
 			this.currentModel = model;
-			this.currentScheme = cps;
+			// this.currentScheme = cps;
 			// console.log("this.model", JSON.stringify(this.currentModel, null, "\t"));
 			// console.log(
 			// 	"this.currentScheme",

@@ -486,14 +486,18 @@ export default {
 						selectedIndex = index;
 					}
 				});
-				// console.log("====sencodeselectedIndex", selectedIndex);
+
 				config = {
 					//  config 临时记录 现有选择的oneOf字段
 					oneOf: config.oneOf,
 					...config.oneOf[selectedIndex],
 					selectedIndex: selectedIndex
 				};
+
+				// if (config.title == "volumeType") {
+				// console.log("====sencodeselectedIndex", selectedIndex);
 				// console.log("item config", JSON.stringify(config, null, "\t"));
+				// }
 				let k = prop + optKey;
 				let idx = prop.lastIndexOf(".");
 				if (idx > -1) {
