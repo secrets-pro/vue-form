@@ -1,6 +1,5 @@
 <template>
 	<div v-if="Object.keys(currentModel).length" class="vue-form" v-show="show">
-		<!-- {{ currentModel }} -->
 		<component
 			:is="`${this.prefix}-form`"
 			size="medium"
@@ -208,7 +207,6 @@ export default {
 		schema(n) {
 			this.settings = [];
 			this.currentScheme = n;
-			// console.log("schema change handleWatch");
 			this.$emit("on-scheme-change");
 			this.handleWatch();
 		},
@@ -216,7 +214,6 @@ export default {
 			deep: true,
 			handler(n, o) {
 				this.initModel = JSON.parse(JSON.stringify(n));
-				// console.log("model change handleWatch");
 				this.$emit("on-model-change");
 				this.handleWatch();
 			}
@@ -258,11 +255,8 @@ export default {
 			this.$emit("on-copy", value);
 		},
 		handleWatch() {
-			// let d1 = new Date().getTime();
 			this.validateScheme();
 			this.setSortProperties();
-			// let d2 = new Date().getTime();
-			// console.log("handleWatch 耗时:" + (d2 - d1));
 			this.$emit("on-change-end");
 		},
 		changeSetting(setting) {
@@ -471,9 +465,6 @@ export default {
 					_value.push(0);
 				}
 			} else if (items.type === "object") {
-				if (parentProp === "volumeMountsNew") {
-					debugger;
-				}
 				if (
 					defaultValue &&
 					Array.isArray(defaultValue) &&
@@ -573,11 +564,12 @@ export default {
 					// 数组类型
 					// 设置默认的格式 config.items
 					let _value = this.setArrayModal(config, rules, prop, defaultValue);
-
 					set(
 						model,
 						prop,
-						defaultValue && defaultValue.length ? defaultValue : _value || ""
+						defaultValue && defaultValue.length
+							? merge(defaultValue, _value)
+							: _value || ""
 					);
 					if (prop.indexOf(".") > -1) {
 						model[prop] =
@@ -650,17 +642,13 @@ export default {
 							);
 						}
 					}
-					// if (config.title == "volumeType") {
-					// 	debugger;
-					// }
-					// model[`${prop}-option`] = selectedIndex;
 					if (selectedIndex > -1) {
 						let defa = config.oneOf[selectedIndex].defaultModel;
 						defa[`${prop}-option`] = selectedIndex;
-						model[prop] = defa;
-						// console.log("====modeldefa====", JSON.stringify(model, null, "\t"));
+						set(model, prop, defa || {});
 					} else {
-						model[prop] = {};
+						defaultValue[`${prop}-option`] = selectedIndex;
+						set(model, prop, defaultValue || {});
 					}
 				} else if (
 					(config.type === "object" && !config.properties && !config.oneOf) ||
@@ -827,12 +815,6 @@ export default {
 			// let cps = JSON.parse(JSON.stringify(this.currentScheme));
 			let model = this.setModel(this.currentScheme, rules);
 			this.currentModel = model;
-			// this.currentScheme = cps;
-			// console.log("this.model", JSON.stringify(this.currentModel, null, "\t"));
-			// console.log(
-			// 	"this.currentScheme",
-			// 	JSON.stringify(this.currentScheme, null, "\t")
-			// );
 		}
 	}
 };

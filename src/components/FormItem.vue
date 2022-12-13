@@ -494,10 +494,6 @@ export default {
 					selectedIndex: selectedIndex
 				};
 
-				// if (config.title == "volumeType") {
-				// console.log("====sencodeselectedIndex", selectedIndex);
-				// console.log("item config", JSON.stringify(config, null, "\t"));
-				// }
 				let k = prop + optKey;
 				let idx = prop.lastIndexOf(".");
 				if (idx > -1) {
@@ -641,7 +637,7 @@ export default {
 								} else {
 									if (prop.includes(optKey)) {
 										// oneof
-										this.$emit("oneOfSelectChange", prop, value);
+										this.$emit("oneOfSelectChange", prop, value || 0);
 									} else {
 										if (type === "input-number") {
 											if (value === null) {

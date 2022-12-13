@@ -1,158 +1,158 @@
 .flex-div {
-  display: flex;
-  & > div:not(.item-button) {
-    flex: 1;
-    min-width: 0;
-  }
+	display: flex;
+	& > div:not(.item-button) {
+		flex: 1;
+		min-width: 0;
+	}
 }
 .item-button {
-  display: flex;
-  flex-direction: column;
-  width: 32px;
-  align-items: center;
+	display: flex;
+	flex-direction: column;
+	width: 32px;
+	align-items: center;
 
-  & > button {
-    width: 18px !important;
-    height: 18px !important;
-    margin-left: 0 !important;
-  }
-  & > button:first-child {
-    margin-bottom: 12px;
-  }
+	& > button {
+		width: 18px !important;
+		height: 18px !important;
+		margin-left: 0 !important;
+	}
+	& > button:first-child {
+		margin-bottom: 12px;
+	}
 }
 
 .form-item-array-content {
-  .flex-array-wrapper {
-    display: flex;
-  }
-  .flex-array {
-    border: 1px solid #efefef;
-    border-radius: 4px;
-    padding: 8px 4px;
-    margin-bottom: 8px;
-    // box-shadow: 0 4px 8px 0 rgba(36, 46, 66, 0.06);
-    margin-right: 8px;
-    flex: 1;
-    & > .item-object > .flex-object > .item-object > .flex-object {
-      // border: 1px solid #efefef;
-      border-radius: 4px;
-      padding: 8px 4px;
-      margin-bottom: 8px;
-      // width: calc(100% - 40px);
-      // width: calc(100% - 160px); // 120 _ 40
-      width: 100%; // 120 _ 40
-    }
+	.flex-array-wrapper {
+		display: flex;
+	}
+	.flex-array {
+		border: 1px solid #efefef;
+		border-radius: 4px;
+		padding: 8px 4px;
+		margin-bottom: 8px;
+		// box-shadow: 0 4px 8px 0 rgba(36, 46, 66, 0.06);
+		margin-right: 8px;
+		flex: 1;
+		& > .item-object > .flex-object > .item-object > .flex-object {
+			// border: 1px solid #efefef;
+			border-radius: 4px;
+			padding: 8px 4px;
+			margin-bottom: 8px;
+			// width: calc(100% - 40px);
+			// width: calc(100% - 160px); // 120 _ 40
+			width: 100%; // 120 _ 40
+		}
 
-    & > .item-object > .flex-object > .item-object > .has-title-object-content {
-      width: calc(100% - 160px); // 120 _ 40
-      border: 1px solid #efefef;
-    }
-  }
+		& > .item-object > .flex-object > .item-object > .has-title-object-content {
+			width: calc(100% - 160px); // 120 _ 40
+			border: 1px solid #efefef;
+		}
+	}
 }
 .vue-form-item {
-  input[readonly="readonly"] {
-    border: none;
-  }
+	input[readonly="readonly"] {
+		border: none;
+	}
 }
 .flex-object {
-  display: flex;
-  flex-wrap: wrap;
+	display: flex;
+	flex-wrap: wrap;
 }
 .vue-form-item.maxWidth33 {
-  width: 33.33%;
+	width: 33.33%;
 }
 .item-object.maxWidth33 {
-  width: 100%;
-  & > .flex-object {
-    border: none !important;
-  }
+	width: 100%;
+	& > .flex-object {
+		border: none !important;
+	}
 }
 
 .vue-form-oneofselection {
-  width: calc(100% - 42px) !important;
+	width: calc(100% - 42px) !important;
 
-  & > .ivu-form-item-content > .ivu-select {
-    width: 100%;
-  }
-  & ~ .normal-vue-item {
-    width: 100%;
-  }
+	& > .ivu-form-item-content > .ivu-select {
+		width: 100%;
+	}
+	& ~ .normal-vue-item {
+		width: calc(100% - 42px) !important;
+	}
 }
 .flex-array > .item-object > .flex-object > .normal-vue-item {
-  max-width: 100%;
+	max-width: 100%;
 }
 .flex-array > .item-object > .flex-object > .widthcomplete {
-  width: 100% !important;
+	width: 100% !important;
 }
 .vue-form
-  > .card
-  > .form-item-array
-  > .form-item-array-content
-  > .flex-array
-  > .item-object
-  > .flex-object
-  > .vue-form-item {
-  flex: 1;
+	> .card
+	> .form-item-array
+	> .form-item-array-content
+	> .flex-array
+	> .item-object
+	> .flex-object
+	> .vue-form-item {
+	flex: 1;
 }
 .vue-form
-  > .card
-  > .form-item-array
-  > .form-item-array-content
-  > .flex-array
-  > .item-object
-  > .flex-object
-  > .flex-object-item-array
-  > .form-item-array-content
-  > .flex-array
-  > .item-object
-  > .flex-object
-  > .normal-vue-item {
-  max-width: calc(50% - 18px);
+	> .card
+	> .form-item-array
+	> .form-item-array-content
+	> .flex-array
+	> .item-object
+	> .flex-object
+	> .flex-object-item-array
+	> .form-item-array-content
+	> .flex-array
+	> .item-object
+	> .flex-object
+	> .normal-vue-item {
+	max-width: calc(50% - 18px);
 }
 .flex-object-item-object {
-  width: 100%;
+	width: 100%;
 }
 .form-item-array.level1 {
-  & > .ivu-form-item-label {
-    width: 100%;
-    float: none;
-    display: block;
-    text-align: left;
-    font-weight: 500;
-  }
-  & > .form-item-array-content {
-    margin: 0 !important;
-  }
+	& > .ivu-form-item-label {
+		width: 100%;
+		float: none;
+		display: block;
+		text-align: left;
+		font-weight: 500;
+	}
+	& > .form-item-array-content {
+		margin: 0 !important;
+	}
 }
 .flex-object-item-string + .form-item-array {
-  width: 100%;
+	width: 100%;
 }
 .vue-form
-  > .card
-  > .form-item-array
-  > .form-item-array-content
-  > .flex-array-wrapper
-  > .flex-div.flex-array
-  > .item-object
-  > .flex-object
-  > .ivu-form-item:first-child.flex-object-item-string {
-  width: calc(100% - 40px);
+	> .card
+	> .form-item-array
+	> .form-item-array-content
+	> .flex-array-wrapper
+	> .flex-div.flex-array
+	> .item-object
+	> .flex-object
+	> .ivu-form-item:first-child.flex-object-item-string {
+	width: calc(100% - 40px);
 }
 
 .vue-form > .card > .vue-form-item {
-  width: calc(100% - 40px);
+	width: calc(100% - 40px);
 }
 // /deep/.flex-object-item-select > .ivu-form-item-content {
 //   width: calc(100% - 160px);
 // }
 .item-object.flex-object-item-object.maxWidth33
-  + .vue-form-item.flex-object-item-integer.maxWidth33 {
-  max-width: 100%;
-  width: 66.66%;
+	+ .vue-form-item.flex-object-item-integer.maxWidth33 {
+	max-width: 100%;
+	width: 66.66%;
 }
 
 .btn_icon_center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
