@@ -10,7 +10,7 @@ let baseconfig = format => {
 			name: "vue-form",
 			globals: {
 				vue: "Vue",
-				lodash: "lodash"
+				lodash: "_"
 			},
 			extend: true,
 			format,
@@ -24,8 +24,8 @@ let baseconfig = format => {
 			babel({
 				exclude: "node_modules/**" // 只编译我们的源代码
 			}),
-			vueplugin({ css: true })
-			// terser()
+			vueplugin({ css: true }),
+			terser()
 		]
 	};
 };
