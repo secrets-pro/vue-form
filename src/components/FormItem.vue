@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 import setting, { optKey } from "../config";
 import { renderSelectOptions, renderRadioCheckbox } from "./render";
-import { difference } from "lodash";
+import difference from "lodash-es/difference";
 const { extraOptions, generateRule, formatUrl, getSetSecretKeys } = setting;
 function type(obj) {
 	return typeof obj;

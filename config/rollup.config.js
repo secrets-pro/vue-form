@@ -9,8 +9,8 @@ let baseconfig = format => {
 		output: {
 			name: "vue-form",
 			globals: {
-				vue: "Vue",
-				lodash: "_"
+				vue: "Vue"
+				// lodash: "_"
 			},
 			extend: true,
 			format,
@@ -18,7 +18,7 @@ let baseconfig = format => {
 			file:
 				format === "iife" ? "dist/vue-form.js" : `dist/vue-form.${format}.js`
 		},
-		external: ["vue", "lodash"],
+		external: ["vue"],
 		plugins: [
 			resolve(),
 			babel({

@@ -66,7 +66,14 @@
 <script>
 /* eslint-disable no-unused-vars */
 const letters = "abcdefghijklmn".split("");
-import { set, get, difference, debounce, omit, merge } from "lodash";
+// import { set, get, difference, debounce, omit, merge } from "lodash-es";
+import set from "lodash-es/set";
+import get from "lodash-es/get";
+import difference from "lodash-es/difference";
+import debounce from "lodash-es/debounce";
+import omit from "lodash-es/omit";
+import merge from "lodash-es/merge";
+
 import FormItemPlugin from "./FormItem.vue";
 import setting, { optKey } from "../config";
 
