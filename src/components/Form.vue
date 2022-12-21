@@ -448,7 +448,6 @@ export default {
 		setArrayModal(currentScheme, rules, parentProp, defaultValue) {
 			const { items } = currentScheme;
 			let _value = [];
-
 			if (items.type === "string") {
 				set(currentScheme, "item", "");
 				if (
@@ -534,7 +533,6 @@ export default {
 					parentProp ? parentProp + "." + el : el,
 					undefined
 				);
-
 				if (defaultValue === undefined) {
 					defaultValue = get(_defaultValue, el, undefined);
 				}
@@ -575,7 +573,7 @@ export default {
 						model,
 						prop,
 						defaultValue && defaultValue.length
-							? merge(defaultValue, _value)
+							? merge(_value, defaultValue)
 							: _value || ""
 					);
 					if (prop.indexOf(".") > -1) {

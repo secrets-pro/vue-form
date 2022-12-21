@@ -14,7 +14,7 @@ let baseconfig = format => {
 			},
 			extend: true,
 			format,
-			sourceMap: true,
+			sourcemap: true,
 			file:
 				format === "iife" ? "dist/vue-form.js" : `dist/vue-form.${format}.js`
 		},
@@ -29,5 +29,4 @@ let baseconfig = format => {
 		]
 	};
 };
-// baseconfig("esm"), , baseconfig("iife") , baseconfig("cjs")
-export default [baseconfig("esm")];
+export default [baseconfig("esm"), baseconfig("iife"), baseconfig("cjs")];
