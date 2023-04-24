@@ -551,6 +551,7 @@ export default {
 				if (config.maximum !== undefined) {
 					props["max"] = config.maximum;
 				}
+         props.activeChange = false
 				if (this.readonly) {
 					type = "input";
 				} else {
