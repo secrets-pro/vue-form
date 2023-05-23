@@ -533,6 +533,7 @@ export default {
 					parentProp ? parentProp + "." + el : el,
 					undefined
 				);
+
 				if (defaultValue === undefined) {
 					defaultValue = get(_defaultValue, el, undefined);
 				}
@@ -617,11 +618,24 @@ export default {
 				if (config.type === "object" && config.properties) {
 					model[prop] = this.setModel(config, rules, prop, defaultValue);
 				} else if (config.type === "object" && config.oneOf) {
+					// if (el == "serviceType") {
+					// 	console.log(
+					// 		"====serviceType==setModel=",
+					// 		config,
+					// 		prop,
+					// 		defaultValue
+					// 	);
+					// }
 					// 通过比较属性key，确定选中的是哪一个。
 					let configOneOfModelArray = [];
 					let selectedIndex = extraOptions(config.description).default || 0;
 					config.oneOf.forEach(oneOfItem => {
-						const oneOfItemMoel = this.setModel(oneOfItem, {});
+						const oneOfItemMoel = this.setModel(
+							oneOfItem,
+							{},
+							prop,
+							defaultValue
+						);
 
 						oneOfItem.defaultModel = oneOfItemMoel;
 						configOneOfModelArray.push(oneOfItemMoel);

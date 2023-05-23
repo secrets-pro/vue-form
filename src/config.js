@@ -2,7 +2,7 @@
  * @Author: bowen.xu
  * @Date: 2021-05-07 09:54:37
  * @Last Modified by: bowen.xu
- * @Last Modified time: 2022-12-21 09:55:12
+ * @Last Modified time: 2023-05-23 15:56:55
  */
 
 import isObject from "lodash-es/isObject";
@@ -58,9 +58,6 @@ export default {
 		return y + "-" + (m > 9 ? m : "0" + m) + "-" + (d > 9 ? d : "0" + d);
 	},
 	generateRule(config, prop) {
-		// if (prop === "imagePullSecrets") {
-		//   debugger;
-		// }
 		if (prop.includes(optKey)) {
 			return [];
 		}
@@ -85,7 +82,8 @@ export default {
 			type = "array";
 		}
 		let extOpt = extraOptions(config.description);
-		let isSelect = config.type === "select" || type === "boolean";
+		let isSelect =
+			config.enum || config.type === "select" || type === "boolean";
 		let baseRule = [
 			{
 				required: required_ || required,

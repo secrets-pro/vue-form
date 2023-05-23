@@ -14,7 +14,7 @@ let baseconfig = format => {
 			},
 			extend: true,
 			format,
-			sourcemap: true,
+			sourcemap: false,
 			file:
 				format === "iife" ? "dist/vue-form.js" : `dist/vue-form.${format}.js`
 		},
@@ -24,7 +24,7 @@ let baseconfig = format => {
 			babel({
 				exclude: "node_modules/**" // 只编译我们的源代码
 			}),
-			vueplugin({ css: true }),
+			vueplugin({ css: true }), //
 			terser()
 		]
 	};
