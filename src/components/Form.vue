@@ -13,8 +13,8 @@
 		>
 			<vue-form-title
 				v-if="split && propertiesSorted.length"
-				title="基础设置"
-				description="部署配置中必要的参数内容"
+				:title="enRes.basicSetting||'基础设置'"
+				:description="enRes.basicSettingTip||'部署配置中必要的参数内容'"
 			/>
 			<div class="card">
 				<template v-for="prop in propertiesSorted">
@@ -33,8 +33,8 @@
 			<div class="card" v-if="Object.keys(lastKeysProperties).length">
 				<vue-form-title
 					v-if="split"
-					title="高级配置"
-					description="除必要参数之外额外设置的内容"
+					:title="enRes.highSetting||'高级配置'"
+					:description="enRes.highSettingTip||'除必要参数之外额外设置的内容'"
 				/>
 				<template v-for="prop in settingcp">
 					<form-item-plugin
@@ -79,7 +79,7 @@ import setting, { optKey } from "../config";
 
 const formatDate = setting.formatDate;
 const extraOptions = setting.extraOptions;
-let Title = {
+ let Title = {
 	props: {
 		title: String,
 		description: String
@@ -239,6 +239,7 @@ export default {
 	},
 	data() {
 		return {
+			enRes:setting.getEnResource(),
 			modal: false,
 			emptyProps: [],
 			currentScheme: this.schema,

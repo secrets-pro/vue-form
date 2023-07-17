@@ -2,7 +2,7 @@
  * @Author: bowen.xu
  * @Date: 2021-05-07 09:54:37
  * @Last Modified by: bowen.xu
- * @Last Modified time: 2023-05-23 15:56:55
+ * @Last Modified time: 2023-07-17 20:01:27
  */
 
 import isObject from "lodash-es/isObject";
@@ -34,6 +34,7 @@ function formatUrl(url, params) {
 	return url;
 }
 let secretKeys = ["password"];
+let enRes = {};
 export default {
 	language: "json",
 	format: "yyyy-MM-dd",
@@ -41,6 +42,14 @@ export default {
 		elementUI: false,
 		iView: false,
 		copy: false
+	},
+	setEnResource(en){
+		console.log('setEnResource÷å',en)
+		enRes = en||{};
+	},
+	getEnResource(){
+		console.log('getEnResource',enRes)
+		return enRes
 	},
 	setSecretKeys(_) {
 		secretKeys = secretKeys.concat(_);
@@ -75,7 +84,7 @@ export default {
 		// if (config.type !== "array") {
 		let required_ = config.minLength || config.maxLength; //|| config.enum;
 		//  || config.pattern;
-		let text = config.enum || config.options ? "请选择" : "请输入";
+		let text = config.enum || config.options ? enRes.select|| "请选择" : enRes.input||"请输入";
 		// FXIME 如果是数组嵌套object的时候 prop--> a.0.b==>rule
 		let type = ruleType[config.type] || "string";
 		if (config.multiple) {
@@ -97,7 +106,7 @@ export default {
 		if (config.minLength || config.maxLength) {
 			let ruleMinlength = {
 				min: config.minLength || 1,
-				message: "长度至少" + (config.minLength || 1),
+				message: (enRes.minLength||"长度至少")+ (config.minLength || 1),
 				trigger: "blur"
 			};
 			if (config.maxlength) {
