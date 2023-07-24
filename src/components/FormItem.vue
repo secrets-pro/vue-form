@@ -583,7 +583,7 @@ export default {
 					props.type = "password";
 				}
 				if (extra.title) {
-					props.placeholder = (enRes.input||"请输入" )+ extra.title;
+					props.placeholder = (this.enRes.input||"请输入" )+ extra.title;
 				}
 				if (type === "textarea") {
 					props.type = "textarea";
