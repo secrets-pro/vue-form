@@ -2,7 +2,7 @@
  * @Author: bowen.xu
  * @Date: 2021-05-07 09:54:37
  * @Last Modified by: bowen.xu
- * @Last Modified time: 2023-07-17 20:01:27
+ * @Last Modified time: 2023-07-24 09:24:46
  */
 
 import isObject from "lodash-es/isObject";
@@ -44,12 +44,10 @@ export default {
 		copy: false
 	},
 	setEnResource(en){
-		console.log('setEnResource÷å',en)
-		enRes = en||{};
+ 		enRes = en||{};
 	},
 	getEnResource(){
-		console.log('getEnResource',enRes)
-		return enRes
+ 		return enRes
 	},
 	setSecretKeys(_) {
 		secretKeys = secretKeys.concat(_);
@@ -119,7 +117,7 @@ export default {
 		if (config.pattern) {
 			baseRule.push({
 				pattern: new RegExp(config.pattern),
-				message: `格式需要满足正则${config.pattern}`,
+				message: (enRes.regtip||'格式需要满足正则')+`${config.pattern}`,
 				trigger: "blur"
 			});
 		}

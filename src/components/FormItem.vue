@@ -3,14 +3,13 @@
 import setting, { optKey } from "../config";
 import { renderSelectOptions, renderRadioCheckbox } from "./render";
 import difference from "lodash-es/difference";
-const { extraOptions, generateRule, formatUrl, getSetSecretKeys } = setting;
+const { extraOptions, generateRule, formatUrl, getSetSecretKeys,getEnResource } = setting;
 function type(obj) {
 	return typeof obj;
 }
 export default {
 	name: "vue-form-item",
 	inject: ["Form"],
-
 	props: {
 		value: [String, Number, Boolean, Array, Date, Object],
 		config: Object,
@@ -33,6 +32,7 @@ export default {
 	},
 	data() {
 		return {
+			enRes: getEnResource(),
 			currentValue: this.value,
 			requests: {}
 		};
@@ -583,7 +583,7 @@ export default {
 					props.type = "password";
 				}
 				if (extra.title) {
-					props.placeholder = "请输入" + extra.title;
+					props.placeholder = (enRes.input||"请输入" )+ extra.title;
 				}
 				if (type === "textarea") {
 					props.type = "textarea";
