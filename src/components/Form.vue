@@ -681,7 +681,7 @@ export default {
 							properties = {
 								key: {
 									type: "string",
-									title: "键",
+									title: this.enRes.key||"键",
 									description: '{"title":"key"}',
 									"ui:options": {
 										width: w
@@ -694,7 +694,7 @@ export default {
 							properties = {
 								key: {
 									type: "textarea",
-									title: "键",
+									title: this.enRes.key||"键",
 									"ui:options": {
 										width: w
 									},
@@ -703,7 +703,7 @@ export default {
 								},
 								value: {
 									type: "textarea",
-									title: "值",
+									title: enRes.value||"值",
 									"ui:options": {
 										width: w
 									},
@@ -716,14 +716,14 @@ export default {
 						properties = {
 							key: {
 								type: "textarea",
-								title: "键",
+								title: this.enRes.key||"键",
 								"ui:options": {
 									width: w
 								}
 							},
 							value: {
 								type: "textarea",
-								title: "值",
+								title: enRes.value||"值",
 								"ui:options": {
 									width: w
 								}
