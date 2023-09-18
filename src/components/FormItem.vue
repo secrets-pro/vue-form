@@ -786,7 +786,7 @@ export default {
  		await this.init(1);
 	},
 	async beforeUpdate() {
- 		{/* await this.init(); */}
+ 		await this.init();
 	},
 	render(h) {
 		if (this.loading) {

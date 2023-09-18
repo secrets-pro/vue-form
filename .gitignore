@@ -21,3 +21,9 @@ yarn-error.log*
 *.sln
 *.sw?
 docs
+.eslintrc.js
+.eslintignore
+.dockerignore
+CHANGELOG.MD
+babel.config.js
+demo.png
