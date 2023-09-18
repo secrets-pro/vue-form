@@ -20,10 +20,3 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
-docs
-.eslintrc.js
-.eslintignore
-.dockerignore
-CHANGELOG.MD
-babel.config.js
-demo.png

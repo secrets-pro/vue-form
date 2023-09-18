@@ -27,3 +27,10 @@ yarn-error.log*
 *.sw?
 vue.config.js
 Dockerfile
+docs
+.eslintrc.js
+.eslintignore
+.dockerignore
+CHANGELOG.MD
+babel.config.js
+demo.png
