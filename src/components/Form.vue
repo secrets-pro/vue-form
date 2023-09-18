@@ -703,7 +703,7 @@ export default {
 								},
 								value: {
 									type: "textarea",
-									title: enRes.value||"值",
+									title: this.enRes.value||"值",
 									"ui:options": {
 										width: w
 									},
@@ -723,7 +723,7 @@ export default {
 							},
 							value: {
 								type: "textarea",
-								title: enRes.value||"值",
+								title: this.enRes.value||"值",
 								"ui:options": {
 									width: w
 								}
