@@ -25,8 +25,9 @@ let baseconfig = format => {
 				exclude: "node_modules/**" // 只编译我们的源代码
 			}),
 			vueplugin({ css: true }), //
-			terser()
+			// terser()
 		]
 	};
 };
-export default [baseconfig("esm"), baseconfig("iife"), baseconfig("cjs")];
+// , baseconfig("iife"), baseconfig("cjs")
+export default [baseconfig("esm")];

@@ -3,7 +3,7 @@
 import setting, { optKey } from "../config";
 import { renderSelectOptions, renderRadioCheckbox } from "./render";
 import difference from "lodash-es/difference";
-const { extraOptions, generateRule, formatUrl, getSetSecretKeys,getEnResource } = setting;
+const { extraOptions, generateRule, formatUrl, getSetSecretKeys, getEnResource } = setting;
 function type(obj) {
 	return typeof obj;
 }
@@ -32,6 +32,7 @@ export default {
 	},
 	data() {
 		return {
+			loading: false,
 			enRes: getEnResource(),
 			currentValue: this.value,
 			requests: {}
@@ -77,19 +78,19 @@ export default {
 					!title || ext.showTitle === "false"
 						? null
 						: h(
-								"div",
-								{
-									class: [
-										this.prefix == "i"
-											? "ivu-form-item-label"
-											: "el-form-item__label"
-									],
-									style: {
-										width: this.labelWidth + "px"
-									}
-								},
-								[this.renderLabel(title, desc)]
-						  ),
+							"div",
+							{
+								class: [
+									this.prefix == "i"
+										? "ivu-form-item-label"
+										: "el-form-item__label"
+								],
+								style: {
+									width: this.labelWidth + "px"
+								}
+							},
+							[this.renderLabel(title, desc)]
+						),
 					h(
 						"div",
 						{
@@ -285,70 +286,70 @@ export default {
 				children =
 					type === "object"
 						? model.map((el, index) => {
-								// TODO model 类型
-								let tmdel = Object.assign({}, item || {}, model[index]);
-								// this.$set(model, index, tmdel);
-								// model是当前构造出来的数组对象 el就是子项 如果el不是object类型
-								return h(
-									"div",
-									{
-										class: ["flex-array-wrapper"],
-										key: `divarr-${prop}.${index}`
-									},
-									[
-										h(
-											"div",
-											{
-												class: "flex-div flex-array"
-											},
-											[
-												this.renderFun(
-													h,
-													items,
-													`${prop}.${index}`,
-													// 解决模版和数据的属性不对应的问题
-													tmdel,
-													index
-												)
-											]
-										),
+							// TODO model 类型
+							let tmdel = Object.assign({}, item || {}, model[index]);
+							// this.$set(model, index, tmdel);
+							// model是当前构造出来的数组对象 el就是子项 如果el不是object类型
+							return h(
+								"div",
+								{
+									class: ["flex-array-wrapper"],
+									key: `divarr-${prop}.${index}`
+								},
+								[
+									h(
+										"div",
+										{
+											class: "flex-div flex-array"
+										},
+										[
+											this.renderFun(
+												h,
+												items,
+												`${prop}.${index}`,
+												// 解决模版和数据的属性不对应的问题
+												tmdel,
+												index
+											)
+										]
+									),
 
-										this.renderArrayButton(
-											h,
-											config,
-											model,
-											extraOptions(config.description).title ||
-												config.title ||
-												prop,
-											index,
-											model.length
-										)
-									]
-								);
-						  })
+									this.renderArrayButton(
+										h,
+										config,
+										model,
+										extraOptions(config.description).title ||
+										config.title ||
+										prop,
+										index,
+										model.length
+									)
+								]
+							);
+						})
 						: model.map((el, index) => {
-								// model是当前构造出来的数组对象 el就是子项 如果el不是object类型
-								return h(
-									"div",
-									{
-										class: ["flex-div", "simple-div"],
-										key: `div0bj-${prop}.${index}`
-									},
-									[
-										this.renderFun(h, items, `${prop}.${index}`, model, index),
-										this.renderArrayButton(
-											h,
-											config,
-											model,
-											extraOptions(config.description).title ||
-												config.title ||
-												prop,
-											index,
-											model.length
-										)
-									]
-								);
-						  });
+							// model是当前构造出来的数组对象 el就是子项 如果el不是object类型
+							return h(
+								"div",
+								{
+									class: ["flex-div", "simple-div"],
+									key: `div0bj-${prop}.${index}`
+								},
+								[
+									this.renderFun(h, items, `${prop}.${index}`, model, index),
+									this.renderArrayButton(
+										h,
+										config,
+										model,
+										extraOptions(config.description).title ||
+										config.title ||
+										prop,
+										index,
+										model.length
+									)
+								]
+							);
+						});
 			}
 			//  判断是否是一级属性
 			let title =
@@ -386,13 +387,13 @@ export default {
 								"div",
 								this.required || (type === "string" && config.required)
 									? [
-											h(
-												"span",
-												{ style: { color: "red", marginRight: "5px" } },
-												"*"
-											),
-											h("span", title)
-									  ]
+										h(
+											"span",
+											{ style: { color: "red", marginRight: "5px" } },
+											"*"
+										),
+										h("span", title)
+									]
 									: [h("span", title)]
 							)
 							// level
@@ -577,13 +578,14 @@ export default {
 				type = "select";
 				// style.width = "100%";
 				props.multiple = config.multiple;
+				// console.log(	config.options,currentValue)
 			} else if (type === "string" || type === "textarea") {
 				// 新增判断加密字段
 				if (getSetSecretKeys().includes(config.name)) {
 					props.type = "password";
 				}
 				if (extra.title) {
-					props.placeholder = (this.enRes.input||"请输入" )+ extra.title;
+					props.placeholder = (this.enRes.input || "请输入") + extra.title;
 				}
 				if (type === "textarea") {
 					props.type = "textarea";
@@ -718,8 +720,10 @@ export default {
 			return <span slot={slot}>{res}</span>;
 		},
 		async init(flag) {
-			let extra = extraOptions(this.config.description);
+ 			let extra = extraOptions(this.config.description);
 			if (extra.url) {
+				this.loading = true;
+
 				let url = formatUrl(extra.url, {
 					...(this.$route ? this.$route.params : {})
 				});
@@ -755,30 +759,39 @@ export default {
 						el => el && __enum__.includes(el)
 					);
 				} else {
-					if (__current_value__ && !__enum__.includes(__current_value__)) {
+					if (__current_value__ && __enum__.length && !__enum__.includes(__current_value__)) {
 						__current_value__ = "";
 						this.currentValue = "";
 						this.$emit("input", "");
 					}
 				}
-				this.config.enum = __enum__;
-				this.config.enumNames = __enumNames__;
-				this.config.type = "select";
-				this.config.multiple = muti;
-				// }e
-				if (flag) {
-					this.$forceUpdate();
+				if (__enum__.length) {
+					this.config.enum = __enum__;
+					this.config.enumNames = __enumNames__;
+					this.config.type = "select";
+					this.config.multiple = muti;
+				} else {
+					this.config.type = "string";
 				}
+
+				this.loading = false;
+				// }e
+				/* if (flag) {
+					this.$forceUpdate();
+				} */
 			}
 		}
 	},
 	async created() {
-		await this.init(1);
+ 		await this.init(1);
 	},
 	async beforeUpdate() {
-		await this.init();
+ 		{/* await this.init(); */}
 	},
 	render(h) {
+		if (this.loading) {
+			return h('div', 'loading');
+		}
 		if (this.Form.visiableStatus) {
 			return this.renderFun(h, this.config, this.prop, this.currentValue);
 		}
