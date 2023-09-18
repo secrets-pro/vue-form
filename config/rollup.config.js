@@ -25,7 +25,7 @@ let baseconfig = format => {
 				exclude: "node_modules/**" // 只编译我们的源代码
 			}),
 			vueplugin({ css: true }), //
-			// terser()
+			terser()
 		]
 	};
 };
