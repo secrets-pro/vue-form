@@ -242,8 +242,8 @@ export default {
 				{
 					class: "item-button"
 				},
-				[add, remove]
-				// index === 0 ? (length > 1 ? [add, remove] : [add]) : [remove]
+				// [add, remove]
+				length > 1 ? [add, remove] : [add]
 			);
 		},
 		clearValues(orginal) {

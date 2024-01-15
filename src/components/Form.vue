@@ -667,7 +667,9 @@ export default {
 						defa[`${prop}-option`] = selectedIndex;
 						set(model, prop, defa || {});
 					} else {
-						defaultValue[`${prop}-option`] = selectedIndex;
+						if(defaultValue){
+							defaultValue[`${prop}-option`] = selectedIndex;
+						}
 						set(model, prop, defaultValue || {});
 					}
 				} else if (
