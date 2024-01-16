@@ -32,7 +32,7 @@ export default {
 	},
 	data() {
 		return {
-			loading: false,
+			// loading: false,
 			enRes: getEnResource(),
 			currentValue: this.value,
 			requests: {}
@@ -722,7 +722,7 @@ export default {
 		async init(flag) {
  			let extra = extraOptions(this.config.description);
 			if (extra.url) {
-				this.loading = true;
+				// this.loading = true;
 
 				let url = formatUrl(extra.url, {
 					...(this.$route ? this.$route.params : {})
@@ -733,7 +733,7 @@ export default {
 				} else {
 					try {
 						let res = await this.Form.request(url);
-
+						// console.log('====res====',res)
 						if (res && res.data) {
 							data = res.data;
 							window.sessionStorage.setItem(url, JSON.stringify(data));
@@ -742,12 +742,14 @@ export default {
 						console.error(error);
 					}
 				}
+				 
+				// console.log('==data==',data)
 				let __enum__ = data ? data.map(el => el[extra.return]) : [];
 				let __enumNames__ = data ? data.map(el => el[extra.show]) : [];
 				let muti = extra.multiple === "true";
 				let __current_value__ = this.currentValue;
 				// 展示不存在的值
-				if (muti) {
+				if (muti && __enum__.length) {
 					// __current_value__.forEach(el => {
 					//   if (el && !__enum__.includes(el)) {
 					//     __enum__.push(el);
@@ -789,9 +791,9 @@ export default {
  		await this.init();
 	},
 	render(h) {
-		if (this.loading) {
-			return h('div', 'loading');
-		}
+		// if (this.loading) {
+		// 	return h('div', 'loading');
+		// }
 		if (this.Form.visiableStatus) {
 			return this.renderFun(h, this.config, this.prop, this.currentValue);
 		}
