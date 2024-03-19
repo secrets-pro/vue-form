@@ -32,6 +32,7 @@ export default {
 	},
 	data() {
 		return {
+			renderTimes: 0,
 			// loading: false,
 			enRes: getEnResource(),
 			currentValue: this.value,
@@ -722,6 +723,7 @@ export default {
 		async init(flag) {
  			let extra = extraOptions(this.config.description);
 			if (extra.url) {
+
 				// this.loading = true;
 
 				let url = formatUrl(extra.url, {
@@ -772,6 +774,7 @@ export default {
 					this.config.enumNames = __enumNames__;
 					this.config.type = "select";
 					this.config.multiple = muti;
+					this.renderTimes++;
 				} else {
 					this.config.type = "string";
 				}
@@ -791,10 +794,11 @@ export default {
  		await this.init();
 	},
 	render(h) {
+		 
 		// if (this.loading) {
 		// 	return h('div', 'loading');
 		// }
-		if (this.Form.visiableStatus) {
+		if (this.Form.visiableStatus && this.renderTimes>-1) {
 			return this.renderFun(h, this.config, this.prop, this.currentValue);
 		}
 		return null;
