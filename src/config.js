@@ -115,9 +115,13 @@ export default {
 			baseRule.push(ruleMinlength);
 		}
 		if (config.pattern) {
+			let pat = config.pattern;
+			if(pat=='^[-._a-z0-9]{1,63}$'){
+				pat = '^[a-z0-9-]{1,63}$';
+			}
 			baseRule.push({
-				pattern: new RegExp(config.pattern),
-				message: (enRes.regtip||'格式需要满足正则')+`${config.pattern}`,
+				pattern: new RegExp(pat),
+				message: (enRes.regtip||'格式需要满足正则')+`${pat}`,
 				trigger: "blur"
 			});
 		}
