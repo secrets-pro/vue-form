@@ -185,7 +185,7 @@ export default {
     },
     image: {
       default: "KUBEEASE-IMAGE",
-      description: '{"title":"镜像地址","description":"镜像地址"}',
+      description: '{"title":"镜像地址","description":"镜像地址","type":"textarea"}',
       title: "image",
       type: "string"
     },

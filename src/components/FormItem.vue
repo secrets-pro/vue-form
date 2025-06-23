@@ -562,7 +562,7 @@ export default {
         if (extra.title) {
           props.placeholder =  extra.placeholder || ( (this.enRes.input || "请输入") + extra.title);
         }
-        if (type === "textarea") {
+        if (type === "textarea" || extra.type === "textarea") {
           props.type = "textarea";
           // props.autosize = { minRows: 2, maxRows: 6 };
         }
