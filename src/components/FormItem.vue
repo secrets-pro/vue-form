@@ -564,6 +564,7 @@ export default {
         }
         if (type === "textarea" || extra.type === "textarea") {
           props.type = "textarea";
+          props.rows = extra.height||2;
           // props.autosize = { minRows: 2, maxRows: 6 };
         }
         type = "input";
