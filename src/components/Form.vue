@@ -17,18 +17,17 @@
         :description="enRes.basicSettingTip || '部署配置中必要的参数内容'"
       />
       <div class="card">
-        <template v-for="prop in propertiesSorted">
-          <form-item-plugin
-            :key="prop.name"
-            :labelWidth="labelWidth"
-            v-model="currentModel[prop.name]"
-            :config="prop"
-            :prop="prop.name"
-            @arrayInput="arrayInput"
-            @deepInput="deepInput"
-            @on-copy="copyed"
-          ></form-item-plugin>
-        </template>
+        <form-item-plugin
+          v-for="prop in propertiesSorted"
+          :key="prop.name"
+          :labelWidth="labelWidth"
+          v-model="currentModel[prop.name]"
+          :config="prop"
+          :prop="prop.name"
+          @arrayInput="arrayInput"
+          @deepInput="deepInput"
+          @on-copy="copyed"
+        ></form-item-plugin>
       </div>
       <div class="card" v-if="Object.keys(lastKeysProperties).length">
         <vue-form-title
@@ -36,23 +35,22 @@
           :title="enRes.highSetting || '高级配置'"
           :description="enRes.highSettingTip || '除必要参数之外额外设置的内容'"
         />
-        <template v-for="prop in settingcp">
-          <!-- {{ lastKeysProperties[prop] }} -->
-          <form-item-plugin
-            :key="prop"
-            :labelWidth="labelWidth"
-            v-model="currentModel[prop]"
-            :config="{
-              ...lastKeysProperties[prop],
-              required: true,
-            }"
-            :prop="prop"
-            @arrayInput="arrayInput"
-            @deepInput="deepInput"
-            @on-copy="copyed"
-            required
-          ></form-item-plugin>
-        </template>
+        <!-- {{ lastKeysProperties[prop] }} -->
+        <form-item-plugin
+          v-for="prop in settingcp"
+          :key="prop"
+          :labelWidth="labelWidth"
+          v-model="currentModel[prop]"
+          :config="{
+            ...lastKeysProperties[prop],
+            required: true,
+          }"
+          :prop="prop"
+          @arrayInput="arrayInput"
+          @deepInput="deepInput"
+          @on-copy="copyed"
+          required
+        ></form-item-plugin>
         <div v-if="!settings.length" style="padding: 12px">
           <div style="text-align: center">
             <slot name="text"> 没有可展示的配置项目，请点击设置按钮添加 </slot>
@@ -75,6 +73,7 @@ import difference from "lodash-es/difference";
 import debounce from "lodash-es/debounce";
 import omit from "lodash-es/omit";
 import merge from "lodash-es/merge";
+import { shallowClone, smartClone, performanceMonitor } from "../utils/performance";
 
 import FormItemPlugin from "./FormItem.vue";
 import setting, { optKey } from "../config";
@@ -172,10 +171,30 @@ export default {
   },
   created() {
     this.handleWatch = debounce(this.handleWatch, 1000);
+    const key = performanceMonitor.start("[vue-form] validateScheme");
     this.handleWatch();
+    if (key) {
+      this.$nextTick(() => {
+        performanceMonitor.end(key, { componentName: "vue-form" });
+      });
+    }
   },
   mounted() {
     this.$emit("on-mounted");
+    // 输出首次渲染性能报告
+    if (performanceMonitor.enabled) {
+      this.$nextTick(() => {
+        setTimeout(() => {
+          const stats = performanceMonitor.getComponentStats("vue-form");
+          if (stats) {
+            console.log("[vue-form] 首次渲染完成", {
+              耗时: `${stats.average}ms`,
+              字段数: this.propertiesSorted.length
+            });
+          }
+        }, 100);
+      });
+    }
   },
   computed: {
     defaultWidth() {
@@ -221,7 +240,8 @@ export default {
     model: {
       deep: true,
       handler(n, o) {
-        this.initModel = JSON.parse(JSON.stringify(n));
+        // 优化：使用智能拷贝，根据对象结构选择浅拷贝或深拷贝
+        this.initModel = smartClone(n);
         this.$emit("on-model-change");
         this.handleWatch();
       },
@@ -255,7 +275,7 @@ export default {
       lastKeysProperties: [],
       settings: [],
       required: [],
-      initModel: JSON.parse(JSON.stringify(this.model)),
+      initModel: smartClone(this.model),
       lastestNeedOneProps: [],
     };
   },
@@ -279,9 +299,9 @@ export default {
       };
     },
     setSortProperties() {
-      let properties = this.currentScheme.properties
-        ? JSON.parse(JSON.stringify(this.currentScheme.properties))
-        : {};
+      const key = performanceMonitor.start("[vue-form] setSortProperties");
+      // 优化：直接使用 properties，不需要深拷贝（因为后面会创建新对象）
+      let properties = this.currentScheme.properties || {};
       // 对最外层properties进行排序（position越小排前面）
       let required = this.currentScheme.required || [];
       let lastKeys = Object.keys(properties);
@@ -292,6 +312,7 @@ export default {
       //   lastKeys.sort((a, b) => properties[a].position - properties[b].position)
       // );
 
+      // 优化：使用展开运算符创建新对象，避免深拷贝
       let propertiesSorted = required.map((el) => ({
         name: el,
         ...properties[el],
@@ -317,16 +338,29 @@ export default {
 
       // 父子段为下拉选项，根据父子段的值渲染不同的子字段，同样需要对其子字段根据position排序
 
+      // 优化：使用浅拷贝替代深拷贝（因为对象结构简单）
       if (this.split) {
-        this.propertiesSorted = JSON.parse(JSON.stringify(propertiesSorted));
-        this.lastKeysProperties = JSON.parse(JSON.stringify(lastKeysProperties));
+        this.propertiesSorted = propertiesSorted.map(item => ({ ...item }));
+        this.lastKeysProperties = Object.keys(lastKeysProperties).reduce((acc, key) => {
+          acc[key] = { ...lastKeysProperties[key] };
+          return acc;
+        }, {});
       } else {
-        this.propertiesSorted = Object.assign(
-          {},
-          JSON.parse(JSON.stringify(propertiesSorted)),
-          JSON.parse(JSON.stringify(lastKeysProperties))
-        );
+        // 优化：合并时使用浅拷贝
+        this.propertiesSorted = [
+          ...propertiesSorted.map(item => ({ ...item })),
+          ...Object.keys(lastKeysProperties).map(key => ({ ...lastKeysProperties[key] }))
+        ];
         this.lastKeysProperties = {};
+      }
+      if (key) {
+        performanceMonitor.end(key, {
+          componentName: "vue-form",
+          data: {
+            propertiesSortedCount: this.propertiesSorted.length,
+            lastKeysPropertiesCount: Object.keys(this.lastKeysProperties).length
+          }
+        });
       }
     },
     // FIXME  优化
@@ -498,8 +532,15 @@ export default {
       return _value;
     },
     setModel(currentScheme, rules, parentProp, _defaultValue) {
+      // 只在顶层调用时监控性能
+      const isTopLevel = !parentProp;
+      const key = isTopLevel ? performanceMonitor.start("[vue-form] setModel") : null;
+      
       let { properties, required, description } = currentScheme;
       if (!properties) {
+        if (key) {
+          performanceMonitor.end(key, { componentName: "vue-form" });
+        }
         return {};
       }
       let model = {};
@@ -768,6 +809,19 @@ export default {
           [propTitles.join("、")]: lastestNeedOneProps,
         });
       }
+      
+      // 结束性能监控
+      if (key) {
+        performanceMonitor.end(key, {
+          componentName: "vue-form",
+          data: {
+            propertiesCount: props.length,
+            modelKeysCount: Object.keys(model).length,
+            depth: parentProp ? parentProp.split('.').length : 0
+          }
+        });
+      }
+      
       return model;
     },
     isEmpty(value) {
@@ -809,6 +863,7 @@ export default {
       if (!this.currentScheme) {
         throw new Error("请配置schema");
       }
+      const key = performanceMonitor.start("[vue-form] validateScheme");
       // 解析 shceme
       // let props = Object.keys(this.currentScheme.properties);
       // let model = {}; // 准备model
@@ -816,6 +871,15 @@ export default {
       // let cps = JSON.parse(JSON.stringify(this.currentScheme));
       let model = this.setModel(this.currentScheme, rules);
       this.currentModel = model;
+      if (key) {
+        performanceMonitor.end(key, {
+          componentName: "vue-form",
+          data: {
+            propertiesCount: Object.keys(this.currentScheme.properties || {}).length,
+            modelKeysCount: Object.keys(model).length
+          }
+        });
+      }
     },
   },
 };

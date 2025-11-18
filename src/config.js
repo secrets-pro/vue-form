@@ -6,24 +6,11 @@
  */
 
 import isObject from "lodash-es/isObject";
+import { cachedExtraOptions } from "./utils/performance";
 
+// 使用带缓存的 extraOptions
 function extraOptions(description) {
-	if (!description) {
-		return {};
-	}
-	if (isObject(description)) {
-		return description;
-	}
-	let rtn = {};
-	try {
-		rtn = JSON.parse(description);
-	} catch (error) {
-		console.error(error, description);
-		// 不是json
-		// rtn.title = description;
-		rtn.description = description;
-	}
-	return rtn;
+	return cachedExtraOptions(description);
 }
 function formatUrl(url, params) {
 	if (params) {

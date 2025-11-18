@@ -3,6 +3,7 @@
 import setting, { optKey } from "../config";
 import { renderSelectOptions, renderRadioCheckbox } from "./render";
 import difference from "lodash-es/difference";
+import { shallowClone, smartClone, performanceMonitor } from "../utils/performance";
 const {
   extraOptions,
   generateRule,
@@ -109,8 +110,8 @@ export default {
             },
             [
               ...modelKeysSorted.map((el) => {
-                let configWrapper = JSON.parse(JSON.stringify(config));
-                let __el__ = configWrapper.properties[el];
+                // 优化：避免深拷贝 config，直接使用（因为 config 是只读的）
+                let __el__ = config.properties[el];
                 return h("vue-form-item", {
                   props: {
                     prop: `${prop}.${el}`,
@@ -136,19 +137,15 @@ export default {
                     },
                     oneOfSelectChange: (key, value) => {
                       // oneof选项变化
-                      if (configWrapper.oneOf) {
+                      if (config.oneOf) {
                         if (value > -1) {
-                          model = JSON.parse(
-                            JSON.stringify(configWrapper.oneOf[value].defaultModel)
-                          );
+                          // 优化：使用智能拷贝
+                          model = smartClone(config.oneOf[value].defaultModel);
                         } else {
                           model = {};
                         }
                         model[el] = value;
                         this.currentValue = model;
-
-                        configWrapper.selectedIndex = value;
-                        configWrapper.type = "object";
 
                         const keys = key.split(".");
                         this.$emit(
@@ -193,15 +190,17 @@ export default {
                 return;
               }
               const modelWrapper = model[0] || item;
+              // 优化：使用智能拷贝
               let zore =
                 type(modelWrapper) === "object"
-                  ? JSON.parse(JSON.stringify(modelWrapper))
+                  ? smartClone(modelWrapper)
                   : modelWrapper;
               // 清空数据，解决添加会带上一项数据的问题
               zore = this.clearValues(zore);
               let _t = type(zore);
               if (_t === "object") {
-                model.push(JSON.parse(JSON.stringify(zore)));
+                // 优化：使用智能拷贝
+                model.push(smartClone(zore));
               } else if (_t === "string" || _t === "number") {
                 model.push("");
               }
@@ -421,6 +420,10 @@ export default {
         console.log(`没有参数`, config, prop);
         return;
       }
+      // 只在顶层渲染时监控性能（避免递归调用时重复监控）
+      const isTopLevel = _arrayIndex === undefined && !slot;
+      const key = isTopLevel ? performanceMonitor.start(`[vue-form-item] renderFun-${prop}`) : null;
+      
       let type = config.type;
 
       let extra = extraOptions(config.description);
@@ -646,7 +649,7 @@ export default {
         rules = void 0;
       }
 
-      return h(
+      const result = h(
         `${this.prefix}-form-item`,
         {
           class: ["vue-form-item", ...uiClass],
@@ -661,6 +664,16 @@ export default {
         },
         arr
       );
+      
+      // 结束性能监控
+      if (key) {
+        performanceMonitor.end(key, {
+          componentName: "vue-form-item",
+          data: { prop, type, hasChildren: type === "object" || type === "array" }
+        });
+      }
+      
+      return result;
     },
     // 修改成render
     renderLabel(title, description, slot) {
@@ -779,17 +792,33 @@ export default {
     },
   },
   async created() {
+    const key = performanceMonitor.start(`[vue-form-item] init-${this.prop}`);
     await this.init(1);
+    if (key) {
+      performanceMonitor.end(key, {
+        componentName: "vue-form-item",
+        data: { prop: this.prop, type: this.config.type }
+      });
+    }
   },
-  async beforeUpdate() {
-    await this.init();
-  },
+  // 优化：移除 beforeUpdate 中的异步操作，避免影响渲染性能
+  // async beforeUpdate() {
+  //   await this.init();
+  // },
   render(h) {
     // if (this.loading) {
     // 	return h('div', 'loading');
     // }
     if (this.Form.visiableStatus && this.renderTimes > -1) {
-      return this.renderFun(h, this.config, this.prop, this.currentValue);
+      const key = performanceMonitor.start(`[vue-form-item] render-${this.prop}`);
+      const result = this.renderFun(h, this.config, this.prop, this.currentValue);
+      if (key) {
+        performanceMonitor.end(key, {
+          componentName: "vue-form-item",
+          data: { prop: this.prop, type: this.config.type }
+        });
+      }
+      return result;
     }
     return null;
   },
