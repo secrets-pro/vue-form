@@ -5,6 +5,52 @@
 		min-width: 0;
 	}
 }
+
+// 优化主要分组（对象类型）的样式
+.item-object {
+	margin-bottom: 24px;
+	
+	// 分组标题样式（默认样式，会被 top-level-group 和 nested-group 覆盖）
+	> .ivu-form-item-label,
+	> .el-form-item__label {
+		font-size: 16px;
+		font-weight: 600;
+		color: #262626;
+		margin-bottom: 16px;
+		padding-bottom: 12px;
+		border-bottom: 2px solid #e8e8e8;
+		width: 100% !important;
+		display: block !important;
+		text-align: left !important;
+		float: none !important;
+	}
+	
+	// 分组内容区域
+	> .flex-object,
+	> .has-title-object-content {
+		margin-top: 0;
+		padding-top: 0;
+	}
+	
+	// 嵌套对象的分组样式
+	.flex-object > .item-object {
+		background: #fafafa;
+		border-radius: 6px;
+		padding: 16px;
+		margin-bottom: 16px;
+		border: 1px solid #f0f0f0;
+		
+		> .ivu-form-item-label,
+		> .el-form-item__label {
+			font-size: 14px;
+			font-weight: 500;
+			color: #595959;
+			margin-bottom: 12px;
+			padding-bottom: 8px;
+			border-bottom: 1px solid #e8e8e8;
+		}
+	}
+}
 .item-button {
 	display: flex;
 	flex-direction: column;
@@ -22,45 +68,79 @@
 }
 
 .form-item-array-content {
+	// margin-top: 8px;
 
 	.flex-array-wrapper {
 		display: flex;
+		margin-bottom: 12px;
+		
+		&:last-child {
+			margin-bottom: 0;
+		}
 	}
 	.flex-array {
-		border: 1px solid #efefef;
-		border-radius: 4px;
-		padding: 8px 4px;
-		margin-bottom: 8px;
-		// box-shadow: 0 4px 8px 0 rgba(36, 46, 66, 0.06);
+		border: 1px solid #e8e8e8;
+		border-radius: 6px;
+		padding: 12px;
+		margin-bottom: 12px;
+		background: #fafafa;
 		margin-right: 8px;
 		flex: 1;
+		transition: all 0.2s;
+		
+		&:hover {
+			border-color: #d9d9d9;
+			background: #fff;
+		}
 		& > .item-object > .flex-object > .item-object > .flex-object {
-			// border: 1px solid #efefef;
 			border-radius: 4px;
-			padding: 8px 4px;
-			margin-bottom: 8px;
-			// width: calc(100% - 40px);
-			// width: calc(100% - 160px); // 120 _ 40
-			width: 100%; // 120 _ 40
+			padding: 12px;
+			margin-bottom: 12px;
+			width: 100%;
+			background: #fff;
 		}
 
 		& > .item-object > .flex-object > .item-object > .has-title-object-content {
-			width: calc(100% - 160px); // 120 _ 40
-			border: 1px solid #efefef;
+			width: calc(100% - 160px);
+			border: 1px solid #e8e8e8;
+			border-radius: 4px;
+			padding: 12px;
+			background: #fff;
 		}
 	}
 }
 .vue-form-item {
+	margin-bottom: 18px;
+	
 	input[readonly="readonly"] {
 		border: none;
+	}
+	
+	// 优化表单项标签样式
+	.ivu-form-item-label,
+	.el-form-item__label {
+		font-weight: 500;
+		color: #595959;
+		padding-right: 12px;
+	}
+	
+	// 优化表单项内容区域
+	.ivu-form-item-content,
+	.el-form-item__content {
+		line-height: 32px;
 	}
 }
 .flex-object {
 	display: flex;
 	flex-wrap: wrap;
+	gap: 16px;
+	
+	.vue-form-item {
+		margin-bottom: 18px;
+	}
 }
 .vue-form-item.maxWidth33 {
-	width: 33.33%;
+	width: 31.2%;
 }
 .item-object.maxWidth33 {
 	width: 100%;
@@ -123,7 +203,8 @@
 	}
 	& > .form-item-array-content {
 		margin: 0 !important;
-		display: inline-grid
+		display: inline-grid;
+		width: 100%;
 	}
 }
 .flex-object-item-string + .form-item-array {
@@ -157,4 +238,60 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
+}
+
+// 顶级分组样式
+.item-object.top-level-group {
+	background: #fff;
+	border-radius: 8px;
+	padding: 20px;
+	margin-bottom: 24px;
+	border: 1px solid #f0f0f0;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+	
+	> .group-title {
+		width: 100% !important;
+		display: block !important;
+		text-align: left !important;
+		float: none !important;
+		font-size: 16px;
+		font-weight: 600;
+		color: #262626;
+		margin-bottom: 20px;
+		padding-bottom: 12px;
+		border-bottom: 2px solid #e8e8e8;
+		padding-left: 0;
+		padding-right: 0;
+	}
+	
+	> .flex-object,
+	> .has-title-object-content {
+		margin-left: 0 !important;
+		padding-top: 0;
+	}
+}
+
+// 嵌套分组样式
+.item-object.nested-group {
+	margin-bottom: 20px;
+	
+	> .group-title {
+		font-size: 14px;
+		font-weight: 500;
+		color: #595959;
+		margin-bottom: 16px;
+		padding-bottom: 8px;
+		border-bottom: 1px solid #e8e8e8;
+	}
+}
+
+// 字段间距已在上面定义，这里不需要重复
+
+// 优化数组项间距
+.simple-div {
+	margin-bottom: 12px;
+	
+	&:last-child {
+		margin-bottom: 0;
+	}
 }

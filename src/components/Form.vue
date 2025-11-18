@@ -16,7 +16,7 @@
         :title="enRes.basicSetting || '基础设置'"
         :description="enRes.basicSettingTip || '部署配置中必要的参数内容'"
       />
-      <div class="card">
+      <div class="card form-card">
         <form-item-plugin
           v-for="prop in propertiesSorted"
           :key="prop.name"
@@ -29,7 +29,7 @@
           @on-copy="copyed"
         ></form-item-plugin>
       </div>
-      <div class="card" v-if="Object.keys(lastKeysProperties).length">
+      <div class="card form-card" v-if="Object.keys(lastKeysProperties).length">
         <vue-form-title
           v-if="split"
           :title="enRes.highSetting || '高级配置'"
@@ -962,8 +962,26 @@ export default {
     display: inline-block;
     font-size: 14px;
     font-weight: 400;
-
     color: #333;
+  }
+  
+  // 优化卡片布局
+  .form-card {
+    background: transparent;
+    padding: 0;
+    margin-bottom: 0;
+    border: none;
+    box-shadow: none;
+    
+    // 每个顶级分组（item-object.top-level-group）已经有自己的卡片样式
+    // 这里只需要确保分组之间有合适的间距
+    > .item-object.top-level-group {
+      margin-bottom: 24px;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
   }
 }
 </style>

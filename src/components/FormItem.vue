@@ -86,10 +86,16 @@ export default {
       let ext = extraOptions(config.description);
       let title = ext.title || config.title;
       let desc = ext.description; //|| config.description;
+      // 判断是否为顶级分组（没有父级路径）
+      const isTopLevelGroup = prop.indexOf(".") === -1;
+      
       return h(
         "div",
         {
-          class: ["item-object"],
+          class: [
+            "item-object",
+            isTopLevelGroup ? "top-level-group" : "nested-group"
+          ],
           style: {
             // display: "flex"
           },
@@ -102,9 +108,10 @@ export default {
                 {
                   class: [
                     this.prefix == "i" ? "ivu-form-item-label" : "el-form-item__label",
+                    "group-title"
                   ],
                   style: {
-                    width: this.labelWidth + "px",
+                    width: isTopLevelGroup ? "100%" : (this.labelWidth + "px"),
                   },
                 },
                 [this.renderLabel(title, desc)]
