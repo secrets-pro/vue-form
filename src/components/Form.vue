@@ -189,7 +189,7 @@ export default {
           if (stats) {
             console.log("[vue-form] 首次渲染完成", {
               耗时: `${stats.average}ms`,
-              字段数: this.propertiesSorted.length
+              字段数: this.propertiesSorted
             });
           }
         }, 100);
@@ -522,10 +522,12 @@ export default {
           }
         }
       }
+      // debugger;
       if (currentScheme.minItems > 1) {
+        // console.log("==minItems===", currentScheme.minItems);
         if (this.initinal) {
           for (let j = 0; j < currentScheme.minItems - 1; j++) {
-            _value.push(_value[0]);
+            _value.push(smartClone(_value[0]));
           }
         }
       }
