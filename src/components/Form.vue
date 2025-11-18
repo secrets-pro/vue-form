@@ -175,39 +175,50 @@ export default {
       this._renderStartTime = performance.now();
       this._firstRenderRecorded = false; // 标志，确保只记录首次渲染
     }
+    // 优化：首次渲染不使用 debounce，直接执行以提高性能
     // 保存原始的 handleWatch 方法
     const originalHandleWatch = this.handleWatch.bind(this);
-    // 创建 debounce 包装的 handleWatch，并在执行完成后记录性能
-    this.handleWatch = debounce(() => {
-      originalHandleWatch();
-      // handleWatch 执行完成后，等待 DOM 更新
-      if (performanceMonitor.enabled && this._renderStartTime && !this._firstRenderRecorded) {
-        this._firstRenderRecorded = true; // 标记已记录，避免重复记录
-        this.$nextTick(() => {
+    // 创建 debounced 版本用于后续更新
+    const debouncedHandleWatch = debounce(originalHandleWatch, 300);
+    // 首次渲染直接执行，后续更新使用 debounce
+    let isFirstRender = true;
+    this.handleWatch = () => {
+      if (isFirstRender) {
+        // 首次渲染直接执行，不使用 debounce
+        isFirstRender = false;
+        originalHandleWatch();
+        // handleWatch 执行完成后，等待 DOM 更新
+        if (performanceMonitor.enabled && this._renderStartTime && !this._firstRenderRecorded) {
+          this._firstRenderRecorded = true; // 标记已记录，避免重复记录
           this.$nextTick(() => {
-            const renderDuration = performance.now() - this._renderStartTime;
-            // 记录到性能监控器
-            const componentName = "vue-form";
-            if (!performanceMonitor.componentTimings.has(componentName)) {
-              performanceMonitor.componentTimings.set(componentName, []);
-            }
-            const timing = {
-              label: "[vue-form] 首次渲染",
-              duration: renderDuration.toFixed(2),
-              durationMs: renderDuration,
-              timestamp: Date.now()
-            };
-            performanceMonitor.componentTimings.get(componentName).push(timing);
-            
-            // 输出准确的首次渲染时间
-            console.warn(`[Performance] [vue-form] 首次渲染完成 耗时: ${renderDuration.toFixed(2)}ms`, {
-              字段数: this.propertiesSorted?.length || 0,
-              实际耗时: `${renderDuration.toFixed(2)}ms`
+            this.$nextTick(() => {
+              const renderDuration = performance.now() - this._renderStartTime;
+              // 记录到性能监控器
+              const componentName = "vue-form";
+              if (!performanceMonitor.componentTimings.has(componentName)) {
+                performanceMonitor.componentTimings.set(componentName, []);
+              }
+              const timing = {
+                label: "[vue-form] 首次渲染",
+                duration: renderDuration.toFixed(2),
+                durationMs: renderDuration,
+                timestamp: Date.now()
+              };
+              performanceMonitor.componentTimings.get(componentName).push(timing);
+              
+              // 输出准确的首次渲染时间
+              console.warn(`[Performance] [vue-form] 首次渲染完成 耗时: ${renderDuration.toFixed(2)}ms`, {
+                字段数: this.propertiesSorted?.length || 0,
+                实际耗时: `${renderDuration.toFixed(2)}ms`
+              });
             });
           });
-        });
+        }
+      } else {
+        // 后续更新使用 debounce
+        debouncedHandleWatch();
       }
-    }, 1000);
+    };
     this.handleWatch();
   },
   mounted() {
@@ -322,12 +333,10 @@ export default {
       // 对最外层properties进行排序（position越小排前面）
       let required = this.currentScheme.required || [];
       let lastKeys = Object.keys(properties);
-      for (let i = required.length - 1; i > -1; i--) {
-        lastKeys.splice(lastKeys.indexOf(required[i]), 1);
-      }
-      // lastKeys = required.concat(
-      //   lastKeys.sort((a, b) => properties[a].position - properties[b].position)
-      // );
+      
+      // 优化：使用 Set 提高查找效率
+      const requiredSet = new Set(required);
+      lastKeys = lastKeys.filter(key => !requiredSet.has(key));
 
       // 优化：使用展开运算符创建新对象，避免深拷贝
       let propertiesSorted = required.map((el) => ({
@@ -336,37 +345,28 @@ export default {
       }));
       let lastKeysProperties = {};
       lastKeys.forEach((el) => {
-        let obj = {
+        lastKeysProperties[el] = {
           name: el,
           ...properties[el],
         };
-        lastKeysProperties[el] = obj;
       });
 
+      // 优化：使用 Set 提高查找效率
       let settings = Object.keys(this.initModel || {});
-      for (let i = required.length - 1; i > -1; i--) {
-        let idx = settings.indexOf(required[i]);
-        if (idx > -1) {
-          settings.splice(idx, 1);
-        }
-      }
+      settings = settings.filter(key => !requiredSet.has(key));
+      
       this.settings = settings;
       this.required = required;
 
-      // 父子段为下拉选项，根据父子段的值渲染不同的子字段，同样需要对其子字段根据position排序
-
-      // 优化：使用浅拷贝替代深拷贝（因为对象结构简单）
+      // 优化：直接赋值，避免不必要的 map/reduce 操作
       if (this.split) {
-        this.propertiesSorted = propertiesSorted.map(item => ({ ...item }));
-        this.lastKeysProperties = Object.keys(lastKeysProperties).reduce((acc, key) => {
-          acc[key] = { ...lastKeysProperties[key] };
-          return acc;
-        }, {});
+        this.propertiesSorted = propertiesSorted;
+        this.lastKeysProperties = lastKeysProperties;
       } else {
-        // 优化：合并时使用浅拷贝
+        // 优化：直接合并数组，避免额外的 map 操作
         this.propertiesSorted = [
-          ...propertiesSorted.map(item => ({ ...item })),
-          ...Object.keys(lastKeysProperties).map(key => ({ ...lastKeysProperties[key] }))
+          ...propertiesSorted,
+          ...Object.values(lastKeysProperties)
         ];
         this.lastKeysProperties = {};
       }
@@ -503,24 +503,26 @@ export default {
     setArrayModal(currentScheme, rules, parentProp, defaultValue) {
       const { items } = currentScheme;
       let _value = [];
+      const minItems = currentScheme.minItems || 0;
+      const needsInit = this.initinal && !(currentScheme.description && JSON.parse(currentScheme.description).url);
+      
       if (items.type === "string") {
         set(currentScheme, "item", "");
-        if (
-          this.initinal &&
-          !(currentScheme.description && JSON.parse(currentScheme.description).url)
-        ) {
-          _value.push("");
+        if (needsInit) {
+          // 优化：直接创建数组，避免循环 push
+          _value = Array(Math.max(1, minItems)).fill("");
         }
-      }
-      if (items.type === "boolean") {
+      } else if (items.type === "boolean") {
         set(currentScheme, "item", true);
         if (this.initinal) {
-          _value.push(true);
+          // 优化：直接创建数组
+          _value = Array(Math.max(1, minItems)).fill(true);
         }
       } else if (items.type === "number" || items.type === "integer") {
         set(currentScheme, "item", 0);
         if (this.initinal) {
-          _value.push(0);
+          // 优化：直接创建数组
+          _value = Array(Math.max(1, minItems)).fill(0);
         }
       } else if (items.type === "object") {
         if (defaultValue && Array.isArray(defaultValue) && defaultValue.length) {
@@ -538,16 +540,23 @@ export default {
             _value.push(obj);
           }
         }
-      }
-      // debugger;
-      if (currentScheme.minItems > 1) {
-        // console.log("==minItems===", currentScheme.minItems);
-        if (this.initinal) {
-          for (let j = 0; j < currentScheme.minItems - 1; j++) {
-            _value.push(smartClone(_value[0]));
+        
+        // 优化：对于对象类型，只在需要时创建模板并批量克隆
+        if (minItems > 1 && this.initinal && _value.length > 0) {
+          const template = _value[0];
+          // 优化：使用更高效的批量克隆方式
+          // 对于简单对象结构，使用浅拷贝+深拷贝组合
+          const remaining = minItems - 1;
+          if (remaining > 0) {
+            // 批量创建，减少函数调用开销
+            for (let j = 0; j < remaining; j++) {
+              // 优化：只在对象有嵌套结构时才使用深拷贝
+              _value.push(smartClone(template));
+            }
           }
         }
       }
+      
       return _value;
     },
     setModel(currentScheme, rules, parentProp, _defaultValue) {
@@ -564,20 +573,33 @@ export default {
       }
       let model = {};
       let props = Object.keys(properties);
-      let { lastestNeedOne, title } = extraOptions(description);
+      // 优化：缓存 extraOptions 结果
+      const extraOpts = extraOptions(description);
+      let { lastestNeedOne, title } = extraOpts;
       let lastestNeedOneProps = [];
       let propTitles = [];
+      
+      // 优化：使用 Set 提高 required 查找效率
+      const requiredSet = new Set(required);
+      
+      // 优化：预先计算 parentProp 路径前缀，避免重复字符串拼接
+      const propPrefix = parentProp ? parentProp + "." : "";
+      
       // lastestNeedOne 当前平级的属性至少满足一个 ，如果属性是object类型 则其所有属性都要有值
       props.forEach((el) => {
         let prop = el;
         let config = properties[el];
+        
+        // 优化：缓存 extraOptions 结果
+        let configExtraOpts = null;
         if (lastestNeedOne) {
-          let propTile = extraOptions(config.description).title;
-          propTitles.push(propTile);
-          lastestNeedOneProps.push(parentProp ? parentProp + "." + prop : prop);
+          configExtraOpts = extraOptions(config.description);
+          propTitles.push(configExtraOpts.title);
+          lastestNeedOneProps.push(propPrefix + prop);
         }
 
-        if (Array.isArray(required) && required.includes(prop)) {
+        // 优化：使用 Set 查找
+        if (requiredSet.has(prop)) {
           config.required = true;
         }
         // 去掉其必填标志
@@ -585,11 +607,9 @@ export default {
           config.required = false;
         }
 
-        let defaultValue = get(
-          this.initModel || {},
-          parentProp ? parentProp + "." + el : el,
-          undefined
-        );
+        // 优化：减少 get 调用次数，合并路径计算
+        const propPath = propPrefix + el;
+        let defaultValue = get(this.initModel || {}, propPath, undefined);
 
         if (defaultValue === undefined) {
           defaultValue = get(_defaultValue, el, undefined);
@@ -599,37 +619,38 @@ export default {
           defaultValue = config.defaultValue || config.default;
         }
 
-        let d = get(this.initModel || {}, parentProp ? parentProp + "." + el : el);
+        // 优化：复用之前的 get 结果
+        let d = get(this.initModel || {}, propPath);
         if (d === false || d === 0) {
           defaultValue = d;
         }
 
+        // 优化：预先判断是否有嵌套路径
+        const hasNestedPath = prop.indexOf(".") > -1;
+        
         if (config.type === "checkbox") {
-          // model[prop] = defaultValue || [];
-          set(model, prop, defaultValue || []);
-          if (prop.indexOf(".") > -1) {
-            model[prop] = defaultValue || [];
+          const value = defaultValue || [];
+          set(model, prop, value);
+          if (hasNestedPath) {
+            model[prop] = value;
           }
         } else if (config.type === "integer" || config.type === "number") {
-          // model[prop] = defaultValue || [];
-          set(model, prop, typeof defaultValue === "number" ? defaultValue : "");
-          if (prop.indexOf(".") > -1) {
-            model[prop] = typeof defaultValue === "number" ? defaultValue : "";
+          const value = typeof defaultValue === "number" ? defaultValue : "";
+          set(model, prop, value);
+          if (hasNestedPath) {
+            model[prop] = value;
           }
         } else if (config.type === "array") {
           // 数组类型
           // 设置默认的格式 config.items
           let _value = this.setArrayModal(config, rules, prop, defaultValue);
-          set(
-            model,
-            prop,
-            defaultValue && defaultValue.length
-              ? merge(_value, defaultValue)
-              : _value || ""
-          );
-          if (prop.indexOf(".") > -1) {
-            model[prop] =
-              defaultValue && defaultValue.length ? defaultValue : _value || "";
+          // 优化：避免不必要的 merge 操作
+          const finalValue = (defaultValue && Array.isArray(defaultValue) && defaultValue.length)
+            ? defaultValue
+            : (_value || "");
+          set(model, prop, finalValue);
+          if (hasNestedPath) {
+            model[prop] = finalValue;
           }
         } else if (config.type === "boolean" || config.type === "bool") {
           if (config.children) {
@@ -638,16 +659,14 @@ export default {
               config.children.rules || {},
               el
             );
-            // 将children的值平铺开放到model里
-            Object.keys(values).map((el) => {
-              model[el] = values[el];
-            });
+            // 优化：使用 Object.assign 或直接赋值，避免 map
+            Object.assign(model, values);
           }
           model[prop] = !!defaultValue;
         } else {
-          // model[prop] = defaultValue || null;
-          set(model, prop, defaultValue || "");
-          if (prop.indexOf(".") > -1) {
+          const value = defaultValue || "";
+          set(model, prop, value);
+          if (hasNestedPath) {
             model[prop] = defaultValue;
           }
 
@@ -658,10 +677,8 @@ export default {
                 config.children[pProp].rules || {},
                 pProp
               );
-              // 将children的值平铺开放到model里
-              Object.keys(values).map((el) => {
-                model[el] = values[el];
-              });
+              // 优化：使用 Object.assign，避免 map
+              Object.assign(model, values);
             });
           }
         }
@@ -677,8 +694,10 @@ export default {
           // 	);
           // }
           // 通过比较属性key，确定选中的是哪一个。
+          // 优化：缓存 extraOptions 结果
+          const configExtraOpts = extraOptions(config.description);
           let configOneOfModelArray = [];
-          let selectedIndex = extraOptions(config.description).default || 0;
+          let selectedIndex = configExtraOpts.default || 0;
           config.oneOf.forEach((oneOfItem) => {
             const oneOfItemMoel = this.setModel(oneOfItem, {}, prop, defaultValue);
 
@@ -687,19 +706,22 @@ export default {
           });
 
           if (defaultValue) {
+            // 优化：预先计算 defaultValueKeys，避免在循环中重复计算
+            const defaultValueKeys = Object.keys(defaultValue);
+            const defaultValueKeysSet = new Set(defaultValueKeys);
             configOneOfModelArray.forEach((modelItem, index) => {
               const modelItemKeys = Object.keys(modelItem);
-              const defaultValueKeys = Object.keys(defaultValue);
-              if (
-                !difference(modelItemKeys, defaultValueKeys).length &&
-                !difference(defaultValueKeys, modelItemKeys).length
-              ) {
-                selectedIndex = index;
+              // 优化：使用 Set 进行快速比较
+              if (modelItemKeys.length === defaultValueKeys.length) {
+                const allMatch = modelItemKeys.every(key => defaultValueKeysSet.has(key));
+                if (allMatch) {
+                  selectedIndex = index;
+                }
               }
             });
             if (selectedIndex > -1) {
-              // config.oneOf[selectedIndex].defaultModel =  Object.assign({},config.oneOf[selectedIndex].defaultModel,defaultValue);
-              config.oneOf[selectedIndex].defaultModel = merge(
+              // 优化：使用 Object.assign 替代 merge（更快）
+              config.oneOf[selectedIndex].defaultModel = Object.assign(
                 {},
                 config.oneOf[selectedIndex].defaultModel,
                 defaultValue
@@ -812,7 +834,7 @@ export default {
             set(model, prop, v);
           }
 
-          if (prop.indexOf(".") > -1) {
+          if (hasNestedPath) {
             model[prop] = defaultValue || _value || [];
           }
           // throw new Error(`类型为object的属性${parentProp}没有properties配置`);

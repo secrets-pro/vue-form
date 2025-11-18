@@ -50,25 +50,39 @@ export default {
   methods: {
     renderObject(h, config, prop, model, slot) {
       // 渲染对象，根据字段的position进行排序，position越小排前面
+      // 优化：预先缓存 extraOptions 结果，避免在排序中重复调用
+      const properties = config.properties;
+      const extraOptsCache = new Map();
+      
+      // 优化：预先计算所有属性的 extraOptions，避免在排序中重复计算
+      Object.keys(properties).forEach(key => {
+        if (properties[key] && properties[key].description) {
+          extraOptsCache.set(key, extraOptions(properties[key].description));
+        }
+      });
+      
       let modelKeysSorted = Object.keys(model)
-        .filter((el) => Object.prototype.hasOwnProperty.call(config.properties, el))
+        .filter((el) => Object.prototype.hasOwnProperty.call(properties, el))
         .sort((a, b) => {
-          if (!config.properties[a]) {
+          if (!properties[a]) {
             console.error(`属性${a}在schema中不存在对应配置`);
             return -1;
           }
-          if (!config.properties[b]) {
+          if (!properties[b]) {
             console.error(`属性${b}在schema中不存在对应配置`);
             return -1;
           }
-          let pa = extraOptions(config.properties[a].description);
-          let pb = extraOptions(config.properties[b].description);
+          // 优化：使用缓存的 extraOptions
+          const pa = extraOptsCache.get(a) || {};
+          const pb = extraOptsCache.get(b) || {};
           if (a.includes(optKey)) {
             return -1;
           }
 
-          return pa.index - pb.index;
+          return (pa.index || 0) - (pb.index || 0);
         });
+      
+      // 优化：缓存 config 的 extraOptions
       let ext = extraOptions(config.description);
       let title = ext.title || config.title;
       let desc = ext.description; //|| config.description;
@@ -459,7 +473,8 @@ export default {
         });
       }
       if (config.oneOf) {
-        let ext = extraOptions(config.description);
+        // 优化：复用之前计算的 extra（已经在上面计算过了）
+        let ext = extra; // 复用上面已经计算的 extraOptions(config.description)
         let optionProp = prop;
         if (prop.includes(".")) {
           const props = prop.split(".");
@@ -472,14 +487,18 @@ export default {
             : config.selectedIndex;
         // 再算一次 以防没有塞到
         let selectedIndex = s;
+        
+        // 优化：使用 Set 进行快速比较，避免重复调用 difference
+        const currentValueKeys = Object.keys(currentValue);
+        const currentValueKeysSet = new Set(currentValueKeys);
         config.oneOf.forEach((modelItem, index) => {
           const modelItemKeys = Object.keys(modelItem.properties);
-          const defaultValueKeys = Object.keys(currentValue);
-          if (
-            !difference(modelItemKeys, defaultValueKeys).length &&
-            !difference(defaultValueKeys, modelItemKeys).length
-          ) {
-            selectedIndex = index;
+          // 优化：使用 Set 进行快速比较
+          if (modelItemKeys.length === currentValueKeys.length) {
+            const allMatch = modelItemKeys.every(key => currentValueKeysSet.has(key));
+            if (allMatch) {
+              selectedIndex = index;
+            }
           }
         });
 
