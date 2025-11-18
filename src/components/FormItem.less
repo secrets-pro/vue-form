@@ -8,7 +8,7 @@
 
 // 优化主要分组（对象类型）的样式
 .item-object {
-	margin-bottom: 24px;
+	margin-bottom: 8px;
 	
 	// 分组标题样式（默认样式，会被 top-level-group 和 nested-group 覆盖）
 	> .ivu-form-item-label,
@@ -18,7 +18,7 @@
 		color: #262626;
 		margin-bottom: 16px;
 		padding-bottom: 12px;
-		border-bottom: 2px solid #e8e8e8;
+		border-bottom: 1px solid #e8e8e8;
 		width: 100% !important;
 		display: block !important;
 		text-align: left !important;
@@ -36,7 +36,7 @@
 	.flex-object > .item-object {
 		background: #fafafa;
 		border-radius: 6px;
-		padding: 16px;
+		padding: 8px;
 		margin-bottom: 16px;
 		border: 1px solid #f0f0f0;
 		
@@ -101,7 +101,7 @@
 		}
 
 		& > .item-object > .flex-object > .item-object > .has-title-object-content {
-			width: calc(100% - 160px);
+			width: calc(100% - 40px);
 			border: 1px solid #e8e8e8;
 			border-radius: 4px;
 			padding: 12px;
@@ -244,8 +244,8 @@
 .item-object.top-level-group {
 	background: #fff;
 	border-radius: 8px;
-	padding: 20px;
-	margin-bottom: 24px;
+	padding: 0 8px;
+	margin-bottom: 8px;
 	border: 1px solid #f0f0f0;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 	
@@ -257,9 +257,9 @@
 		font-size: 16px;
 		font-weight: 600;
 		color: #262626;
-		margin-bottom: 20px;
+		margin-bottom: 12x;
 		padding-bottom: 12px;
-		border-bottom: 2px solid #e8e8e8;
+		border-bottom: 1px solid #e8e8e8;
 		padding-left: 0;
 		padding-right: 0;
 	}

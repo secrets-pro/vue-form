@@ -976,7 +976,7 @@ export default {
     // 每个顶级分组（item-object.top-level-group）已经有自己的卡片样式
     // 这里只需要确保分组之间有合适的间距
     > .item-object.top-level-group {
-      margin-bottom: 24px;
+      margin-bottom: 12px;
       
       &:last-child {
         margin-bottom: 0;
