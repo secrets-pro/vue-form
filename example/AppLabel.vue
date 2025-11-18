@@ -54,7 +54,7 @@ export default {
   },
   methods: {
     confirm(model) {
-      console.log(model);
+      // console.log(model);
     }
   }
 };

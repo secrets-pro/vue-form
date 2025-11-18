@@ -42,7 +42,7 @@ export default {
   },
   methods: {
     copy(vv) {
-      console.log(vv);
+      // console.log(vv);
     },
     setModal() {
       this.model = {
@@ -63,13 +63,13 @@ export default {
     },
     async getData() {
       this.$http("http://api.com/image/list", {}).then(res => {
-        console.log(res);
+        // console.log(res);
       });
       let data = await this.$refs.form.validate();
-      console.log(data);
+      // console.log(data);
       if (data) {
         let data1 = this.$refs.form.getData();
-        console.log(data1);
+        // console.log(data1);
       }
       // this.data1 = JSON.stringify(data, null, "\t");
     }

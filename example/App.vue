@@ -92,7 +92,7 @@ export default {
   },
   methods: {
     confirm(model) {
-      console.log(model);
+      // console.log(model);
     },
     getData() {
       this.$refs.form.validate().then(el => {

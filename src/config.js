@@ -103,7 +103,7 @@ export default {
 				message: `${text}${extOpt.title || config.title || parentTitle || prop}`
 			}
 		];
-		console.log(baseRule, config);
+		// console.log(baseRule, config);
 
 		// 更多校验规则
 		if (config.minLength || config.maxLength) {
