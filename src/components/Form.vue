@@ -331,7 +331,10 @@ export default {
       // 优化：直接使用 properties，不需要深拷贝（因为后面会创建新对象）
       let properties = this.currentScheme.properties || {};
       // 对最外层properties进行排序（position越小排前面）
-      let required = this.currentScheme.required || [];
+      // 确保 required 是数组格式，兼容 boolean 或其他类型
+      const required = Array.isArray(this.currentScheme.required) 
+        ? this.currentScheme.required 
+        : [];
       let lastKeys = Object.keys(properties);
       
       // 优化：使用 Set 提高查找效率
@@ -580,7 +583,9 @@ export default {
       let propTitles = [];
       
       // 优化：使用 Set 提高 required 查找效率
-      const requiredSet = new Set(required);
+      // 确保 required 是数组格式，兼容 boolean 或其他类型
+      const requiredArray = Array.isArray(required) ? required : [];
+      const requiredSet = new Set(requiredArray);
       
       // 优化：预先计算 parentProp 路径前缀，避免重复字符串拼接
       const propPrefix = parentProp ? parentProp + "." : "";

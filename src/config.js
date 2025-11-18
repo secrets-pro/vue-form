@@ -55,6 +55,10 @@ export default {
 		if (prop.includes(optKey)) {
 			return [];
 		}
+		// switch 类型字段无需设置验证规则
+		if (config.type === "switch") {
+			return [];
+		}
 		let required = !!config.required;
 		let ruleType = {
 			checkbox: "array",
@@ -84,7 +88,7 @@ export default {
 		}
 		let baseRule = [
 			{
-				required: required_ || required,
+				required: type=='boolean' ? false : required_ || required,
 				trigger: isSelect ? "change" : "blur",
 				type: type,
 				message: `${text}${extOpt.title || config.title || parentTitle || prop}`
