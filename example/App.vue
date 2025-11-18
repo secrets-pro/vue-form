@@ -17,7 +17,6 @@
       </div>
       <div class="right">
         <vue-form
-          readonly
           @on-confirm="confirm"
           :initinal="true"
           ref="form"

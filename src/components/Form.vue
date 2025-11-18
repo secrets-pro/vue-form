@@ -37,11 +37,15 @@
           :description="enRes.highSettingTip || '除必要参数之外额外设置的内容'"
         />
         <template v-for="prop in settingcp">
+          <!-- {{ lastKeysProperties[prop] }} -->
           <form-item-plugin
             :key="prop"
             :labelWidth="labelWidth"
             v-model="currentModel[prop]"
-            :config="lastKeysProperties[prop]"
+            :config="{
+              ...lastKeysProperties[prop],
+              required: true,
+            }"
             :prop="prop"
             @arrayInput="arrayInput"
             @deepInput="deepInput"

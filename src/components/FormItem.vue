@@ -289,6 +289,7 @@ export default {
                 let tmdel = Object.assign({}, item || {}, model[index]);
                 // this.$set(model, index, tmdel);
                 // model是当前构造出来的数组对象 el就是子项 如果el不是object类型
+                items.parentConfig = config;
                 return h(
                   "div",
                   {
@@ -325,6 +326,7 @@ export default {
                 );
               })
             : model.map((el, index) => {
+              items.parentConfig = config;
                 // model是当前构造出来的数组对象 el就是子项 如果el不是object类型
                 return h(
                   "div",

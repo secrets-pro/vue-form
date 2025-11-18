@@ -43,11 +43,11 @@ export default {
 		iView: false,
 		copy: false
 	},
-	setEnResource(en){
- 		enRes = en||{};
+	setEnResource(en) {
+		enRes = en || {};
 	},
-	getEnResource(){
- 		return enRes
+	getEnResource() {
+		return enRes
 	},
 	setSecretKeys(_) {
 		secretKeys = secretKeys.concat(_);
@@ -82,7 +82,7 @@ export default {
 		// if (config.type !== "array") {
 		let required_ = config.minLength || config.maxLength; //|| config.enum;
 		//  || config.pattern;
-		let text = config.enum || config.options ? enRes.select|| "请选择" : enRes.input||"请输入";
+		let text = config.enum || config.options ? enRes.select || "请选择" : enRes.input || "请输入";
 		// FXIME 如果是数组嵌套object的时候 prop--> a.0.b==>rule
 		let type = ruleType[config.type] || "string";
 		if (config.multiple) {
@@ -91,20 +91,25 @@ export default {
 		let extOpt = extraOptions(config.description);
 		let isSelect =
 			config.enum || config.type === "select" || type === "boolean";
+		let parentTitle;
+		if (config.parentConfig) {
+			parentTitle = extraOptions(config.parentConfig.description).title || config.parentConfig.title;
+		}
 		let baseRule = [
 			{
 				required: required_ || required,
 				trigger: isSelect ? "change" : "blur",
 				type: type,
-				message: `${text}${extOpt.title || config.title || prop}`
+				message: `${text}${extOpt.title || config.title || parentTitle || prop}`
 			}
 		];
+		console.log(baseRule, config);
 
 		// 更多校验规则
 		if (config.minLength || config.maxLength) {
 			let ruleMinlength = {
 				min: config.minLength || 1,
-				message: (enRes.minLength||"长度至少")+ (config.minLength || 1),
+				message: (enRes.minLength || "长度至少") + (config.minLength || 1),
 				trigger: "blur"
 			};
 			if (config.maxlength) {
@@ -116,12 +121,12 @@ export default {
 		}
 		if (config.pattern) {
 			let pat = config.pattern;
-			if(pat=='^[-._a-z0-9]{1,63}$'){
+			if (pat == '^[-._a-z0-9]{1,63}$') {
 				pat = '^[a-z0-9-]{1,63}$';
 			}
 			baseRule.push({
 				pattern: new RegExp(pat),
-				message: (enRes.regtip||'格式需要满足正则')+`${pat}`,
+				message: (enRes.regtip || '格式需要满足正则') + `${pat}`,
 				trigger: "blur"
 			});
 		}
