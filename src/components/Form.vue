@@ -170,31 +170,48 @@ export default {
     this.$emit("on-create");
   },
   created() {
-    this.handleWatch = debounce(this.handleWatch, 1000);
-    const key = performanceMonitor.start("[vue-form] validateScheme");
-    this.handleWatch();
-    if (key) {
-      this.$nextTick(() => {
-        performanceMonitor.end(key, { componentName: "vue-form" });
-      });
+    // 开始测量组件创建到首次渲染完成的时间
+    if (performanceMonitor.enabled) {
+      this._renderStartTime = performance.now();
+      this._firstRenderRecorded = false; // 标志，确保只记录首次渲染
     }
+    // 保存原始的 handleWatch 方法
+    const originalHandleWatch = this.handleWatch.bind(this);
+    // 创建 debounce 包装的 handleWatch，并在执行完成后记录性能
+    this.handleWatch = debounce(() => {
+      originalHandleWatch();
+      // handleWatch 执行完成后，等待 DOM 更新
+      if (performanceMonitor.enabled && this._renderStartTime && !this._firstRenderRecorded) {
+        this._firstRenderRecorded = true; // 标记已记录，避免重复记录
+        this.$nextTick(() => {
+          this.$nextTick(() => {
+            const renderDuration = performance.now() - this._renderStartTime;
+            // 记录到性能监控器
+            const componentName = "vue-form";
+            if (!performanceMonitor.componentTimings.has(componentName)) {
+              performanceMonitor.componentTimings.set(componentName, []);
+            }
+            const timing = {
+              label: "[vue-form] 首次渲染",
+              duration: renderDuration.toFixed(2),
+              durationMs: renderDuration,
+              timestamp: Date.now()
+            };
+            performanceMonitor.componentTimings.get(componentName).push(timing);
+            
+            // 输出准确的首次渲染时间
+            console.warn(`[Performance] [vue-form] 首次渲染完成 耗时: ${renderDuration.toFixed(2)}ms`, {
+              字段数: this.propertiesSorted?.length || 0,
+              实际耗时: `${renderDuration.toFixed(2)}ms`
+            });
+          });
+        });
+      }
+    }, 1000);
+    this.handleWatch();
   },
   mounted() {
     this.$emit("on-mounted");
-    // 输出首次渲染性能报告
-    if (performanceMonitor.enabled) {
-      this.$nextTick(() => {
-        setTimeout(() => {
-          const stats = performanceMonitor.getComponentStats("vue-form");
-          if (stats) {
-            console.log("[vue-form] 首次渲染完成", {
-              耗时: `${stats.average}ms`,
-              字段数: this.propertiesSorted
-            });
-          }
-        }, 100);
-      });
-    }
   },
   computed: {
     defaultWidth() {
