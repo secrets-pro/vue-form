@@ -4,6 +4,7 @@
 export default {
   type: "object",
   required: [
+    "arrdemo",
     "userInfo",
     "companyInfo",
     "productConfig",
@@ -12,6 +13,15 @@ export default {
     "shippingAddress"
   ],
   properties: {
+    arrdemo: {
+      type: "array",
+      title: "标签",
+      items: {
+        type: "string"
+      },
+      minItems: 1,
+      maxLength: 10
+    },
     // ========== 用户信息部分 ==========
     userInfo: {
       type: "object",
