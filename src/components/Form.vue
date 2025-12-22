@@ -1,57 +1,27 @@
 <template>
   <div v-if="Object.keys(currentModel).length" class="vue-form" v-show="show">
-    <component
-      :is="`${this.prefix}-form`"
-      size="medium"
-      :class="`vue-form ${this.trait ? 'trait' : ''}`"
-      :model="currentModel"
-      :ref="formId"
-      :label-width="
-        (this.prefix === 'el' ? schema.labelWidth + 'px' : schema.labelWidth) ||
+    <component :is="`${this.prefix}-form`" size="medium" :class="`vue-form ${this.trait ? 'trait' : ''}`"
+      :model="currentModel" :ref="formId" :label-width="(this.prefix === 'el' ? schema.labelWidth + 'px' : schema.labelWidth) ||
         this.defaultWidth
-      "
-    >
-      <vue-form-title
-        v-if="split && propertiesSorted.length"
-        :title="enRes.basicSetting || '基础设置'"
-        :description="enRes.basicSettingTip || '部署配置中必要的参数内容'"
-      />
+        ">
+      <vue-form-title v-if="split && propertiesSorted.length" :title="enRes.basicSetting || '基础设置'"
+        :description="enRes.basicSettingTip || '部署配置中必要的参数内容'" />
       <div class="card">
         <template v-for="prop in propertiesSorted">
-          <form-item-plugin
-            :key="prop.name"
-            :labelWidth="labelWidth"
-            v-model="currentModel[prop.name]"
-            :config="prop"
-            :prop="prop.name"
-            @arrayInput="arrayInput"
-            @deepInput="deepInput"
-            @on-copy="copyed"
-          ></form-item-plugin>
+          <form-item-plugin :key="prop.name" :labelWidth="labelWidth" v-model="currentModel[prop.name]" :config="prop"
+            :prop="prop.name" @arrayInput="arrayInput" @deepInput="deepInput" @on-copy="copyed"></form-item-plugin>
         </template>
       </div>
       <div class="card" v-if="Object.keys(lastKeysProperties).length">
-        <vue-form-title
-          v-if="split"
-          :title="enRes.highSetting || '高级配置'"
-          :description="enRes.highSettingTip || '除必要参数之外额外设置的内容'"
-        />
+        <vue-form-title v-if="split" :title="enRes.highSetting || '高级配置'"
+          :description="enRes.highSettingTip || '除必要参数之外额外设置的内容'" />
         <template v-for="prop in settingcp">
           <!-- {{ lastKeysProperties[prop] }} -->
-          <form-item-plugin
-            :key="prop"
-            :labelWidth="labelWidth"
-            v-model="currentModel[prop]"
-            :config="{
-              ...lastKeysProperties[prop],
-              required: true,
-            }"
-            :prop="prop"
-            @arrayInput="arrayInput"
-            @deepInput="deepInput"
-            @on-copy="copyed"
-            required
-          ></form-item-plugin>
+          <form-item-plugin :key="prop" :labelWidth="labelWidth" v-model="currentModel[prop]" :config="{
+            ...lastKeysProperties[prop],
+            required: true,
+          }" :prop="prop" @arrayInput="arrayInput" @deepInput="deepInput" @on-copy="copyed"
+            required></form-item-plugin>
         </template>
         <div v-if="!settings.length" style="padding: 12px">
           <div style="text-align: center">
@@ -137,7 +107,7 @@ export default {
     request: {
       type: Function,
       default() {
-        return () => {};
+        return () => { };
       },
     },
     trait: Boolean,
@@ -204,8 +174,8 @@ export default {
       return !this.schema.layout
         ? 1
         : Math.ceil(
-            Object.keys(this.currentModel).length / (24 / (this.schema.layout.span || 8))
-          );
+          Object.keys(this.currentModel).length / (24 / (this.schema.layout.span || 8))
+        );
     },
     prefix() {
       return !setting.options.iView ? "el" : "i";
@@ -518,7 +488,12 @@ export default {
         }
 
         if (Array.isArray(required) && required.includes(prop)) {
-          config.required = true;
+          if (Array.isArray(config.required)) {
+
+          } else {
+            config.required = true;
+          }
+
         }
         // 去掉其必填标志
         if (lastestNeedOne) {
@@ -826,28 +801,36 @@ export default {
   .ivu-form-item-label {
     word-break: break-all;
   }
-  .ivu-btn + .ivu-btn {
+
+  .ivu-btn+.ivu-btn {
     margin-left: 10px;
   }
+
   .el-form-item__content {
+
     .el-select,
     .el-input-number {
       width: 100%;
     }
   }
+
   .el-form-item__label {
     word-break: break-all;
   }
+
   .ivu-form-item-content {
+
     .ivu-select,
     .ivu-input-number {
       width: 100%;
     }
   }
-  .ivu-btn > .ivu-icon {
+
+  .ivu-btn>.ivu-icon {
     line-height: 1;
     vertical-align: unset;
   }
+
   .vue-form-title {
     display: inline-block;
     font-size: 14px;
