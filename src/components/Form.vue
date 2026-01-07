@@ -75,6 +75,7 @@ let Title = {
             effect="dark"
             placement="top"
             max-width="200"
+            transfer
             content={this.description}
           >
             <ButtonTag
