@@ -60,6 +60,10 @@ export default {
             console.error(`属性${b}在schema中不存在对应配置`);
             return -1;
           }
+          if(Object.prototype.hasOwnProperty.call(config.properties[a], 'position') && Object.prototype.hasOwnProperty.call(config.properties[b], 'position')){
+            return config.properties[a].position - config.properties[b].position;
+          }
+           
           let pa = extraOptions(config.properties[a].description);
           let pb = extraOptions(config.properties[b].description);
           if (a.includes(optKey)) {
@@ -68,6 +72,7 @@ export default {
 
           return pa.index - pb.index;
         });
+        // debugger;
       let ext = extraOptions(config.description);
       let title = ext.title || config.title;
       let desc = ext.description; //|| config.description;
@@ -86,13 +91,13 @@ export default {
                 "div",
                 {
                   class: [
-                    this.prefix == "i" ? "ivu-form-item-label" : "el-form-item__label",
+                    // this.prefix == "i" ? "ivu-form-item-label" : "el-form-item__label",
                   ],
                   style: {
-                    width: this.labelWidth + "px",
+                    // width: this.labelWidth + "px",
                   },
                 },
-                [this.renderLabel(title, desc)]
+                // [this.renderLabel(title, desc)]
               ),
           h(
             "div",
